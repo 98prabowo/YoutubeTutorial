@@ -7,12 +7,29 @@
 
 import UIKit
 
-class HomeController: UIViewController {
+internal final class HomeController: UIViewController {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
+    
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel(frame: CGRectMake(0, 0, view.frame.width - 32, view.frame.height))
+        label.text = "Home"
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 20)
+        return label
+    }()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
+    }
     
     override internal func viewDidLoad() {
         super.viewDidLoad()
@@ -25,13 +42,13 @@ class HomeController: UIViewController {
     }
     
     private func setupNavigationBar() {
-        navigationItem.title = "home"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
     }
     
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.backgroundColor = .red
+        collectionView.backgroundColor = .white
         collectionView.register(forCell: VideoCell.self)
     }
 }
@@ -47,59 +64,13 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, 
     }
 
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSizeMake(view.frame.width, 200)
+        let inset: CGFloat = 16
+        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16) // Video pixel aspect ratio w: 19 h: 6
+        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
+        return CGSizeMake(view.frame.width, cellHeight)
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 0
-    }
-}
-
-internal final class VideoCell: UICollectionViewCell {
-    override internal init(frame: CGRect) {
-        super.init(frame: frame)
-        setupCell()
-    }
-    
-    private let thumbnailImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .systemBlue
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
-    
-    private let separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .black
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    internal func setupCell() {
-        backgroundColor = .white
-        addView(thumbnailImage, padding: UIEdgeInsets(inset: 16))
-//        addView(separatorView, size: CGSize(width: 0, height: 10))
-        addSubview(separatorView)
-        addConstraints(
-            NSLayoutConstraint.constraints(
-                withVisualFormat: "V:[v0(10)]|",
-                options: [],
-                metrics: nil,
-                views: ["v0": separatorView]
-            )
-        )
-        
-        addConstraints(
-            NSLayoutConstraint.constraints(
-                withVisualFormat: "H:|[v0]|",
-                options: [],
-                metrics: nil,
-                views: ["v0": separatorView]
-            )
-        )
-    }
-    
-    required internal init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

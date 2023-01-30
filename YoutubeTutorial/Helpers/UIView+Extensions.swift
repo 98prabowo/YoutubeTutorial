@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIView: Identifiable {
-    /// Add view to subview programmatically with constraints
+    /// Pin subview to it's superView programmatically with constraints
     ///
     /// - Parameters:
     ///   - view: A `UIView` to add as a subview.
@@ -16,7 +16,7 @@ extension UIView: Identifiable {
     ///   - size: Size value for view.
     ///   - options: Options describing the attribute and the direction of layout for all objects in the visual format string.
     ///   - metrics: A dictionary of constants that appear in the visual format string. The dictionary’s keys must be the string values used in the visual format string. Their values must be `NSNumber` objects..
-    internal func addView(
+    internal func pinSubview(
         _ view: UIView,
         padding: UIEdgeInsets = .zero,
         size: CGSize = .zero,
@@ -37,7 +37,7 @@ extension UIView: Identifiable {
         let bottomFormat: String = padding.bottom > 0 ? "-\(padding.bottom)-" : ""
         
         // Add constraint format
-        addConstraints(
+        NSLayoutConstraint.activate(
             NSLayoutConstraint.constraints(
                 withVisualFormat: "H:|\(leadingFormat)[v0\(widthFormat)]\(trailingFormat)|",
                 options: options,
@@ -46,7 +46,7 @@ extension UIView: Identifiable {
             )
         )
         
-        addConstraints(
+        NSLayoutConstraint.activate(
             NSLayoutConstraint.constraints(
                 withVisualFormat: "V:|\(topFormat)[v0\(heightFormat)]\(bottomFormat)|",
                 options: options,

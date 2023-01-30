@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D651874C2988891F00362A46 /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874B2988891F00362A46 /* VideoCell.swift */; };
+		D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874F29888A3600362A46 /* UIColor+Extensions.swift */; };
 		D682F74F298117530053A5FE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F74E298117530053A5FE /* AppDelegate.swift */; };
 		D682F751298117530053A5FE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F750298117530053A5FE /* SceneDelegate.swift */; };
 		D682F753298117530053A5FE /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F752298117530053A5FE /* HomeController.swift */; };
@@ -39,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D651874B2988891F00362A46 /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
+		D651874F29888A3600362A46 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		D682F74B298117530053A5FE /* YoutubeTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YoutubeTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D682F74E298117530053A5FE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D682F750298117530053A5FE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -82,6 +86,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D651874A298888C800362A46 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				D682F77E298128F60053A5FE /* UICollectionView+Extensions.swift */,
+				D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */,
+				D682F7822981295A0053A5FE /* UIView+Extensions.swift */,
+				D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */,
+				D651874F29888A3600362A46 /* UIColor+Extensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		D651874D2988893D00362A46 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D651874B2988891F00362A46 /* VideoCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D651874E2988896D00362A46 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D682F752298117530053A5FE /* HomeController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		D682F742298117530053A5FE = {
 			isa = PBXGroup;
 			children = (
@@ -105,16 +137,14 @@
 		D682F74D298117530053A5FE /* YoutubeTutorial */ = {
 			isa = PBXGroup;
 			children = (
+				D651874A298888C800362A46 /* Helpers */,
+				D651874D2988893D00362A46 /* Views */,
+				D651874E2988896D00362A46 /* Controllers */,
+				D682F75C298117540053A5FE /* Info.plist */,
 				D682F74E298117530053A5FE /* AppDelegate.swift */,
 				D682F750298117530053A5FE /* SceneDelegate.swift */,
-				D682F752298117530053A5FE /* HomeController.swift */,
 				D682F757298117540053A5FE /* Assets.xcassets */,
 				D682F759298117540053A5FE /* LaunchScreen.storyboard */,
-				D682F75C298117540053A5FE /* Info.plist */,
-				D682F77E298128F60053A5FE /* UICollectionView+Extensions.swift */,
-				D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */,
-				D682F7822981295A0053A5FE /* UIView+Extensions.swift */,
-				D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */,
 			);
 			path = YoutubeTutorial;
 			sourceTree = "<group>";
@@ -267,11 +297,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */,
+				D651874C2988891F00362A46 /* VideoCell.swift in Sources */,
 				D682F77F298128F60053A5FE /* UICollectionView+Extensions.swift in Sources */,
 				D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */,
 				D682F753298117530053A5FE /* HomeController.swift in Sources */,
 				D682F7812981291C0053A5FE /* Identifiable+Extensions.swift in Sources */,
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,
+				D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */,
 				D682F751298117530053A5FE /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -447,6 +479,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -476,6 +510,8 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
