@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIView: Identifiable {
-    /// Pin subview to it's superView programmatically with constraints
+    /// Pin subview to it's superView programmatically with constraints.
     ///
     /// - Parameters:
     ///   - view: A `UIView` to add as a subview.

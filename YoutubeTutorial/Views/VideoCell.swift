@@ -14,7 +14,6 @@ internal final class VideoCell: BaseCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "taylor_swift_blank_space")
         imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
         imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -31,7 +30,6 @@ internal final class VideoCell: BaseCell {
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "taylor_swift_profile")
         imageView.layer.cornerRadius = 22
         imageView.layer.masksToBounds = true
         imageView.setContentHuggingPriority(.required, for: .vertical)
@@ -45,7 +43,6 @@ internal final class VideoCell: BaseCell {
         label.font = .preferredFont(forTextStyle: .body)
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
-        label.text = "Taylor Swift - Blank Space"
         label.setContentHuggingPriority(.defaultLow, for: .vertical)
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .vertical)
@@ -60,11 +57,21 @@ internal final class VideoCell: BaseCell {
         label.textColor = .secondaryLabel
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
-        label.text = "TaylorSwiftVevo • 1,604,684,607 • 2 years ago"
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    // MARK: Properties
+    
+    internal var video: Video? {
+        didSet {
+            thumbnailImage.image = UIImage(named: video?.thumbnail ?? "")
+            profileImage.image = UIImage(named: video?.channel.profile ?? "")
+            title.text = video?.title
+            subtitle.text = video?.subtitle
+        }
+    }
     
     // MARK: Layouts
     
@@ -94,6 +101,8 @@ internal final class VideoCell: BaseCell {
     }
     
     override internal func setupViews() {
+        backgroundColor = .white
+        
         let rootView = setupStackLayout()
         contentView.addSubview(rootView)
         contentView.addSubview(separatorView)
@@ -116,11 +125,5 @@ internal final class VideoCell: BaseCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1)
         ])
-    }
-    
-    // MARK: Implementations
-    
-    internal func setupUI() {
-        backgroundColor = .white
     }
 }

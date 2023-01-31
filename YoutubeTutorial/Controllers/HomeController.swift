@@ -39,6 +39,8 @@ internal final class HomeController: UIViewController {
         .lightContent
     }
     
+    private let videos: [Video] = .mock
+    
     // MARK: LifeCycles
     
     override internal func viewDidLoad() {
@@ -77,7 +79,27 @@ internal final class HomeController: UIViewController {
     // MARK: Private Implementations
     
     private func setupNavigationBar() {
+        // Set left icon
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+        
+        // Set right icon
+        let searchBtn = UIBarButtonItem(
+            image: UIImage(systemName: "magnifyingglass"),
+            style: .plain,
+            target: self,
+            action: #selector(searchAction(_:))
+        )
+        searchBtn.tintColor = .white
+        
+        let moreBtn = UIBarButtonItem(
+            image: UIImage(systemName: "ellipsis.circle.fill"),
+            style: .plain,
+            target: self,
+            action: #selector(moreAction(_:))
+        )
+        moreBtn.tintColor = .white
+        
+        navigationItem.rightBarButtonItems = [moreBtn, searchBtn]
     }
     
     private func setupCollectionView() {
@@ -85,22 +107,32 @@ internal final class HomeController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(forCell: VideoCell.self)
     }
+    
+    @objc private func searchAction(_ sender: UIBarButtonItem) {
+        print("Search Tapped")
+    }
+    
+    @objc private func moreAction(_ sender: UIBarButtonItem) {
+        print("Option Tapped")
+    }
 }
 
 extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return videos.count
     }
 
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
         let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
-        cell.setupUI()
+        cell.video = video
         return cell
     }
 
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let inset: CGFloat = 16
-        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16) // Video pixel aspect ratio w: 16 h: 9
+        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
+        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16)
         let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
         return CGSizeMake(view.frame.width, cellHeight)
     }
