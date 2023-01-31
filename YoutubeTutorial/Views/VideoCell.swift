@@ -7,7 +7,7 @@
 
 import UIKit
 
-internal final class VideoCell: UICollectionViewCell {
+internal final class VideoCell: BaseCell {
     // MARK: UI Components
     
     private let thumbnailImage: UIImageView = {
@@ -60,23 +60,11 @@ internal final class VideoCell: UICollectionViewCell {
         label.textColor = .secondaryLabel
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
-        label.text = "TaylorSwiftVevo • TaylorSwiftVevo • 1,604,684,607 • 2 years ago"
+        label.text = "TaylorSwiftVevo • 1,604,684,607 • 2 years ago"
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    // MARK: Life Cycles
-    
-    override internal init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .white
-        setupUI()
-    }
-    
-    required internal init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: Layouts
     
@@ -105,10 +93,8 @@ internal final class VideoCell: UICollectionViewCell {
         return rootStack
     }
     
-    private func setupUI() {
-        
+    override internal func setupViews() {
         let rootView = setupStackLayout()
-        
         contentView.addSubview(rootView)
         contentView.addSubview(separatorView)
         
@@ -130,5 +116,11 @@ internal final class VideoCell: UICollectionViewCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1)
         ])
+    }
+    
+    // MARK: Implementations
+    
+    internal func setupUI() {
+        backgroundColor = .white
     }
 }

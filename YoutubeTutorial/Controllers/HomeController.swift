@@ -8,15 +8,16 @@
 import UIKit
 
 internal final class HomeController: UIViewController {
+    // MARK: UI Components
+    
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        return UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collection.backgroundColor = .white
+        collection.translatesAutoresizingMaskIntoConstraints = false
+        return collection
     }()
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
-    }
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: CGRectMake(0, 0, view.frame.width - 32, view.frame.height))
@@ -26,20 +27,54 @@ internal final class HomeController: UIViewController {
         return label
     }()
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setNeedsStatusBarAppearanceUpdate()
+    private let menuBar: MenuBar = {
+        let menu = MenuBar()
+        menu.translatesAutoresizingMaskIntoConstraints = false
+        return menu
+    }()
+    
+    // MARK: Properties
+    
+    override internal var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
     }
+    
+    // MARK: LifeCycles
     
     override internal func viewDidLoad() {
         super.viewDidLoad()
+        setupLayout()
         setupNavigationBar()
         setupCollectionView()
     }
     
-    override internal func loadView() {
-        view = collectionView
+    override internal func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
     }
+    
+    // MARK: Layouts
+    
+    private func setupLayout() {
+        view.addSubview(menuBar)
+        view.addSubview(collectionView)
+        
+        NSLayoutConstraint.activate([
+            menuBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            menuBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            menuBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            menuBar.heightAnchor.constraint(equalToConstant: 50)
+        ])
+        
+        NSLayoutConstraint.activate([
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.topAnchor.constraint(equalTo: menuBar.bottomAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    // MARK: Private Implementations
     
     private func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
@@ -48,7 +83,6 @@ internal final class HomeController: UIViewController {
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.backgroundColor = .white
         collectionView.register(forCell: VideoCell.self)
     }
 }
@@ -60,12 +94,13 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, 
 
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
+        cell.setupUI()
         return cell
     }
 
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let inset: CGFloat = 16
-        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16) // Video pixel aspect ratio w: 19 h: 6
+        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16) // Video pixel aspect ratio w: 16 h: 9
         let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
         return CGSizeMake(view.frame.width, cellHeight)
     }
