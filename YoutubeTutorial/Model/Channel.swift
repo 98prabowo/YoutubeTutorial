@@ -9,14 +9,21 @@ import Foundation
 
 internal struct Channel {
     internal let name: String
-    internal let profile: String
+    internal let profileImageName: String
+}
+
+extension Channel: Codable {
+    internal enum CodingKeys: String, CodingKey {
+        case name
+        case profileImageName = "profile_image_name"
+    }
 }
 
 extension Channel {
     internal static var mock: Channel {
         Channel(
             name: "TaylorSwiftVEVO",
-            profile: "taylor_swift_profile"
+            profileImageName: "taylor_swift_profile"
         )
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 25/01/23.
 //
 
+import Combine
 import UIKit
 
 internal final class HomeController: UIViewController {
@@ -13,6 +14,8 @@ internal final class HomeController: UIViewController {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -39,7 +42,9 @@ internal final class HomeController: UIViewController {
         .lightContent
     }
     
-    private let videos: [Video] = .mock
+    private var videos: [Video] = .mock
+    
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: LifeCycles
     
@@ -48,6 +53,7 @@ internal final class HomeController: UIViewController {
         setupLayout()
         setupNavigationBar()
         setupCollectionView()
+        fetchData()
     }
     
     override internal func viewWillAppear(_ animated: Bool) {
@@ -102,18 +108,36 @@ internal final class HomeController: UIViewController {
         navigationItem.rightBarButtonItems = [moreBtn, searchBtn]
     }
     
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(forCell: VideoCell.self)
-    }
-    
     @objc private func searchAction(_ sender: UIBarButtonItem) {
         print("Search Tapped")
     }
     
     @objc private func moreAction(_ sender: UIBarButtonItem) {
         print("Option Tapped")
+    }
+    
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(forCell: VideoCell.self)
+    }
+    
+    private func fetchData() {
+        APIManager.shared.readLocalFile([Video].self, forName: "home")
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                switch completion {
+                case let .failure(error):
+                    print("Home Data: \(error.localizedDescription)")
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] videos in
+                guard let self else { return }
+                self.videos = videos
+                self.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -125,7 +149,7 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, 
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
         let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
-        cell.video = video
+        cell.setupCell(video)
         return cell
     }
 
@@ -135,9 +159,5 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, 
         let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16)
         let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
         return CGSizeMake(view.frame.width, cellHeight)
-    }
-    
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
     }
 }

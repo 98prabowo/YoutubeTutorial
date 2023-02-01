@@ -1,13 +1,14 @@
 //
-//  VideoCell.swift
+//  VideoCellContent.swift
 //  YoutubeTutorial
 //
-//  Created by Dimas Prabowo on 31/01/23.
+//  Created by Dimas Prabowo on 01/02/23.
 //
 
+import Combine
 import UIKit
 
-internal final class VideoCell: BaseCell {
+internal final class VideoCellContent: UIView {
     // MARK: UI Components
     
     private let thumbnailImage: UIImageView = {
@@ -29,7 +30,7 @@ internal final class VideoCell: BaseCell {
     
     private let profileImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 22
         imageView.layer.masksToBounds = true
         imageView.setContentHuggingPriority(.required, for: .vertical)
@@ -64,13 +65,17 @@ internal final class VideoCell: BaseCell {
     
     // MARK: Properties
     
-    internal var video: Video? {
-        didSet {
-            thumbnailImage.image = UIImage(named: video?.thumbnail ?? "")
-            profileImage.image = UIImage(named: video?.channel.profile ?? "")
-            title.text = video?.title
-            subtitle.text = video?.subtitle
-        }
+    private var cancellables = Set<AnyCancellable>()
+    
+    // MARK: Life Cycles
+    
+    override internal init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required internal init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: Layouts
@@ -100,12 +105,12 @@ internal final class VideoCell: BaseCell {
         return rootStack
     }
     
-    override internal func setupViews() {
+    private func setupViews() {
         backgroundColor = .white
         
         let rootView = setupStackLayout()
-        contentView.addSubview(rootView)
-        contentView.addSubview(separatorView)
+        addSubview(rootView)
+        addSubview(separatorView)
         
         NSLayoutConstraint.activate([
             profileImage.widthAnchor.constraint(equalToConstant: 44),
@@ -113,17 +118,31 @@ internal final class VideoCell: BaseCell {
         ])
         
         NSLayoutConstraint.activate([
-            rootView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            rootView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            rootView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16)
+            rootView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            rootView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            rootView.topAnchor.constraint(equalTo: topAnchor, constant: 16)
         ])
         
         NSLayoutConstraint.activate([
-            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            separatorView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
             separatorView.topAnchor.constraint(equalTo: rootView.bottomAnchor, constant: 16),
-            separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1)
         ])
+    }
+    
+    // MARK: Implementations
+    
+    internal func setupCell(
+        title: String,
+        subtitle: String,
+        thumbnailImage: UIImage,
+        profileImage: UIImage
+    ) {
+        self.title.text = title
+        self.subtitle.text = subtitle
+        self.thumbnailImage.image = thumbnailImage
+        self.profileImage.image = profileImage
     }
 }
