@@ -21,9 +21,18 @@ internal final class MenuBar: UIView {
         return collection
     }()
     
+    private let horizontalView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     // MARK: Properties
     
     private let menus: [Menu] = Menu.allCases
+    
+    private var leadingConstraint: NSLayoutConstraint?
     
     // MARK: Lifecycles
     
@@ -31,6 +40,7 @@ internal final class MenuBar: UIView {
         super.init(frame: frame)
         setupLayout()
         setupCollectionView()
+        setupHorizontalView()
     }
     
     required internal init?(coder: NSCoder) {
@@ -54,6 +64,17 @@ internal final class MenuBar: UIView {
         let indexPath = IndexPath(item: 0, section: 0)
         collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
     }
+    
+    private func setupHorizontalView() {
+        addSubview(horizontalView)
+        leadingConstraint = horizontalView.leadingAnchor.constraint(equalTo: leadingAnchor)
+        leadingConstraint?.isActive = true
+        NSLayoutConstraint.activate([
+            horizontalView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            horizontalView.heightAnchor.constraint(equalToConstant: 4.0),
+            horizontalView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/4)
+        ])
+    }
 }
 
 extension MenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
@@ -70,5 +91,13 @@ extension MenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UIColle
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSizeMake(frame.width / 4, frame.height)
+    }
+    
+    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let x: CGFloat = CGFloat(indexPath.item) * frame.width / 4
+        leadingConstraint?.constant = x
+        UIView.animate(withDuration: 0.75, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseOut) {
+            self.layoutIfNeeded()
+        }
     }
 }
