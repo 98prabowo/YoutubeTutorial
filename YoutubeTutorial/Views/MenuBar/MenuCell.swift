@@ -47,7 +47,7 @@ internal final class MenuCell: BaseCell {
     
     // MARK: Implementations
     
-    internal func setupUI(icon: UIImage?) {
-        tabIcon.image = icon
+    internal func setupUI(menu: Menu) {
+        tabIcon.image = menu.icon
     }
 }

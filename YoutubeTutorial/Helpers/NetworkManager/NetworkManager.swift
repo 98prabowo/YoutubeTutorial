@@ -1,5 +1,5 @@
 //
-//  APIManager.swift
+//  NetworkManager.swift
 //  YoutubeTutorial
 //
 //  Created by Dimas Prabowo on 01/02/23.
@@ -8,35 +8,12 @@
 import Combine
 import UIKit
 
-internal enum APIError: Error {
-    case noURL
-    case dataNotFound
-    case decodeFail
-    case sessionError
-    case statusCodeError(Int)
-    
-    internal var localizedDescription: String {
-        switch self {
-        case .noURL:
-            return "Error - URL Not valid"
-        case .dataNotFound:
-            return "Error - Data not found or corrupt"
-        case .decodeFail:
-            return "Error - Fail to decode data"
-        case .sessionError:
-            return "Error - URL session return error"
-        case let .statusCodeError(statusCode):
-            return "Server error - \(statusCode)"
-        }
-    }
-}
-
-internal class APIManager {
-    internal static let shared = APIManager()
+internal class NetworkManager {
+    internal static let shared = NetworkManager()
     
     private init() {}
     
-    internal func readLocalFile<T: Decodable>(_ type: T.Type, forName name: String) -> Future<T, APIError>  {
+    internal func readLocalFile<T: Decodable>(_ type: T.Type, forName name: String) -> Future<T, NetworkError>  {
         Future { promise in
             do {
                 guard let bundlePath = Bundle.main.path(forResource: name, ofType: "json"),
@@ -49,7 +26,7 @@ internal class APIManager {
         }
     }
     
-    internal func readURLJSON<T: Decodable>(_ type: T.Type, from urlString: String) -> Future<T, APIError> {
+    internal func readURLJSON<T: Decodable>(_ type: T.Type, from urlString: String) -> Future<T, NetworkError> {
         Future { promise in
             guard let url = URL(string: urlString) else { return promise(.failure(.noURL)) }
             let session = URLSession(configuration: .default)
@@ -75,7 +52,7 @@ internal class APIManager {
         }
     }
     
-    internal func getImageURL(from urlString: String) -> Future<UIImage, APIError> {
+    internal func getImageURL(from urlString: String) -> Future<UIImage, NetworkError> {
         Future { promise in
             guard let url = URL(string: urlString) else { return promise(.failure(.noURL)) }
             let session = URLSession(configuration: .default)
@@ -97,11 +74,5 @@ internal class APIManager {
                 return promise(.success(image))
             }.resume()
         }
-    }
-}
-
-extension HTTPURLResponse {
-    internal func isResponseOK() -> Bool {
-        return (200...299).contains(self.statusCode)
     }
 }

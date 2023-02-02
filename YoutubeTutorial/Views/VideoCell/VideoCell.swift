@@ -40,8 +40,8 @@ internal final class VideoCell: BaseCell {
     
     internal func setupCell(_ video: Video) {
         Publishers.Zip(
-            APIManager.shared.getImageURL(from: video.thumbnailImageName),
-            APIManager.shared.getImageURL(from: video.channel.profileImageName)
+            NetworkManager.shared.getImageURL(from: video.thumbnailImageName),
+            NetworkManager.shared.getImageURL(from: video.channel.profileImageName)
         )
         .receive(on: DispatchQueue.main)
         .sink { completion in

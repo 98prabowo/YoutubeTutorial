@@ -39,7 +39,7 @@ internal final class SettingView: UIView {
         iconSize + verticalInset + verticalInset
     }
     
-    // MARK: Life Cycles
+    // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
         super.init(frame: frame)

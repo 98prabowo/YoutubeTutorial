@@ -22,6 +22,9 @@
 		D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D210298C0D82002BCF24 /* BarButtonSubscription.swift */; };
 		D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D212298C0F52002BCF24 /* BarButtonPublisher.swift */; };
 		D634D215298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D214298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift */; };
+		D634D218298C15ED002BCF24 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D217298C15ED002BCF24 /* NetworkError.swift */; };
+		D634D21A298C1608002BCF24 /* HTTPURLResponse+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */; };
+		D634D21C298C1666002BCF24 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D21B298C1666002BCF24 /* Menu.swift */; };
 		D635AE4629896143000B5659 /* MenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4529896143000B5659 /* MenuBar.swift */; };
 		D635AE4829896C30000B5659 /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4729896C30000B5659 /* MenuCell.swift */; };
 		D635AE4A29896C9C000B5659 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4929896C9C000B5659 /* BaseCell.swift */; };
@@ -47,7 +50,7 @@
 		D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F7822981295A0053A5FE /* UIView+Extensions.swift */; };
 		D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */; };
 		D6A8DC50298A353500DA16BD /* home.json in Resources */ = {isa = PBXBuildFile; fileRef = D6A8DC4F298A353500DA16BD /* home.json */; };
-		D6A8DC52298A356700DA16BD /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8DC51298A356700DA16BD /* APIManager.swift */; };
+		D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8DC51298A356700DA16BD /* NetworkManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +86,9 @@
 		D634D210298C0D82002BCF24 /* BarButtonSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonSubscription.swift; sourceTree = "<group>"; };
 		D634D212298C0F52002BCF24 /* BarButtonPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonPublisher.swift; sourceTree = "<group>"; };
 		D634D214298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonPublisherImplementations.swift; sourceTree = "<group>"; };
+		D634D217298C15ED002BCF24 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPURLResponse+Extensions.swift"; sourceTree = "<group>"; };
+		D634D21B298C1666002BCF24 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		D635AE4529896143000B5659 /* MenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBar.swift; sourceTree = "<group>"; };
 		D635AE4729896C30000B5659 /* MenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
 		D635AE4929896C9C000B5659 /* BaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
@@ -112,7 +118,7 @@
 		D682F7822981295A0053A5FE /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Extensions.swift"; sourceTree = "<group>"; };
 		D6A8DC4F298A353500DA16BD /* home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = home.json; sourceTree = "<group>"; };
-		D6A8DC51298A356700DA16BD /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
+		D6A8DC51298A356700DA16BD /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +175,7 @@
 				D651874F29888A3600362A46 /* UIColor+Extensions.swift */,
 				D635AE4E29897FA2000B5659 /* Collection+Extensions.swift */,
 				D635AE5229899128000B5659 /* Date+Extensions.swift */,
+				D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -176,7 +183,9 @@
 		D634D1FD298C00D2002BCF24 /* NetworkManager */ = {
 			isa = PBXGroup;
 			children = (
-				D6A8DC51298A356700DA16BD /* APIManager.swift */,
+				D6A8DC4F298A353500DA16BD /* home.json */,
+				D6A8DC51298A356700DA16BD /* NetworkManager.swift */,
+				D634D217298C15ED002BCF24 /* NetworkError.swift */,
 			);
 			path = NetworkManager;
 			sourceTree = "<group>";
@@ -237,10 +246,10 @@
 		D635AE4B29897D1D000B5659 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D6A8DC4F298A353500DA16BD /* home.json */,
 				D635AE4C29897D2D000B5659 /* Video.swift */,
 				D635AE502989832A000B5659 /* Channel.swift */,
 				D634D1F8298BDF4F002BCF24 /* Setting.swift */,
+				D634D21B298C1666002BCF24 /* Menu.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -489,16 +498,19 @@
 				D634D1F9298BDF4F002BCF24 /* Setting.swift in Sources */,
 				D682F7812981291C0053A5FE /* Identifiable+Extensions.swift in Sources */,
 				D635AE4F29897FA2000B5659 /* Collection+Extensions.swift in Sources */,
+				D634D21A298C1608002BCF24 /* HTTPURLResponse+Extensions.swift in Sources */,
 				D63258FB298A61FD006363CF /* VideoCellLoading.swift in Sources */,
 				D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */,
-				D6A8DC52298A356700DA16BD /* APIManager.swift in Sources */,
+				D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */,
 				D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */,
 				D635AE4D29897D2D000B5659 /* Video.swift in Sources */,
 				D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */,
+				D634D21C298C1666002BCF24 /* Menu.swift in Sources */,
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,
 				D634D204298C02E2002BCF24 /* GestureSubscription.swift in Sources */,
 				D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */,
 				D682F751298117530053A5FE /* SceneDelegate.swift in Sources */,
+				D634D218298C15ED002BCF24 /* NetworkError.swift in Sources */,
 				D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */,
 				D63D2486298AF828006FCDA3 /* SettingView.swift in Sources */,
 			);

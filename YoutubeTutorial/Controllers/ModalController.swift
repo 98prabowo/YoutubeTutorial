@@ -81,7 +81,7 @@ internal final class ModalController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    // MARK: Life Cycles
+    // MARK: Lifecycles
     
     internal init(_ view: UIView, size: Size = .fitContent, style: Style = .flat) {
         contentView = view

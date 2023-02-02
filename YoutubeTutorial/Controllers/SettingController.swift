@@ -8,6 +8,8 @@
 import UIKit
 
 internal final class SettingController: UIViewController {
+    // MARK: Lifecycles
+    
     internal init(title: String) {
         super.init(nibName: nil, bundle: nil)
         navigationItem.title = title

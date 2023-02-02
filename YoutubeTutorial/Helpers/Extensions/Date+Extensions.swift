@@ -19,7 +19,10 @@ extension Date {
         dateComponentsFormatter.unitsStyle = .full
         return dateComponentsFormatter.string(from: self, to: date)
     }
-    
+}
+
+// MARK: Mock dates
+extension Date {
     internal static var mockLoveStoryDate: Date? {
         // Specify date components
         var dateComponents = DateComponents()

@@ -23,9 +23,9 @@ internal final class MenuBar: UIView {
     
     // MARK: Properties
     
-    private let icons: [UIImage?] = .implemented
+    private let menus: [Menu] = Menu.allCases
     
-    // MARK: Life Cycles
+    // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
         super.init(frame: frame)
@@ -58,28 +58,17 @@ internal final class MenuBar: UIView {
 
 extension MenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return icons.count
+        return menus.count
     }
     
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let icon = icons[safe: indexPath.item] else { return UICollectionViewCell() }
+        guard let menu = menus[safe: indexPath.item] else { return UICollectionViewCell() }
         let cell = collectionView.dequeueReusableCell(withCell: MenuCell.self, for: indexPath)
-        cell.setupUI(icon: icon)
+        cell.setupUI(menu: menu)
         return cell
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSizeMake(frame.width / 4, frame.height)
-    }
-}
-
-extension Array where Element == UIImage? {
-    internal static var implemented: [UIImage?] {
-        [
-            UIImage(systemName: "house.fill"),
-            UIImage(systemName: "flame.fill"),
-            UIImage(systemName: "play.square.stack.fill"),
-            UIImage(systemName: "person.fill")
-        ]
     }
 }

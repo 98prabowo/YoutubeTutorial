@@ -51,7 +51,7 @@ internal final class VideoCellLoading: UIView {
         return shimmer
     }()
     
-    // MARK: Life Cycles
+    // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
         super.init(frame: frame)

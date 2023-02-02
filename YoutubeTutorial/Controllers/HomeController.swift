@@ -62,7 +62,7 @@ internal final class HomeController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    // MARK: LifeCycles
+    // MARK: Lifecycles
     
     override internal func viewDidLoad() {
         super.viewDidLoad()
@@ -138,7 +138,7 @@ internal final class HomeController: UIViewController {
     }
     
     private func bindData() {
-        APIManager.shared.readLocalFile([Video].self, forName: "home")
+        NetworkManager.shared.readLocalFile([Video].self, forName: "home")
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {

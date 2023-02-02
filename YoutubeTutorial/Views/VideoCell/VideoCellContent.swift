@@ -67,7 +67,7 @@ internal final class VideoCellContent: UIView {
     
     private var cancellables = Set<AnyCancellable>()
     
-    // MARK: Life Cycles
+    // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
         super.init(frame: frame)
