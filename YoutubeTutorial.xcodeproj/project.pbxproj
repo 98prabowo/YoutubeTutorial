@@ -222,6 +222,18 @@
 			path = BarButton;
 			sourceTree = "<group>";
 		};
+		D634D216298C151F002BCF24 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				D682F75C298117540053A5FE /* Info.plist */,
+				D682F74E298117530053A5FE /* AppDelegate.swift */,
+				D682F750298117530053A5FE /* SceneDelegate.swift */,
+				D682F757298117540053A5FE /* Assets.xcassets */,
+				D682F759298117540053A5FE /* LaunchScreen.storyboard */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 		D635AE4B29897D1D000B5659 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -297,15 +309,11 @@
 		D682F74D298117530053A5FE /* YoutubeTutorial */ = {
 			isa = PBXGroup;
 			children = (
+				D651874E2988896D00362A46 /* Controllers */,
+				D634D216298C151F002BCF24 /* Core */,
 				D651874A298888C800362A46 /* Helpers */,
 				D635AE4B29897D1D000B5659 /* Model */,
 				D651874D2988893D00362A46 /* Views */,
-				D651874E2988896D00362A46 /* Controllers */,
-				D682F75C298117540053A5FE /* Info.plist */,
-				D682F74E298117530053A5FE /* AppDelegate.swift */,
-				D682F750298117530053A5FE /* SceneDelegate.swift */,
-				D682F757298117540053A5FE /* Assets.xcassets */,
-				D682F759298117540053A5FE /* LaunchScreen.storyboard */,
 			);
 			path = YoutubeTutorial;
 			sourceTree = "<group>";
@@ -663,7 +671,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DY684J9X8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = YoutubeTutorial/Info.plist;
+				INFOPLIST_FILE = YoutubeTutorial/Core/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
@@ -694,7 +702,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DY684J9X8;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = YoutubeTutorial/Info.plist;
+				INFOPLIST_FILE = YoutubeTutorial/Core/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
