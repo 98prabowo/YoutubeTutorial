@@ -25,7 +25,7 @@ internal final class MenuBar: UIView {
     
     private let icons: [UIImage?] = .implemented
     
-    // MARK: LifeCycles
+    // MARK: Life Cycles
     
     override internal init(frame: CGRect) {
         super.init(frame: frame)

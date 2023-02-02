@@ -55,4 +55,34 @@ extension UIView: Identifiable {
             )
         )
     }
+    
+    /// Round corner radius for for specific corners of `UIView`.
+    ///
+    /// - Parameters:
+    ///   - corners: Add collection of specific corners that will be rounded.
+    ///   - radius: Magnitude of radius for rounded corners.
+    internal func roundSpecificCorners(_ corners: [UIRectCorner], radius: CGFloat) {
+        self.layer.cornerRadius = radius
+        var masked = CACornerMask()
+        
+        corners.forEach { corner in
+            if corner.contains(.allCorners) || corner.contains(.topLeft) {
+                masked.insert(CACornerMask.layerMinXMinYCorner)
+            }
+            
+            if corner.contains(.allCorners) || corner.contains(.topRight) {
+                masked.insert(CACornerMask.layerMaxXMinYCorner)
+            }
+            
+            if corner.contains(.allCorners) || corner.contains(.bottomLeft) {
+                masked.insert(CACornerMask.layerMinXMaxYCorner)
+            }
+            
+            if corner.contains(.allCorners) || corner.contains(.bottomLeft) {
+                masked.insert(CACornerMask.layerMaxXMaxYCorner)
+            }
+        }
+        
+        self.layer.maskedCorners = masked
+    }
 }

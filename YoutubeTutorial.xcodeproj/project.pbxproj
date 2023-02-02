@@ -10,6 +10,18 @@
 		D63258F9298A57C6006363CF /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258F8298A57C6006363CF /* ShimmerView.swift */; };
 		D63258FB298A61FD006363CF /* VideoCellLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258FA298A61FD006363CF /* VideoCellLoading.swift */; };
 		D63258FE298A6765006363CF /* VideoCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258FD298A6765006363CF /* VideoCellContent.swift */; };
+		D634D1F9298BDF4F002BCF24 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D1F8298BDF4F002BCF24 /* Setting.swift */; };
+		D634D1FB298BEFB0002BCF24 /* SettingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D1FA298BEFB0002BCF24 /* SettingController.swift */; };
+		D634D200298C00F9002BCF24 /* GesturePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D1FF298C00F9002BCF24 /* GesturePublisher.swift */; };
+		D634D202298C011A002BCF24 /* GestureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D201298C011A002BCF24 /* GestureType.swift */; };
+		D634D204298C02E2002BCF24 /* GestureSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D203298C02E2002BCF24 /* GestureSubscription.swift */; };
+		D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D205298C0597002BCF24 /* GesturePublisherImplementations.swift */; };
+		D634D20A298C07D8002BCF24 /* ControlSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D209298C07D8002BCF24 /* ControlSubscription.swift */; };
+		D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D20B298C0990002BCF24 /* ControlPublisher.swift */; };
+		D634D20E298C0AF3002BCF24 /* ControlPublisherImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D20D298C0AF3002BCF24 /* ControlPublisherImplementations.swift */; };
+		D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D210298C0D82002BCF24 /* BarButtonSubscription.swift */; };
+		D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D212298C0F52002BCF24 /* BarButtonPublisher.swift */; };
+		D634D215298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D214298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift */; };
 		D635AE4629896143000B5659 /* MenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4529896143000B5659 /* MenuBar.swift */; };
 		D635AE4829896C30000B5659 /* MenuCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4729896C30000B5659 /* MenuCell.swift */; };
 		D635AE4A29896C9C000B5659 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4929896C9C000B5659 /* BaseCell.swift */; };
@@ -17,6 +29,9 @@
 		D635AE4F29897FA2000B5659 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE4E29897FA2000B5659 /* Collection+Extensions.swift */; };
 		D635AE512989832A000B5659 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE502989832A000B5659 /* Channel.swift */; };
 		D635AE5329899128000B5659 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D635AE5229899128000B5659 /* Date+Extensions.swift */; };
+		D63D2484298AD300006FCDA3 /* ModalController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63D2483298AD300006FCDA3 /* ModalController.swift */; };
+		D63D2486298AF828006FCDA3 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63D2485298AF828006FCDA3 /* SettingView.swift */; };
+		D63D2489298AFB7F006FCDA3 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63D2488298AFB7F006FCDA3 /* SettingCell.swift */; };
 		D651874C2988891F00362A46 /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874B2988891F00362A46 /* VideoCell.swift */; };
 		D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874F29888A3600362A46 /* UIColor+Extensions.swift */; };
 		D682F74F298117530053A5FE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F74E298117530053A5FE /* AppDelegate.swift */; };
@@ -56,6 +71,18 @@
 		D63258F8298A57C6006363CF /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
 		D63258FA298A61FD006363CF /* VideoCellLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCellLoading.swift; sourceTree = "<group>"; };
 		D63258FD298A6765006363CF /* VideoCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCellContent.swift; sourceTree = "<group>"; };
+		D634D1F8298BDF4F002BCF24 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		D634D1FA298BEFB0002BCF24 /* SettingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingController.swift; sourceTree = "<group>"; };
+		D634D1FF298C00F9002BCF24 /* GesturePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GesturePublisher.swift; sourceTree = "<group>"; };
+		D634D201298C011A002BCF24 /* GestureType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureType.swift; sourceTree = "<group>"; };
+		D634D203298C02E2002BCF24 /* GestureSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureSubscription.swift; sourceTree = "<group>"; };
+		D634D205298C0597002BCF24 /* GesturePublisherImplementations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GesturePublisherImplementations.swift; sourceTree = "<group>"; };
+		D634D209298C07D8002BCF24 /* ControlSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlSubscription.swift; sourceTree = "<group>"; };
+		D634D20B298C0990002BCF24 /* ControlPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPublisher.swift; sourceTree = "<group>"; };
+		D634D20D298C0AF3002BCF24 /* ControlPublisherImplementations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPublisherImplementations.swift; sourceTree = "<group>"; };
+		D634D210298C0D82002BCF24 /* BarButtonSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonSubscription.swift; sourceTree = "<group>"; };
+		D634D212298C0F52002BCF24 /* BarButtonPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonPublisher.swift; sourceTree = "<group>"; };
+		D634D214298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarButtonPublisherImplementations.swift; sourceTree = "<group>"; };
 		D635AE4529896143000B5659 /* MenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBar.swift; sourceTree = "<group>"; };
 		D635AE4729896C30000B5659 /* MenuCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCell.swift; sourceTree = "<group>"; };
 		D635AE4929896C9C000B5659 /* BaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
@@ -63,6 +90,9 @@
 		D635AE4E29897FA2000B5659 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
 		D635AE502989832A000B5659 /* Channel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Channel.swift; sourceTree = "<group>"; };
 		D635AE5229899128000B5659 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
+		D63D2483298AD300006FCDA3 /* ModalController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalController.swift; sourceTree = "<group>"; };
+		D63D2485298AF828006FCDA3 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		D63D2488298AFB7F006FCDA3 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		D651874B2988891F00362A46 /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		D651874F29888A3600362A46 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		D682F74B298117530053A5FE /* YoutubeTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YoutubeTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,17 +150,16 @@
 			path = VideoCell;
 			sourceTree = "<group>";
 		};
-		D635AE4B29897D1D000B5659 /* Model */ = {
+		D63258FF298A7274006363CF /* MenuBar */ = {
 			isa = PBXGroup;
 			children = (
-				D6A8DC4F298A353500DA16BD /* home.json */,
-				D635AE4C29897D2D000B5659 /* Video.swift */,
-				D635AE502989832A000B5659 /* Channel.swift */,
+				D635AE4529896143000B5659 /* MenuBar.swift */,
+				D635AE4729896C30000B5659 /* MenuCell.swift */,
 			);
-			path = Model;
+			path = MenuBar;
 			sourceTree = "<group>";
 		};
-		D651874A298888C800362A46 /* Helpers */ = {
+		D634D1FC298C00C2002BCF24 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 				D682F77E298128F60053A5FE /* UICollectionView+Extensions.swift */,
@@ -140,7 +169,85 @@
 				D651874F29888A3600362A46 /* UIColor+Extensions.swift */,
 				D635AE4E29897FA2000B5659 /* Collection+Extensions.swift */,
 				D635AE5229899128000B5659 /* Date+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		D634D1FD298C00D2002BCF24 /* NetworkManager */ = {
+			isa = PBXGroup;
+			children = (
 				D6A8DC51298A356700DA16BD /* APIManager.swift */,
+			);
+			path = NetworkManager;
+			sourceTree = "<group>";
+		};
+		D634D1FE298C00DA002BCF24 /* Combines */ = {
+			isa = PBXGroup;
+			children = (
+				D634D20F298C0D60002BCF24 /* BarButton */,
+				D634D208298C07B9002BCF24 /* Control */,
+				D634D207298C07B2002BCF24 /* Gesture */,
+			);
+			path = Combines;
+			sourceTree = "<group>";
+		};
+		D634D207298C07B2002BCF24 /* Gesture */ = {
+			isa = PBXGroup;
+			children = (
+				D634D1FF298C00F9002BCF24 /* GesturePublisher.swift */,
+				D634D203298C02E2002BCF24 /* GestureSubscription.swift */,
+				D634D201298C011A002BCF24 /* GestureType.swift */,
+				D634D205298C0597002BCF24 /* GesturePublisherImplementations.swift */,
+			);
+			path = Gesture;
+			sourceTree = "<group>";
+		};
+		D634D208298C07B9002BCF24 /* Control */ = {
+			isa = PBXGroup;
+			children = (
+				D634D209298C07D8002BCF24 /* ControlSubscription.swift */,
+				D634D20B298C0990002BCF24 /* ControlPublisher.swift */,
+				D634D20D298C0AF3002BCF24 /* ControlPublisherImplementations.swift */,
+			);
+			path = Control;
+			sourceTree = "<group>";
+		};
+		D634D20F298C0D60002BCF24 /* BarButton */ = {
+			isa = PBXGroup;
+			children = (
+				D634D210298C0D82002BCF24 /* BarButtonSubscription.swift */,
+				D634D212298C0F52002BCF24 /* BarButtonPublisher.swift */,
+				D634D214298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift */,
+			);
+			path = BarButton;
+			sourceTree = "<group>";
+		};
+		D635AE4B29897D1D000B5659 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D6A8DC4F298A353500DA16BD /* home.json */,
+				D635AE4C29897D2D000B5659 /* Video.swift */,
+				D635AE502989832A000B5659 /* Channel.swift */,
+				D634D1F8298BDF4F002BCF24 /* Setting.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		D63D2487298AF9AD006FCDA3 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				D63D2485298AF828006FCDA3 /* SettingView.swift */,
+				D63D2488298AFB7F006FCDA3 /* SettingCell.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		D651874A298888C800362A46 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				D634D1FE298C00DA002BCF24 /* Combines */,
+				D634D1FC298C00C2002BCF24 /* Extensions */,
+				D634D1FD298C00D2002BCF24 /* NetworkManager */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -149,10 +256,10 @@
 			isa = PBXGroup;
 			children = (
 				D635AE4929896C9C000B5659 /* BaseCell.swift */,
-				D635AE4529896143000B5659 /* MenuBar.swift */,
-				D635AE4729896C30000B5659 /* MenuCell.swift */,
 				D63258F8298A57C6006363CF /* ShimmerView.swift */,
+				D63258FF298A7274006363CF /* MenuBar */,
 				D63258FC298A6240006363CF /* VideoCell */,
+				D63D2487298AF9AD006FCDA3 /* Setting */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -161,6 +268,8 @@
 			isa = PBXGroup;
 			children = (
 				D682F752298117530053A5FE /* HomeController.swift */,
+				D63D2483298AD300006FCDA3 /* ModalController.swift */,
+				D634D1FA298BEFB0002BCF24 /* SettingController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -350,25 +459,40 @@
 			buildActionMask = 2147483647;
 			files = (
 				D63258FE298A6765006363CF /* VideoCellContent.swift in Sources */,
+				D634D20A298C07D8002BCF24 /* ControlSubscription.swift in Sources */,
+				D634D20E298C0AF3002BCF24 /* ControlPublisherImplementations.swift in Sources */,
 				D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */,
 				D635AE512989832A000B5659 /* Channel.swift in Sources */,
 				D651874C2988891F00362A46 /* VideoCell.swift in Sources */,
 				D682F77F298128F60053A5FE /* UICollectionView+Extensions.swift in Sources */,
+				D634D202298C011A002BCF24 /* GestureType.swift in Sources */,
 				D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */,
+				D634D200298C00F9002BCF24 /* GesturePublisher.swift in Sources */,
+				D63D2484298AD300006FCDA3 /* ModalController.swift in Sources */,
+				D634D215298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift in Sources */,
 				D635AE4A29896C9C000B5659 /* BaseCell.swift in Sources */,
 				D635AE4629896143000B5659 /* MenuBar.swift in Sources */,
 				D63258F9298A57C6006363CF /* ShimmerView.swift in Sources */,
+				D634D1FB298BEFB0002BCF24 /* SettingController.swift in Sources */,
 				D635AE4829896C30000B5659 /* MenuCell.swift in Sources */,
 				D682F753298117530053A5FE /* HomeController.swift in Sources */,
 				D635AE5329899128000B5659 /* Date+Extensions.swift in Sources */,
+				D63D2489298AFB7F006FCDA3 /* SettingCell.swift in Sources */,
+				D634D1F9298BDF4F002BCF24 /* Setting.swift in Sources */,
 				D682F7812981291C0053A5FE /* Identifiable+Extensions.swift in Sources */,
 				D635AE4F29897FA2000B5659 /* Collection+Extensions.swift in Sources */,
 				D63258FB298A61FD006363CF /* VideoCellLoading.swift in Sources */,
+				D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */,
 				D6A8DC52298A356700DA16BD /* APIManager.swift in Sources */,
+				D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */,
 				D635AE4D29897D2D000B5659 /* Video.swift in Sources */,
+				D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */,
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,
+				D634D204298C02E2002BCF24 /* GestureSubscription.swift in Sources */,
 				D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */,
 				D682F751298117530053A5FE /* SceneDelegate.swift in Sources */,
+				D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */,
+				D63D2486298AF828006FCDA3 /* SettingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

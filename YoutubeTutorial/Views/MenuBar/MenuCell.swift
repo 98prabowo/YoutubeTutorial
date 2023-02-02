@@ -18,11 +18,21 @@ internal final class MenuCell: BaseCell {
         return imageView
     }()
     
-    override var isSelected: Bool {
+    // MARK: Properties
+    
+    override internal var isSelected: Bool {
         didSet {
             tabIcon.tintColor = isSelected ? .white : .redMenuIcon
         }
     }
+    
+    override internal var isHighlighted: Bool {
+        didSet {
+            tabIcon.tintColor = isHighlighted ? .white : .redMenuIcon
+        }
+    }
+    
+    // MARK: Layouts
     
     override internal func setupViews() {
         addSubview(tabIcon)
@@ -34,6 +44,8 @@ internal final class MenuCell: BaseCell {
             tabIcon.heightAnchor.constraint(equalToConstant: 28)
         ])
     }
+    
+    // MARK: Implementations
     
     internal func setupUI(icon: UIImage?) {
         tabIcon.image = icon

@@ -36,6 +36,22 @@ internal final class HomeController: UIViewController {
         return menu
     }()
     
+    private let searchBtn: UIBarButtonItem = {
+        let btn = UIBarButtonItem()
+        btn.image = UIImage(systemName: "magnifyingglass")
+        btn.style = .plain
+        btn.tintColor = .white
+        return btn
+    }()
+    
+    private let settingBtn: UIBarButtonItem = {
+        let btn = UIBarButtonItem()
+        btn.image = UIImage(systemName: "ellipsis.circle.fill")
+        btn.style = .plain
+        btn.tintColor = .white
+        return btn
+    }()
+    
     // MARK: Properties
     
     override internal var preferredStatusBarStyle: UIStatusBarStyle {
@@ -53,7 +69,8 @@ internal final class HomeController: UIViewController {
         setupLayout()
         setupNavigationBar()
         setupCollectionView()
-        fetchData()
+        bindData()
+        bindAction()
     }
     
     override internal func viewWillAppear(_ animated: Bool) {
@@ -85,35 +102,33 @@ internal final class HomeController: UIViewController {
     // MARK: Private Implementations
     
     private func setupNavigationBar() {
-        // Set left icon
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-        
-        // Set right icon
-        let searchBtn = UIBarButtonItem(
-            image: UIImage(systemName: "magnifyingglass"),
-            style: .plain,
-            target: self,
-            action: #selector(searchAction(_:))
-        )
-        searchBtn.tintColor = .white
-        
-        let moreBtn = UIBarButtonItem(
-            image: UIImage(systemName: "ellipsis.circle.fill"),
-            style: .plain,
-            target: self,
-            action: #selector(moreAction(_:))
-        )
-        moreBtn.tintColor = .white
-        
-        navigationItem.rightBarButtonItems = [moreBtn, searchBtn]
+        navigationItem.rightBarButtonItems = [settingBtn, searchBtn]
     }
     
-    @objc private func searchAction(_ sender: UIBarButtonItem) {
+    private func showSettings() {
+        let content = SettingView()
+        let vc = ModalController(content)
+        present(vc, animated: true)
+        
+        content.cancellable = content.tapButton
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] setting in
+                guard let navController = self?.navigationController else { return }
+                switch setting {
+                case .cancel:
+                    vc.dismissModal()
+                default:
+                    vc.dismissModal {
+                        let settingVC = SettingController(title: setting.title)
+                        navController.pushViewController(settingVC, animated: true)
+                    }
+                }
+            }
+    }
+    
+    private func searchAction() {
         print("Search Tapped")
-    }
-    
-    @objc private func moreAction(_ sender: UIBarButtonItem) {
-        print("Option Tapped")
     }
     
     private func setupCollectionView() {
@@ -122,7 +137,7 @@ internal final class HomeController: UIViewController {
         collectionView.register(forCell: VideoCell.self)
     }
     
-    private func fetchData() {
+    private func bindData() {
         APIManager.shared.readLocalFile([Video].self, forName: "home")
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -136,6 +151,22 @@ internal final class HomeController: UIViewController {
                 guard let self else { return }
                 self.videos = videos
                 self.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func bindAction() {
+        searchBtn.tap()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.searchAction()
+            }
+            .store(in: &cancellables)
+        
+        settingBtn.tap()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.showSettings()
             }
             .store(in: &cancellables)
     }

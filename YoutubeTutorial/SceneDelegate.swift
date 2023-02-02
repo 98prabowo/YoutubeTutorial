@@ -19,6 +19,7 @@ internal class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         navigationBarAppearance.configureWithOpaqueBackground()
         navigationBarAppearance.backgroundColor = .redNavBar
         navigationBarAppearance.shadowColor = .clear
+        navigationBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
         UINavigationBar.appearance().compactAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
