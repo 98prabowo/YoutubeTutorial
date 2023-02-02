@@ -8,19 +8,8 @@
 import Combine
 import UIKit
 
-internal final class HomeController: UIViewController {
+internal final class HomeController: UICollectionViewController {
     // MARK: UI Components
-    
-    private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collection.backgroundColor = .white
-        collection.translatesAutoresizingMaskIntoConstraints = false
-        return collection
-    }()
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: CGRectMake(0, 0, view.frame.width - 32, view.frame.height))
@@ -52,6 +41,12 @@ internal final class HomeController: UIViewController {
         return btn
     }()
     
+    private let statusBarView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .redNavBar
+        return view
+    }()
+    
     // MARK: Properties
     
     override internal var preferredStatusBarStyle: UIStatusBarStyle {
@@ -62,7 +57,24 @@ internal final class HomeController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
+    private var statusBarFrame = CurrentValueSubject<CGRect, Never>(.zero)
+    
+    private let menuBarHeight: CGFloat = 50.0
+    
     // MARK: Lifecycles
+    
+    internal init() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
+        super.init(collectionViewLayout: layout)
+        view.backgroundColor = .white
+    }
+    
+    required internal init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override internal func viewDidLoad() {
         super.viewDidLoad()
@@ -71,32 +83,45 @@ internal final class HomeController: UIViewController {
         setupCollectionView()
         bindData()
         bindAction()
+        
     }
     
     override internal func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
+        navigationController?.hidesBarsOnSwipe = true
     }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let statusBarFrame = view.window?.windowScene?.statusBarManager?.statusBarFrame ?? .zero
+        guard !CGRectEqualToRect(self.statusBarFrame.value, statusBarFrame) else { return }
+        self.statusBarFrame.send(statusBarFrame)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.hidesBarsOnSwipe = false
+      }
     
     // MARK: Layouts
     
     private func setupLayout() {
+        view.addSubview(statusBarView)
         view.addSubview(menuBar)
-        view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
             menuBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             menuBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             menuBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
-            menuBar.heightAnchor.constraint(equalToConstant: 50)
+            menuBar.heightAnchor.constraint(equalToConstant: menuBarHeight)
         ])
         
-        NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.topAnchor.constraint(equalTo: menuBar.bottomAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        
+        // Configure collection view content inset
+        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
+        self.collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+        self.collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Private Implementations
@@ -153,6 +178,14 @@ internal final class HomeController: UIViewController {
                 self.collectionView.reloadData()
             }
             .store(in: &cancellables)
+        
+        statusBarFrame
+            .receive(on: DispatchQueue.main)
+            .sink { [statusBarView, menuBarHeight] frame in
+                let statusFrame = CGRectMake(frame.minX, frame.minY, frame.width, frame.height + menuBarHeight)
+                statusBarView.frame = statusFrame
+            }
+            .store(in: &cancellables)
     }
     
     private func bindAction() {
@@ -172,12 +205,12 @@ internal final class HomeController: UIViewController {
     }
 }
 
-extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+extension HomeController: UICollectionViewDelegateFlowLayout {
+    override internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return videos.count
     }
 
-    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
         let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
         cell.setupCell(video)
