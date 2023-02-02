@@ -106,57 +106,7 @@ internal final class ModalController: UIViewController {
         presentContent()
     }
     
-    // MARK: Implementations
-    
-    internal func dismissModal(completion: (() -> Void)? = nil) {
-        dismissContent(completionHandler: completion)
-    }
-    
-    // MARK: Private Methods
-    
-    private func presentContent() {
-        backgroundView.frame = view.frame
-        setupContainer()
-        view.addSubview(backgroundView)
-        view.addSubview(containerView)
-        
-        let calculatedY: CGFloat = view.frame.height - containerHeight
-        
-        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseOut) {
-            self.backgroundView.alpha = 1.0
-            self.containerView.frame = CGRectMake(0.0, calculatedY, self.view.frame.width, self.containerHeight)
-        }
-    }
-    
-    private func dismissContent(completionHandler: (() -> Void)? = nil) {
-        UIView.animate(withDuration: 0.5) {
-            self.backgroundView.alpha = 0.0
-            self.containerView.frame = CGRectMake(0.0, self.view.frame.height, self.containerView.frame.width, self.containerView.frame.height)
-        } completion: { _ in
-            self.backgroundView.removeFromSuperview()
-            self.contentView.removeFromSuperview()
-            self.containerView.removeFromSuperview()
-            self.dismiss(animated: false, completion: completionHandler)
-        }
-    }
-    
-    private func setupGesture() {
-        backgroundView.tap()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.dismissContent()
-            }
-            .store(in: &cancellables)
-    }
-    
-    private func setupButton() {
-        closeButton.action()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.dismissContent()
-            }
-            .store(in: &cancellables)
-    }
+    // MARK: Layouts
     
     private func setupContainer() {
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -224,5 +174,57 @@ internal final class ModalController: UIViewController {
                 contentView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: view.safeAreaInsets.bottom)
             ])
         }
+    }
+    
+    private func presentContent() {
+        backgroundView.frame = view.frame
+        setupContainer()
+        view.addSubview(backgroundView)
+        view.addSubview(containerView)
+        
+        let calculatedY: CGFloat = view.frame.height - containerHeight
+        
+        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseOut) {
+            self.backgroundView.alpha = 1.0
+            self.containerView.frame = CGRectMake(0.0, calculatedY, self.view.frame.width, self.containerHeight)
+        }
+    }
+    
+    // MARK: Private Methods
+    
+    private func dismissContent(completionHandler: (() -> Void)? = nil) {
+        UIView.animate(withDuration: 0.5) {
+            self.backgroundView.alpha = 0.0
+            self.containerView.frame = CGRectMake(0.0, self.view.frame.height, self.containerView.frame.width, self.containerView.frame.height)
+        } completion: { _ in
+            self.backgroundView.removeFromSuperview()
+            self.contentView.removeFromSuperview()
+            self.containerView.removeFromSuperview()
+            self.dismiss(animated: false, completion: completionHandler)
+        }
+    }
+    
+    private func setupGesture() {
+        backgroundView.tap()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.dismissContent()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func setupButton() {
+        closeButton.action()
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.dismissContent()
+            }
+            .store(in: &cancellables)
+    }
+    
+    // MARK: Implementations
+    
+    internal func dismissModal(completion: (() -> Void)? = nil) {
+        dismissContent(completionHandler: completion)
     }
 }

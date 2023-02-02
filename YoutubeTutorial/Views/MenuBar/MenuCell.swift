@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 31/01/23.
 //
 
+import Combine
 import UIKit
 
 internal final class MenuCell: BaseCell {
@@ -32,6 +33,10 @@ internal final class MenuCell: BaseCell {
         }
     }
     
+    internal let menu = CurrentValueSubject<Menu?, Never>(nil)
+    
+    private var cancellable: AnyCancellable?
+    
     // MARK: Layouts
     
     override internal func setupViews() {
@@ -43,11 +48,18 @@ internal final class MenuCell: BaseCell {
             tabIcon.widthAnchor.constraint(equalToConstant: 28),
             tabIcon.heightAnchor.constraint(equalToConstant: 28)
         ])
+        
+        bindData()
     }
     
     // MARK: Implementations
     
-    internal func setupUI(menu: Menu) {
-        tabIcon.image = menu.icon
+    private func bindData() {
+        cancellable = menu
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0 }
+            .sink { [tabIcon] menu in
+                tabIcon.image = menu.icon
+            }
     }
 }

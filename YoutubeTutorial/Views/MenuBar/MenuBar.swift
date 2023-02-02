@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 31/01/23.
 //
 
+import Combine
 import UIKit
 
 internal final class MenuBar: UIView {
@@ -32,7 +33,11 @@ internal final class MenuBar: UIView {
     
     private let menus: [Menu] = Menu.allCases
     
-    private var leadingConstraint: NSLayoutConstraint?
+    internal var leadingConstraint: NSLayoutConstraint?
+    
+    internal var cancellables = Set<AnyCancellable>()
+    
+    internal let tapMenu = CurrentValueSubject<IndexPath, Never>(IndexPath(item: 0, section: 0))
     
     // MARK: Lifecycles
     
@@ -61,8 +66,7 @@ internal final class MenuBar: UIView {
         collectionView.register(forCell: MenuCell.self)
         
         // Set initial cell selection
-        let indexPath = IndexPath(item: 0, section: 0)
-        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        collectionView.selectItem(at: tapMenu.value, animated: false, scrollPosition: .centeredHorizontally)
     }
     
     private func setupHorizontalView() {
@@ -75,29 +79,29 @@ internal final class MenuBar: UIView {
             horizontalView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/4)
         ])
     }
+    
+    internal func selectItem(at indexPath: IndexPath) {
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+    }
 }
 
 extension MenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    internal func collectionView(_: UICollectionView, numberOfItemsInSection: Int) -> Int {
         return menus.count
     }
     
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let menu = menus[safe: indexPath.item] else { return UICollectionViewCell() }
         let cell = collectionView.dequeueReusableCell(withCell: MenuCell.self, for: indexPath)
-        cell.setupUI(menu: menu)
+        cell.menu.send(menu)
         return cell
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
         return CGSizeMake(frame.width / 4, frame.height)
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let x: CGFloat = CGFloat(indexPath.item) * frame.width / 4
-        leadingConstraint?.constant = x
-        UIView.animate(withDuration: 0.75, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseOut) {
-            self.layoutIfNeeded()
-        }
+    internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        tapMenu.send(indexPath)
     }
 }

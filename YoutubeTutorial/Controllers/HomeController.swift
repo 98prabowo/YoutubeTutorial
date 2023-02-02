@@ -13,7 +13,6 @@ internal final class HomeController: UICollectionViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: CGRectMake(0, 0, view.frame.width - 32, view.frame.height))
-        label.text = "Home"
         label.textColor = .white
         label.font = .systemFont(ofSize: 20)
         return label
@@ -59,15 +58,17 @@ internal final class HomeController: UICollectionViewController {
     
     private var statusBarFrame = CurrentValueSubject<CGRect, Never>(.zero)
     
+    private var contentIndex: IndexPath = IndexPath(row: 0, section: 0)
+    
     private let menuBarHeight: CGFloat = 50.0
     
     // MARK: Lifecycles
     
     internal init() {
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0.0
+        layout.minimumInteritemSpacing = 0.0
         super.init(collectionViewLayout: layout)
         view.backgroundColor = .white
     }
@@ -119,9 +120,10 @@ internal final class HomeController: UICollectionViewController {
         
         
         // Configure collection view content inset
-        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
-        self.collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
-        self.collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+//        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
+//        self.collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//        self.collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+//        self.collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Private Implementations
@@ -129,6 +131,15 @@ internal final class HomeController: UICollectionViewController {
     private func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         navigationItem.rightBarButtonItems = [settingBtn, searchBtn]
+    }
+    
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
+//        collectionView.register(forCell: VideoCell.self)
+        collectionView.register(forCell: UICollectionViewCell.self)
     }
     
     private func showSettings() {
@@ -154,12 +165,6 @@ internal final class HomeController: UICollectionViewController {
     
     private func searchAction() {
         print("Search Tapped")
-    }
-    
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(forCell: VideoCell.self)
     }
     
     private func bindData() {
@@ -202,26 +207,79 @@ internal final class HomeController: UICollectionViewController {
                 self.showSettings()
             }
             .store(in: &cancellables)
+        
+        menuBar.tapMenu
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] index in
+                guard let self,
+                      let menu = Menu.allCases[safe: index.item] else { return }
+                // Handle collection scroll
+                self.collectionView.isPagingEnabled = false
+                self.collectionView.scrollToItem(at: index, at: .left, animated: true)
+                self.collectionView.isPagingEnabled = true
+                
+                // Handle title update
+                self.titleLabel.text = menu.title
+                let titleView = UIBarButtonItem(customView: self.titleLabel)
+                self.navigationItem.setLeftBarButtonItems([titleView], animated: false)
+            }
+            .store(in: &menuBar.cancellables)
     }
 }
 
 extension HomeController: UICollectionViewDelegateFlowLayout {
-    override internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return videos.count
+    override internal func collectionView(_: UICollectionView, numberOfItemsInSection: Int) -> Int {
+        return Menu.allCases.count
     }
 
     override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
-        let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
-        cell.setupCell(video)
+        let cell = collectionView.dequeueReusableCell(withCell: UICollectionViewCell.self, for: indexPath)
+        let colors: [UIColor] = [.green, .blue, .yellow, .orange]
+        cell.backgroundColor = colors[indexPath.row]
         return cell
     }
 
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let inset: CGFloat = 16
-        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
-        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16)
-        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
-        return CGSizeMake(view.frame.width, cellHeight)
+    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
+        let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top
+        let width: CGFloat = view.frame.width - view.safeAreaInsets.left  - view.safeAreaInsets.right
+        return CGSizeMake(width, height)
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        menuBar.leadingConstraint?.constant = scrollView.contentOffset.x / 4
+    }
+    
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let index = targetContentOffset.pointee.x / view.frame.width
+        let indexPath = IndexPath(item: Int(index), section: 0)
+        guard let menu = Menu.allCases[safe: indexPath.item] else { return }
+        // Handle menu selection
+        menuBar.selectItem(at: indexPath)
+        
+        // Handle title update
+        self.titleLabel.text = menu.title
+        let titleView = UIBarButtonItem(customView: self.titleLabel)
+        self.navigationItem.setLeftBarButtonItems([titleView], animated: false)
     }
 }
+
+//extension HomeController: UICollectionViewDelegateFlowLayout {
+//    override internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return videos.count
+//    }
+//
+//    override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
+//        let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
+//        cell.setupCell(video)
+//        return cell
+//    }
+//
+//    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        let inset: CGFloat = 16
+//        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
+//        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16)
+//        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
+//        return CGSizeMake(view.frame.width, cellHeight)
+//    }
+//}
