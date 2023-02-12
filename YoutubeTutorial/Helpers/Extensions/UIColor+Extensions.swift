@@ -19,7 +19,6 @@ extension UIColor {
     }
     
     /// Color code for youtube tutorial navigation bar
-//    internal static var redNavBar: UIColor = UIColor.clear
     internal static var redNavBar: UIColor = UIColor(red: 230, green: 32, blue: 31)
     
     /// Color code for youtube tutorial menu bar icon
