@@ -8,22 +8,32 @@
 import Foundation
 
 extension Date {
-    /// Get time distance to designated date.
+    /// Get string formated of  two dates distance
     ///
     /// - Parameters:
     ///   - date: A `Date` target to calculate the distance from self.
-    internal func getDateDistance(to date: Date = Date()) -> String? {
+    internal func getDateDistance(from date: Date = Date()) -> String {
         let dateComponentsFormatter = DateComponentsFormatter()
         dateComponentsFormatter.allowedUnits = [.second, .minute, .hour, .day, .weekOfMonth, .month, .year]
         dateComponentsFormatter.maximumUnitCount = 1
         dateComponentsFormatter.unitsStyle = .full
-        return dateComponentsFormatter.string(from: self, to: date)
+        return dateComponentsFormatter.string(from: date, to: self) ?? "0 seconds"
+    }
+    
+    /// Get the distance value of the calendar component between two dates.
+    ///
+    /// - Parameters:
+    ///   - component: A `Calendar.Component` to get each of the date component value
+    internal func get(_ component: Calendar.Component, from date: Date = Date()) -> Int {
+        let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
+        let day: Int = userCalendar.dateComponents([component], from: date, to: self).day ?? 0
+        return day + 1
     }
 }
 
 // MARK: Mock dates
 extension Date {
-    internal static var mockLoveStoryDate: Date? {
+    internal static var mockLoveStoryDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2009
@@ -33,10 +43,10 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
     
-    internal static var mockBlankSpaceDate: Date? {
+    internal static var mockBlankSpaceDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2014
@@ -46,10 +56,10 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
     
-    internal static var mockBadBloodDate: Date? {
+    internal static var mockBadBloodDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2015
@@ -59,10 +69,10 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
     
-    internal static var mockLookWhatDate: Date? {
+    internal static var mockLookWhatDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2017
@@ -72,10 +82,10 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
     
-    internal static var mockShakeItOffDate: Date? {
+    internal static var mockShakeItOffDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2014
@@ -85,10 +95,10 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
     
-    internal static var mockAntiHeroDate: Date? {
+    internal static var mockAntiHeroDate: Date {
         // Specify date components
         var dateComponents = DateComponents()
         dateComponents.year = 2022
@@ -98,6 +108,6 @@ extension Date {
 
         // Create date from components
         let userCalendar = Calendar(identifier: .gregorian) // since the components above (like year 1980) are for Gregorian
-        return userCalendar.date(from: dateComponents)
+        return userCalendar.date(from: dateComponents) ?? Date()
     }
 }

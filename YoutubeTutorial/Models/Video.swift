@@ -11,19 +11,15 @@ internal struct Video {
     internal let title: String
     internal let numberOfViews: Int
     internal let thumbnailImageName: String
-    internal let uploadDate: Date?
+    internal let uploadDate: Date
     internal let channel: Channel
     
     internal var subtitle: String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         let formattedViews = formatter.string(from: NSNumber(integerLiteral: numberOfViews)) ?? "0"
-        var uploadDistance = String()
-        if let uploadDate = uploadDate,
-           let distanceUpload = uploadDate.getDateDistance() {
-            uploadDistance = " • \(distanceUpload) ago"
-        }
-        return "\(channel.name) • \(formattedViews)\(uploadDistance)"
+        let uploadDistance = "\(uploadDate.getDateDistance()) ago"
+        return "\(channel.name) • \(formattedViews) • \(uploadDistance)"
     }
 }
 
@@ -37,8 +33,7 @@ extension Video: Codable {
         channel = try container.decode(Channel.self, forKey: .channel)
         
         let duration = try container.decode(Int.self, forKey: .duration)
-        uploadDate = Date(timeIntervalSinceNow: TimeInterval(integerLiteral: Int64(duration)))
-
+        uploadDate = Date(timeIntervalSinceNow: .days(duration))
     }
     
     internal func encode(to encoder: Encoder) throws {
@@ -47,6 +42,9 @@ extension Video: Codable {
         try container.encode(numberOfViews, forKey: .numberOfViews)
         try container.encode(thumbnailImageName, forKey: .thumbnailImageName)
         try container.encode(channel, forKey: .channel)
+        
+        let duration: Int = uploadDate.get(.day)
+        try container.encode(duration, forKey: .duration)
     }
     
     internal enum CodingKeys: String, CodingKey {
