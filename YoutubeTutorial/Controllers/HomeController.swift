@@ -52,8 +52,6 @@ internal final class HomeController: UICollectionViewController {
         .lightContent
     }
     
-    private var videos: [Video] = .mock
-    
     private var cancellables = Set<AnyCancellable>()
     
     private var statusBarFrame = CurrentValueSubject<CGRect, Never>(.zero)
@@ -84,7 +82,6 @@ internal final class HomeController: UICollectionViewController {
         setupCollectionView()
         bindData()
         bindAction()
-        
     }
     
     override internal func viewWillAppear(_ animated: Bool) {
@@ -117,13 +114,6 @@ internal final class HomeController: UICollectionViewController {
             menuBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             menuBar.heightAnchor.constraint(equalToConstant: menuBarHeight)
         ])
-        
-        
-        // Configure collection view content inset
-//        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
-//        self.collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//        self.collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
-//        self.collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Private Implementations
@@ -138,16 +128,18 @@ internal final class HomeController: UICollectionViewController {
         collectionView.dataSource = self
         collectionView.isPagingEnabled = true
         collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.register(forCell: VideoCell.self)
-        collectionView.register(forCell: UICollectionViewCell.self)
+        collectionView.register(forCell: FeedCell.self)
+        collectionView.register(forCell: TrendingCell.self)
+        collectionView.register(forCell: SubscriptionsCell.self)
+        collectionView.register(forCell: AccountCell.self)
     }
     
     private func showSettings() {
-        let content = SettingView()
-        let vc = ModalController(content)
+        let settingView = SettingView()
+        let vc = ModalController(settingView)
         present(vc, animated: true)
         
-        content.cancellable = content.tapButton
+        settingView.cancellable = settingView.tapButton
             .receive(on: DispatchQueue.main)
             .sink { [weak self] setting in
                 guard let navController = self?.navigationController else { return }
@@ -168,28 +160,10 @@ internal final class HomeController: UICollectionViewController {
     }
     
     private func bindData() {
-        NetworkManager.shared.readLocalFile([Video].self, forName: "home")
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case let .failure(error):
-                    print("Home Data: \(error.localizedDescription)")
-                case .finished:
-                    break
-                }
-            } receiveValue: { [weak self] videos in
-                guard let self else { return }
-                self.videos = videos
-                self.collectionView.reloadData()
-            }
-            .store(in: &cancellables)
-        
         statusBarFrame
             .receive(on: DispatchQueue.main)
-            .sink { [statusBarView, menuBarHeight] frame in
-                let statusFrame = CGRectMake(frame.minX, frame.minY, frame.width, frame.height + menuBarHeight)
-                statusBarView.frame = statusFrame
-            }
+            .map { [menuBarHeight] in CGRectMake($0.minX, $0.minY, $0.width, $0.height + menuBarHeight) }
+            .assign(to: \.frame, on: statusBarView)
             .store(in: &cancellables)
     }
     
@@ -202,7 +176,7 @@ internal final class HomeController: UICollectionViewController {
             .store(in: &cancellables)
         
         settingBtn.tap()
-            .sink { [weak self] _ in
+            .sink { [weak self] in
                 guard let self else { return }
                 self.showSettings()
             }
@@ -223,7 +197,7 @@ internal final class HomeController: UICollectionViewController {
                 let titleView = UIBarButtonItem(customView: self.titleLabel)
                 self.navigationItem.setLeftBarButtonItems([titleView], animated: false)
             }
-            .store(in: &menuBar.cancellables)
+            .store(in: &menuBar.cancellable)
     }
 }
 
@@ -233,23 +207,37 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
     }
 
     override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withCell: UICollectionViewCell.self, for: indexPath)
-        let colors: [UIColor] = [.green, .blue, .yellow, .orange]
-        cell.backgroundColor = colors[indexPath.row]
-        return cell
+        switch indexPath.item {
+        case 1:
+            let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
+            cell.navigationController.send(navigationController)
+            return cell
+        case 2:
+            let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
+            cell.navigationController.send(navigationController)
+            return cell
+        case 3:
+            let cell = collectionView.dequeueReusableCell(withCell: AccountCell.self, for: indexPath)
+            cell.navigationController.send(navigationController)
+            return cell
+        default:
+            let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
+            cell.navigationController.send(navigationController)
+            return cell
+        }
     }
 
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
         let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top
-        let width: CGFloat = view.frame.width - view.safeAreaInsets.left  - view.safeAreaInsets.right
+        let width: CGFloat = view.frame.width - view.safeAreaInsets.left - view.safeAreaInsets.right
         return CGSizeMake(width, height)
     }
     
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    override internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
         menuBar.leadingConstraint?.constant = scrollView.contentOffset.x / 4
     }
     
-    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    override internal func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let index = targetContentOffset.pointee.x / view.frame.width
         let indexPath = IndexPath(item: Int(index), section: 0)
         guard let menu = Menu.allCases[safe: indexPath.item] else { return }
@@ -257,29 +245,8 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         menuBar.selectItem(at: indexPath)
         
         // Handle title update
-        self.titleLabel.text = menu.title
-        let titleView = UIBarButtonItem(customView: self.titleLabel)
-        self.navigationItem.setLeftBarButtonItems([titleView], animated: false)
+        if let titleView = navigationItem.titleView as? UILabel {
+            titleView.text = menu.title
+        }
     }
 }
-
-//extension HomeController: UICollectionViewDelegateFlowLayout {
-//    override internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return videos.count
-//    }
-//
-//    override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
-//        let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
-//        cell.setupCell(video)
-//        return cell
-//    }
-//
-//    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let inset: CGFloat = 16
-//        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
-//        let thumbnailHeight: CGFloat = (view.frame.width - inset - inset) * (9 / 16)
-//        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
-//        return CGSizeMake(view.frame.width, cellHeight)
-//    }
-//}

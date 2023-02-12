@@ -33,17 +33,50 @@ internal class ShimmerView: UIView {
     
     private let gradientLightColor: CGColor = UIColor(white: 0.85, alpha: 1).cgColor
     
+    internal var size: CGSize = .zero {
+        didSet {
+            startAnimating()
+        }
+    }
+    
+    internal var cornerRadius: CGFloat = .zero {
+        didSet {
+            startAnimating()
+        }
+    }
+    
+    // MARK: Layouts
+    
+    private func setupLayout() {
+        let widthAnchor = widthAnchor.constraint(equalToConstant: size.width)
+        widthAnchor.priority = .defaultLow
+        widthAnchor.isActive = true
+        
+        let heightAnchor = heightAnchor.constraint(equalToConstant: size.height)
+        heightAnchor.priority = .defaultLow
+        heightAnchor.isActive = true
+    }
+    
     // MARK: Private Implementations
     
     private func setupGradientLayer() {
-        gradientLayer.frame = bounds
+        let updateBounds = CGRectMake(
+            frame.origin.x,
+            frame.origin.y,
+            size.width,
+            size.height
+        )
+        
+        gradientLayer.frame = updateBounds
+        gradientLayer.cornerRadius = cornerRadius
         gradientLayer.colors = [gradientDarkColor, gradientLightColor, gradientDarkColor]
         layer.addSublayer(gradientLayer)
         layer.masksToBounds = true
     }
 
-    internal func startAnimating() {
+    private func startAnimating() {
         setupGradientLayer()
         gradientLayer.add(animation, forKey: animation.keyPath)
+        setupLayout()
     }
 }

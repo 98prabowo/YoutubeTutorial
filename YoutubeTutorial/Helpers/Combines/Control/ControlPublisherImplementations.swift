@@ -9,8 +9,9 @@ import Combine
 import UIKit
 
 extension UIControl {
-    internal func action(_ event: UIControl.Event = .touchUpInside) -> Publishers.ReceiveOn<ControlPublisher, DispatchQueue> {
+    internal func action(_ event: UIControl.Event = .touchUpInside) -> AnyPublisher<ControlPublisher.Output, ControlPublisher.Failure> {
         ControlPublisher(control: self, event: event)
             .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
     }
 }

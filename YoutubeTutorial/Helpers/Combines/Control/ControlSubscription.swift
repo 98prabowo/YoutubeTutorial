@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal class ControlSubscription<S: Subscriber>: Subscription where S.Input == Void, S.Failure == Never {
+internal final class ControlSubscription<S: Subscriber>: Subscription where S.Input == Void, S.Failure == Never {
     private var subscriber: S?
     private let control: UIControl
     
@@ -20,7 +20,9 @@ internal class ControlSubscription<S: Subscriber>: Subscription where S.Input ==
     
     internal func request(_ demand: Subscribers.Demand) {}
     
-    internal func cancel() {}
+    internal func cancel() {
+        subscriber = nil
+    }
     
     @objc private func handleEvent(_ sender: UIControl) {
         _ = subscriber?.receive(())

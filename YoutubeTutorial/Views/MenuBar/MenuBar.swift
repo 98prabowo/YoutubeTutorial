@@ -35,7 +35,7 @@ internal final class MenuBar: UIView {
     
     internal var leadingConstraint: NSLayoutConstraint?
     
-    internal var cancellables = Set<AnyCancellable>()
+    internal var cancellable = Set<AnyCancellable>()
     
     internal let tapMenu = CurrentValueSubject<IndexPath, Never>(IndexPath(item: 0, section: 0))
     

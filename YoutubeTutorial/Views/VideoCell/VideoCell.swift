@@ -33,14 +33,9 @@ internal final class VideoCell: BaseCell {
         contentView.pinSubview(loadingCell)
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        loadingCell.starAnimating()
-    }
-    
     internal func setupCell(_ video: Video) {
         Publishers.Zip(
-            NetworkManager.shared.getImageURL(from: video.thumbnailImageName),
+            NetworkManager.shared.getImageURLPublisher(from: video.thumbnailImageName),
             NetworkManager.shared.getImageURL(from: video.channel.profileImageName)
         )
         .receive(on: DispatchQueue.main)

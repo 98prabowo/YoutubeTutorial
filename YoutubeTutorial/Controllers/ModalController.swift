@@ -9,7 +9,7 @@ import Combine
 import UIKit
 
 internal final class ModalController: UIViewController {
-    // MARK: Enums
+    // MARK: Options
     
     internal enum Size {
         case fitContent
@@ -108,6 +108,31 @@ internal final class ModalController: UIViewController {
     
     // MARK: Layouts
     
+    private func presentContent() {
+        backgroundView.frame = view.frame
+        setupContainer()
+        view.addSubview(backgroundView)
+        view.addSubview(containerView)
+        
+        let calculatedY: CGFloat = view.frame.height - containerHeight
+        
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0.0,
+            usingSpringWithDamping: 1.0,
+            initialSpringVelocity: 1.0,
+            options: .curveEaseOut
+        ) {
+            self.backgroundView.alpha = 1.0
+            self.containerView.frame = CGRectMake(
+                0.0,
+                calculatedY,
+                self.view.frame.width,
+                self.containerHeight
+            )
+        }
+    }
+    
     private func setupContainer() {
         contentView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = .white
@@ -176,26 +201,17 @@ internal final class ModalController: UIViewController {
         }
     }
     
-    private func presentContent() {
-        backgroundView.frame = view.frame
-        setupContainer()
-        view.addSubview(backgroundView)
-        view.addSubview(containerView)
-        
-        let calculatedY: CGFloat = view.frame.height - containerHeight
-        
-        UIView.animate(withDuration: 0.5, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: .curveEaseOut) {
-            self.backgroundView.alpha = 1.0
-            self.containerView.frame = CGRectMake(0.0, calculatedY, self.view.frame.width, self.containerHeight)
-        }
-    }
+    // MARK: Private Implementations
     
-    // MARK: Private Methods
-    
-    private func dismissContent(completionHandler: (() -> Void)? = nil) {
+    private func dismissContent(completion completionHandler: (() -> Void)? = nil) {
         UIView.animate(withDuration: 0.5) {
             self.backgroundView.alpha = 0.0
-            self.containerView.frame = CGRectMake(0.0, self.view.frame.height, self.containerView.frame.width, self.containerView.frame.height)
+            self.containerView.frame = CGRectMake(
+                0.0,
+                self.view.frame.height,
+                self.containerView.frame.width,
+                self.containerView.frame.height
+            )
         } completion: { _ in
             self.backgroundView.removeFromSuperview()
             self.contentView.removeFromSuperview()
@@ -206,7 +222,7 @@ internal final class ModalController: UIViewController {
     
     private func setupGesture() {
         backgroundView.tap()
-            .sink { [weak self] _ in
+            .sink { [weak self] in
                 guard let self else { return }
                 self.dismissContent()
             }
@@ -215,16 +231,17 @@ internal final class ModalController: UIViewController {
     
     private func setupButton() {
         closeButton.action()
-            .sink { [weak self] _ in
+            .mapToVoid()
+            .sink { [weak self] in
                 guard let self else { return }
                 self.dismissContent()
             }
             .store(in: &cancellables)
     }
     
-    // MARK: Implementations
+    // MARK: Interfaces
     
     internal func dismissModal(completion: (() -> Void)? = nil) {
-        dismissContent(completionHandler: completion)
+        dismissContent(completion: completion)
     }
 }

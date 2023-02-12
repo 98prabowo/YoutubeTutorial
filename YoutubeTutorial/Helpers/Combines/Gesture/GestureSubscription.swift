@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal class GestureSubscription<S: Subscriber>: Subscription where S.Input == GestureType, S.Failure == Never {
+internal final class GestureSubscription<S: Subscriber>: Subscription where S.Input == GestureType, S.Failure == Never {
     private var subscriber: S?
     private let gestureType: GestureType
     private let view: UIView

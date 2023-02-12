@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal class GesturePublisher: Publisher {
+internal final class GesturePublisher: Publisher {
     typealias Output = GestureType
     typealias Failure = Never
     

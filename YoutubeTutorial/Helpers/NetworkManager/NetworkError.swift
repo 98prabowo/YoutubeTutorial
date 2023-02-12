@@ -7,25 +7,39 @@
 
 import Foundation
 
-internal enum NetworkError: Error {
-    case noURL
+internal enum NetworkError: LocalizedError {
+    internal enum RequestError {
+        case invalidURL
+        case jsonNotFound
+        case statusCodeError(Int)
+    }
+    
+    /// Invalid request, e.g. invalid URL
+    case requestError(RequestError)
+    
+    /// Indicates an error on the transport layer, e.g. not being able to connect to the server
+    case transportError(Error)
+    
+    /// Unable to find data in the memmory
     case dataNotFound
+    
+    /// Fail to decode received data
     case decodeFail
-    case sessionError
-    case statusCodeError(Int)
     
     internal var localizedDescription: String {
         switch self {
-        case .noURL:
-            return "Error - URL Not valid"
+        case .requestError(.invalidURL):
+            return "URL is not valid"
+        case .requestError(.jsonNotFound):
+            return "JSON file not found in memmory"
+        case let .requestError(.statusCodeError(statusCode)):
+            return "Server error: \(statusCode) error"
+        case let .transportError(error):
+            return "Server error: \(error.localizedDescription)"
         case .dataNotFound:
-            return "Error - Data not found or corrupt"
+            return "Data not found or corrupt"
         case .decodeFail:
-            return "Error - Fail to decode data"
-        case .sessionError:
-            return "Error - URL session return error"
-        case let .statusCodeError(statusCode):
-            return "Server error - \(statusCode)"
+            return "Fail to decode data"
         }
     }
 }

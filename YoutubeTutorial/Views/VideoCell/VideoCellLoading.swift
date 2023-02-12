@@ -12,6 +12,7 @@ internal final class VideoCellLoading: UIView {
     
     private let thumbnailImageShimmer: ShimmerView = {
         let shimmer = ShimmerView()
+        shimmer.size = CGSizeMake(400, 400)
         shimmer.setContentHuggingPriority(.defaultLow, for: .vertical)
         shimmer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
@@ -27,7 +28,8 @@ internal final class VideoCellLoading: UIView {
     
     private let profileImageShimmer: ShimmerView = {
         let shimmer = ShimmerView()
-        shimmer.layer.cornerRadius = 22
+        shimmer.size = CGSizeMake(44, 44)
+        shimmer.cornerRadius = 22
         shimmer.setContentHuggingPriority(.required, for: .vertical)
         shimmer.setContentHuggingPriority(.required, for: .horizontal)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
@@ -36,6 +38,7 @@ internal final class VideoCellLoading: UIView {
 
     private let titleShimmer: ShimmerView = {
         let shimmer = ShimmerView()
+        shimmer.size = CGSizeMake(300, 20)
         shimmer.setContentHuggingPriority(.defaultLow, for: .vertical)
         shimmer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         shimmer.setContentCompressionResistancePriority(.required, for: .vertical)
@@ -46,6 +49,7 @@ internal final class VideoCellLoading: UIView {
 
     private let subtitleShimmer: ShimmerView = {
         let shimmer = ShimmerView()
+        shimmer.size = CGSizeMake(300, 20)
         shimmer.setContentCompressionResistancePriority(.required, for: .vertical)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
         return shimmer
@@ -95,19 +99,13 @@ internal final class VideoCellLoading: UIView {
         let rootView = setupStackLayout()
         addSubview(rootView)
         addSubview(separatorView)
-        
-        NSLayoutConstraint.activate([
-            profileImageShimmer.widthAnchor.constraint(equalToConstant: 44),
-            profileImageShimmer.heightAnchor.constraint(equalToConstant: 44)
-        ])
-        
+
         NSLayoutConstraint.activate([
             rootView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             rootView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             rootView.topAnchor.constraint(equalTo: topAnchor, constant: 16),
-            
         ])
-        
+
         NSLayoutConstraint.activate([
             separatorView.leadingAnchor.constraint(equalTo: leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -115,14 +113,5 @@ internal final class VideoCellLoading: UIView {
             separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1)
         ])
-    }
-    
-    // MARK: Implementations
-    
-    internal func starAnimating() {
-        thumbnailImageShimmer.startAnimating()
-        titleShimmer.startAnimating()
-        subtitleShimmer.startAnimating()
-        profileImageShimmer.startAnimating()
     }
 }

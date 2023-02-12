@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal class ControlPublisher: Publisher {
+internal final class ControlPublisher: Publisher {
     typealias Output = Void
     typealias Failure = Never
     

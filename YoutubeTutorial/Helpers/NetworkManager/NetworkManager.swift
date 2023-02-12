@@ -11,7 +11,13 @@ import UIKit
 internal class NetworkManager {
     internal static let shared = NetworkManager()
     
+    private var imageCache = NSCache<NSString, UIImage>()
+    
+    private var cancellables = Set<AnyCancellable>()
+    
     private init() {}
+    
+    // MARK: Variety of local json file reader using combine
     
     internal func readLocalFile<T: Decodable>(_ type: T.Type, forName name: String) -> Future<T, NetworkError>  {
         Future { promise in
@@ -26,20 +32,36 @@ internal class NetworkManager {
         }
     }
     
-    internal func readURLJSON<T: Decodable>(_ type: T.Type, from urlString: String) -> Future<T, NetworkError> {
+    internal func readLocalFilePublisher<T: Decodable>(_ type: T.Type, forName name: String) -> AnyPublisher<T, NetworkError>  {
+        Just(Bundle.main.path(forResource: name, ofType: "json"))
+            .tryMap { bundlePath in
+                guard let bundlePath else { throw NetworkError.requestError(.jsonNotFound) }
+                if let data = try String(contentsOfFile: bundlePath).data(using: .utf8) {
+                    return data
+                } else {
+                    throw NetworkError.dataNotFound
+                }
+            }
+            .decode(type: type, decoder: JSONDecoder())
+            .mapError { _ in NetworkError.decodeFail }
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: Variety of network call using combine
+    
+    internal func fetchURL<T: Decodable>(_ type: T.Type, from urlString: String) -> Future<T, NetworkError> {
         Future { promise in
-            guard let url = URL(string: urlString) else { return promise(.failure(.noURL)) }
-            let session = URLSession(configuration: .default)
+            guard let url = URL(string: urlString) else { return promise(.failure(.requestError(.invalidURL))) }
             let request = URLRequest(url: url)
-            session.dataTask(with: request) { data, response, error in
+            URLSession.shared.dataTask(with: request) { data, response, error in
                 do {
-                    if error != nil {
-                        promise(.failure(.sessionError))
+                    if let error {
+                        promise(.failure(.transportError(error)))
                     }
                     
                     if let httpResponse = response as? HTTPURLResponse,
                        !httpResponse.isResponseOK() {
-                        promise(.failure(.statusCodeError(httpResponse.statusCode)))
+                        promise(.failure(.requestError(.statusCodeError(httpResponse.statusCode))))
                     }
                     
                     guard let data else { return promise(.failure(.dataNotFound)) }
@@ -52,19 +74,111 @@ internal class NetworkManager {
         }
     }
     
+    internal func readURLPublisher<T: Decodable>(_ type: T.Type, from urlString: String) -> AnyPublisher<T, NetworkError> {
+        guard let url = URL(string: urlString) else {
+            return Fail(error: .requestError(.invalidURL))
+                .eraseToAnyPublisher()
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .mapError { .transportError($0) }
+            .flatMap { data, response -> AnyPublisher<T, NetworkError> in
+                if let httpResponse = response as? HTTPURLResponse,
+                   !httpResponse.isResponseOK() {
+                    return Fail(error: .requestError(.statusCodeError(httpResponse.statusCode)))
+                        .eraseToAnyPublisher()
+                } else {
+                    return Just(data)
+                        .decode(type: type, decoder: JSONDecoder())
+                        .mapError { _ in .decodeFail }
+                        .eraseToAnyPublisher()
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    internal func fetchURLPublisher<T: Decodable>(_ type: T.Type, from urlString: String) -> Future<T, NetworkError> {
+        Future { [weak self] promise in
+            guard let self, let url = URL(string: urlString) else { return promise(.failure(.requestError(.invalidURL))) }
+            URLSession.shared.dataTaskPublisher(for: url)
+                .tryMap { data, response in
+                    if let httpResponse = response as? HTTPURLResponse,
+                       !httpResponse.isResponseOK() {
+                        throw NetworkError.requestError(.statusCodeError(httpResponse.statusCode))
+                    }
+                    return data
+                }
+                .decode(type: type, decoder: JSONDecoder())
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(error):
+                        switch error {
+                        case _ as DecodingError:
+                            promise(.failure(.decodeFail))
+                        case let networkError as NetworkError:
+                            promise(.failure(networkError))
+                        default:
+                            promise(.failure(.transportError(error)))
+                        }
+                    case .finished:
+                        break
+                    }
+                }, receiveValue: { decodedData in
+                    return promise(.success(decodedData))
+                })
+                .store(in: &self.cancellables)
+        }
+    }
+    
+    internal func fetchEndPointPublisher<T: Decodable>(_ type: T.Type, from endpoint: EndPoint) -> Future<T, NetworkError> {
+        Future { [weak self] promise in
+            guard let self, let url = URL(string: endpoint.url) else { return promise(.failure(.requestError(.invalidURL))) }
+            URLSession.shared.dataTaskPublisher(for: url)
+                .tryMap { data, response in
+                    if let httpResponse = response as? HTTPURLResponse,
+                       !httpResponse.isResponseOK() {
+                        throw NetworkError.requestError(.statusCodeError(httpResponse.statusCode))
+                    }
+                    return data
+                }
+                .decode(type: type, decoder: JSONDecoder())
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(error):
+                        switch error {
+                        case _ as DecodingError:
+                            promise(.failure(.decodeFail))
+                        case let networkError as NetworkError:
+                            promise(.failure(networkError))
+                        default:
+                            promise(.failure(.transportError(error)))
+                        }
+                    case .finished:
+                        break
+                    }
+                }, receiveValue: { decodedData in
+                    return promise(.success(decodedData))
+                })
+                .store(in: &self.cancellables)
+        }
+    }
+    
+    // MARK: Variety of network call to handle image with cache using combine
+    
     internal func getImageURL(from urlString: String) -> Future<UIImage, NetworkError> {
         Future { promise in
-            guard let url = URL(string: urlString) else { return promise(.failure(.noURL)) }
-            let session = URLSession(configuration: .default)
+            guard let url = URL(string: urlString) else { return promise(.failure(.requestError(.invalidURL))) }
             let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 3)
-            session.dataTask(with: request) { data, response, error in
-                if error != nil {
-                    promise(.failure(.sessionError))
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error {
+                    promise(.failure(.transportError(error)))
                 }
                 
                 if let httpResponse = response as? HTTPURLResponse,
                    !httpResponse.isResponseOK() {
-                    promise(.failure(.statusCodeError(httpResponse.statusCode)))
+                    promise(.failure(.requestError(.statusCodeError(httpResponse.statusCode))))
                 }
                 
                 guard let data, let image = UIImage(data: data) else {
@@ -73,6 +187,73 @@ internal class NetworkManager {
                 
                 return promise(.success(image))
             }.resume()
+        }
+    }
+    
+    internal func getImageURLPublisher(from urlString: String) -> AnyPublisher<UIImage, NetworkError> {
+        guard let url = URL(string: urlString) else {
+            return Fail(error: .requestError(.invalidURL))
+                .eraseToAnyPublisher()
+        }
+        
+        if let imageFromCache = imageCache.object(forKey: urlString as NSString) {
+            return Just(imageFromCache)
+                .setFailureType(to: NetworkError.self)
+                .eraseToAnyPublisher()
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .mapError { NetworkError.transportError($0) }
+            .flatMap { [weak self] data, response -> AnyPublisher<UIImage, NetworkError> in
+                if let httpResponse = response as? HTTPURLResponse,
+                   !httpResponse.isResponseOK() {
+                    return Fail(error: .requestError(.statusCodeError(httpResponse.statusCode)))
+                        .eraseToAnyPublisher()
+                } else {
+                    guard let self, let image = UIImage(data: data) else {
+                        return Fail(error: .dataNotFound).eraseToAnyPublisher()
+                    }
+                    
+                    self.imageCache.setObject(image, forKey: urlString as NSString)
+                    
+                    return Just(image)
+                        .setFailureType(to: NetworkError.self)
+                        .eraseToAnyPublisher()
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    internal func getImagePublisher(from urlString: String) -> Future<UIImage, NetworkError> {
+        Future { [weak self] promise in
+            guard let self, let url = URL(string: urlString) else { return promise(.failure(.requestError(.invalidURL))) }
+            
+            if let imageFromCache = self.imageCache.object(forKey: urlString as NSString) {
+                return promise(.success(imageFromCache))
+            }
+            
+            URLSession.shared.dataTaskPublisher(for: url)
+                .tryMap { data, response in
+                    if let httpResponse = response as? HTTPURLResponse,
+                       !httpResponse.isResponseOK() {
+                        throw NetworkError.requestError(.statusCodeError(httpResponse.statusCode))
+                    }
+                    return UIImage(data: data)
+                }
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case let .failure(error):
+                        return promise(.failure(.transportError(error)))
+                    case .finished:
+                        break
+                    }
+                }) { [weak self] image in
+                    guard let self, let image else { return promise(.failure(.dataNotFound)) }
+                    self.imageCache.setObject(image, forKey: urlString as NSString)
+                    return promise(.success(image))
+                }
+                .store(in: &self.cancellables)
         }
     }
 }

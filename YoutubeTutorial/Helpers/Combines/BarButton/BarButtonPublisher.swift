@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal class BarButtonPublisher: Publisher {
+internal final class BarButtonPublisher: Publisher {
     typealias Output = Void
     typealias Failure = Never
     

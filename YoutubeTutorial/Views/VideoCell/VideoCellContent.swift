@@ -5,7 +5,6 @@
 //  Created by Dimas Prabowo on 01/02/23.
 //
 
-import Combine
 import UIKit
 
 internal final class VideoCellContent: UIView {
@@ -62,10 +61,6 @@ internal final class VideoCellContent: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    // MARK: Properties
-    
-    private var cancellables = Set<AnyCancellable>()
     
     // MARK: Lifecycles
     
