@@ -26,7 +26,7 @@ internal class TrendingCell: BaseCell {
     
     private var videos = CurrentValueSubject<[Video], Never>([Video]())
     
-    internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
+    internal var parentVC = CurrentValueSubject<UIViewController?, Never>(nil)
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -55,8 +55,8 @@ internal class TrendingCell: BaseCell {
             }
             .store(in: &cancellables)
         
-        navigationController
-            .defaultToZero { $0?.navigationBar.frame.height }
+        parentVC
+            .defaultToZero { $0?.navigationController?.navigationBar.frame.height }
             .receive(on: DispatchQueue.main)
             .sink { [collectionView] navigationBarHeight in
                 collectionView.contentInset = UIEdgeInsets(

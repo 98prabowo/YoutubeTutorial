@@ -39,6 +39,8 @@
 		D648638C29999349007DA5B4 /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638B29999349007DA5B4 /* EndPoint.swift */; };
 		D648638E29999E92007DA5B4 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */; };
 		D64863902999B964007DA5B4 /* DiffableCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638F2999B964007DA5B4 /* DiffableCollection.swift */; };
+		D64D8AB1299AB58B00F2FAC1 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */; };
+		D64D8AB4299ACC2700F2FAC1 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */; };
 		D651874C2988891F00362A46 /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874B2988891F00362A46 /* VideoCell.swift */; };
 		D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874F29888A3600362A46 /* UIColor+Extensions.swift */; };
 		D66A95332990E5CA003D2B6B /* TrendingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66A95322990E5CA003D2B6B /* TrendingCell.swift */; };
@@ -111,6 +113,8 @@
 		D648638B29999349007DA5B4 /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
 		D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 		D648638F2999B964007DA5B4 /* DiffableCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffableCollection.swift; sourceTree = "<group>"; };
+		D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
+		D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		D651874B2988891F00362A46 /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		D651874F29888A3600362A46 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		D66A95322990E5CA003D2B6B /* TrendingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCell.swift; sourceTree = "<group>"; };
@@ -293,12 +297,22 @@
 			path = Setting;
 			sourceTree = "<group>";
 		};
+		D64D8AB2299AB5AC00F2FAC1 /* VideoManager */ = {
+			isa = PBXGroup;
+			children = (
+				D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */,
+				D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */,
+			);
+			path = VideoManager;
+			sourceTree = "<group>";
+		};
 		D651874A298888C800362A46 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				D634D1FE298C00DA002BCF24 /* Combines */,
 				D634D1FC298C00C2002BCF24 /* Extensions */,
 				D634D1FD298C00D2002BCF24 /* NetworkManager */,
+				D64D8AB2299AB5AC00F2FAC1 /* VideoManager */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -548,6 +562,7 @@
 				D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */,
 				D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */,
 				D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */,
+				D64D8AB1299AB58B00F2FAC1 /* VideoView.swift in Sources */,
 				D635AE4D29897D2D000B5659 /* Video.swift in Sources */,
 				D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */,
 				D634D21C298C1666002BCF24 /* Menu.swift in Sources */,
@@ -561,6 +576,7 @@
 				D634D218298C15ED002BCF24 /* NetworkError.swift in Sources */,
 				D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */,
 				D63D2486298AF828006FCDA3 /* SettingView.swift in Sources */,
+				D64D8AB4299ACC2700F2FAC1 /* VideoPlayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -117,9 +117,9 @@ internal final class HomeController: DiffableCollectionController<Menu> {
         ])
         
         // Configure collection view content inset
-        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
-        collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
-        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+//        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
+//        collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+//        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Private Implementations
@@ -211,23 +211,24 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         collectionView.register(forCell: SubscriptionsCell.self)
         collectionView.register(forCell: AccountCell.self)
         
-        setupDataSource { [navigationController] collectionView, indexPath, menu in
+        setupDataSource { [weak self] collectionView, indexPath, menu in
+            guard let self else { return nil }
             switch menu {
             case .home:
                 let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
-                cell.navigationController.send(navigationController)
+                cell.parentVC.send(self)
                 return cell
             case .trending:
                 let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
-                cell.navigationController.send(navigationController)
+                cell.parentVC.send(self)
                 return cell
             case .subscriptions:
                 let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
-                cell.navigationController.send(navigationController)
+                cell.parentVC.send(self)
                 return cell
             case .account:
                 let cell = collectionView.dequeueReusableCell(withCell: AccountCell.self, for: indexPath)
-                cell.navigationController.send(navigationController)
+                cell.parentVC.send(self)
                 return cell
             }
         }
@@ -236,7 +237,7 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
     }
     
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
-        let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top - menuBarHeight
+        let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top
         let width: CGFloat = view.frame.width - view.safeAreaInsets.left - view.safeAreaInsets.right
         return CGSizeMake(width, height)
     }
