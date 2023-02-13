@@ -89,7 +89,7 @@ extension SubscriptionsCell: UICollectionViewDelegate, UICollectionViewDelegateF
         }
     }
 
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
         let inset: CGFloat = 16
         // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
         let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)

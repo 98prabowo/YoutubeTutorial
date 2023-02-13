@@ -245,7 +245,7 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         menuBar.leadingConstraint?.constant = scrollView.contentOffset.x / 4
     }
     
-    override internal func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    override internal func scrollViewWillEndDragging(_: UIScrollView, withVelocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let index = targetContentOffset.pointee.x / view.frame.width
         let indexPath = IndexPath(item: Int(index), section: 0)
         guard let menu = Menu.allCases[safe: indexPath.item] else { return }

@@ -84,12 +84,12 @@ extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
         collectionView.items.send(settings)
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
         return CGSizeMake(frame.width, cellHeight)
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let setting = self.collectionView.itemSource?.itemIdentifier(for: indexPath) else { return }
+    internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let setting = collectionView.itemSource?.itemIdentifier(for: indexPath) else { return }
         tapButton.send(setting)
     }
 }
