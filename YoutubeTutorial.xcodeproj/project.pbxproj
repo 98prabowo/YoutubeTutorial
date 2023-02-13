@@ -38,6 +38,7 @@
 		D63D2489298AFB7F006FCDA3 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63D2488298AFB7F006FCDA3 /* SettingCell.swift */; };
 		D648638C29999349007DA5B4 /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638B29999349007DA5B4 /* EndPoint.swift */; };
 		D648638E29999E92007DA5B4 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */; };
+		D64863902999B964007DA5B4 /* DiffableCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D648638F2999B964007DA5B4 /* DiffableCollection.swift */; };
 		D651874C2988891F00362A46 /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874B2988891F00362A46 /* VideoCell.swift */; };
 		D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651874F29888A3600362A46 /* UIColor+Extensions.swift */; };
 		D66A95332990E5CA003D2B6B /* TrendingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66A95322990E5CA003D2B6B /* TrendingCell.swift */; };
@@ -109,6 +110,7 @@
 		D63D2488298AFB7F006FCDA3 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		D648638B29999349007DA5B4 /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
 		D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
+		D648638F2999B964007DA5B4 /* DiffableCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffableCollection.swift; sourceTree = "<group>"; };
 		D651874B2988891F00362A46 /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
 		D651874F29888A3600362A46 /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		D66A95322990E5CA003D2B6B /* TrendingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCell.swift; sourceTree = "<group>"; };
@@ -320,6 +322,7 @@
 				D682F752298117530053A5FE /* HomeController.swift */,
 				D63D2483298AD300006FCDA3 /* ModalController.swift */,
 				D634D1FA298BEFB0002BCF24 /* SettingController.swift */,
+				D648638F2999B964007DA5B4 /* DiffableCollection.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -552,6 +555,7 @@
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,
 				D634D204298C02E2002BCF24 /* GestureSubscription.swift in Sources */,
 				D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */,
+				D64863902999B964007DA5B4 /* DiffableCollection.swift in Sources */,
 				D682F751298117530053A5FE /* SceneDelegate.swift in Sources */,
 				D66A95352990E5E3003D2B6B /* SubscriptionsCell.swift in Sources */,
 				D634D218298C15ED002BCF24 /* NetworkError.swift in Sources */,

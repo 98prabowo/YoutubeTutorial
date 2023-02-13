@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct Video {
+internal struct Video: Hashable {
     internal let title: String
     internal let numberOfViews: Int
     internal let thumbnailImageName: String

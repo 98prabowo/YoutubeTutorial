@@ -7,7 +7,7 @@
 
 import UIKit
 
-internal enum Menu: CaseIterable {
+internal enum Menu: CaseIterable, Hashable {
     case home
     case trending
     case subscriptions

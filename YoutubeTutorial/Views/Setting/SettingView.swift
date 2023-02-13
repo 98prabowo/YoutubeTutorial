@@ -11,12 +11,12 @@ import UIKit
 internal final class SettingView: UIView {
     // MARK: UI Components
     
-    private let collectionView: UICollectionView = {
+    private let collectionView: DiffableCollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collection = DiffableCollectionView<Setting>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.isScrollEnabled = false
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -66,28 +66,22 @@ internal final class SettingView: UIView {
         // Explicitly set `UIView` height
         frame = CGRectMake(0, 0, 0, CGFloat(settings.count) * cellHeight)
     }
-    
-    // MARK: Private Implementations
-    
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(forCell: SettingCell.self)
-    }
 }
 
-extension SettingView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return settings.count
-    }
-    
-    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let setting = settings[safe: indexPath.item] else { return UICollectionViewCell() }
-        let cell = collectionView.dequeueReusableCell(withCell: SettingCell.self, for: indexPath)
-        cell.setting = setting
-        cell.iconSize = iconSize
-        cell.verticalInset = verticalInset
-        return cell
+// MARK: Collection View
+
+extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.register(forCell: SettingCell.self)
+        collectionView.setupDataSource { [iconSize, verticalInset] collectionView, indexPath, setting in
+            let cell = collectionView.dequeueReusableCell(withCell: SettingCell.self, for: indexPath)
+            cell.setting = setting
+            cell.iconSize = iconSize
+            cell.verticalInset = verticalInset
+            return cell
+        }
+        collectionView.items.send(settings)
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

@@ -11,12 +11,12 @@ import UIKit
 internal final class MenuBar: UIView {
     // MARK: UI Components
     
-    private let collectionView: UICollectionView = {
+    private let collectionView: DiffableCollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collection = DiffableCollectionView<Menu>(frame: .zero, layout: layout)
         collection.backgroundColor = .redNavBar
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
@@ -60,15 +60,6 @@ internal final class MenuBar: UIView {
     
     // MARK: Private Implementations
     
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(forCell: MenuCell.self)
-        
-        // Set initial cell selection
-        collectionView.selectItem(at: tapMenu.value, animated: false, scrollPosition: .centeredHorizontally)
-    }
-    
     private func setupHorizontalView() {
         addSubview(horizontalView)
         leadingConstraint = horizontalView.leadingAnchor.constraint(equalTo: leadingAnchor)
@@ -79,22 +70,30 @@ internal final class MenuBar: UIView {
             horizontalView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/4)
         ])
     }
+}
+
+// MARK: Collection View
+
+extension MenuBar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.register(forCell: MenuCell.self)
+        collectionView.setupDataSource { collectionView, indexPath, menu in
+            let cell = collectionView.dequeueReusableCell(withCell: MenuCell.self, for: indexPath)
+            cell.menu.send(menu)
+            return cell
+        }
+        
+        collectionView.items.send(menus)
+        
+        // Set initial cell selection. Need to dispatch to main to make it serial with collection view.
+        DispatchQueue.main.async {
+            self.selectItem(at: self.tapMenu.value)
+        }
+    }
     
     internal func selectItem(at indexPath: IndexPath) {
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
-    }
-}
-
-extension MenuBar: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    internal func collectionView(_: UICollectionView, numberOfItemsInSection: Int) -> Int {
-        return menus.count
-    }
-    
-    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let menu = menus[safe: indexPath.item] else { return UICollectionViewCell() }
-        let cell = collectionView.dequeueReusableCell(withCell: MenuCell.self, for: indexPath)
-        cell.menu.send(menu)
-        return cell
     }
     
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {

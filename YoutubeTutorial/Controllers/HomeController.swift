@@ -8,7 +8,8 @@
 import Combine
 import UIKit
 
-internal final class HomeController: UICollectionViewController {
+internal final class HomeController: DiffableCollectionController<Menu> {
+    
     // MARK: UI Components
     
     private lazy var titleLabel: UILabel = {
@@ -67,7 +68,7 @@ internal final class HomeController: UICollectionViewController {
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        super.init(collectionViewLayout: layout)
+        super.init(layout: layout)
         view.backgroundColor = .white
     }
     
@@ -100,7 +101,7 @@ internal final class HomeController: UICollectionViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.hidesBarsOnSwipe = false
-      }
+    }
     
     // MARK: Layouts
     
@@ -114,6 +115,11 @@ internal final class HomeController: UICollectionViewController {
             menuBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             menuBar.heightAnchor.constraint(equalToConstant: menuBarHeight)
         ])
+        
+        // Configure collection view content inset
+        let navBarHeight: CGFloat = navigationController?.navigationBar.frame.height ?? 0.0
+        collectionView.contentInset = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
+        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: navBarHeight + menuBarHeight, left: 0, bottom: 0, right: 0)
     }
     
     // MARK: Private Implementations
@@ -122,18 +128,10 @@ internal final class HomeController: UICollectionViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         navigationItem.rightBarButtonItems = [settingBtn, searchBtn]
     }
-    
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.isPagingEnabled = true
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.register(forCell: FeedCell.self)
-        collectionView.register(forCell: TrendingCell.self)
-        collectionView.register(forCell: SubscriptionsCell.self)
-        collectionView.register(forCell: AccountCell.self)
-    }
-    
+}
+
+// MARK: Handle Data and Actions
+extension HomeController {
     private func showSettings() {
         let settingView = SettingView()
         let vc = ModalController(settingView)
@@ -201,34 +199,42 @@ internal final class HomeController: UICollectionViewController {
     }
 }
 
+// MARK: Collection View
 extension HomeController: UICollectionViewDelegateFlowLayout {
-    override internal func collectionView(_: UICollectionView, numberOfItemsInSection: Int) -> Int {
-        return Menu.allCases.count
-    }
-
-    override internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        switch indexPath.item {
-        case 1:
-            let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
-            cell.navigationController.send(navigationController)
-            return cell
-        case 2:
-            let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
-            cell.navigationController.send(navigationController)
-            return cell
-        case 3:
-            let cell = collectionView.dequeueReusableCell(withCell: AccountCell.self, for: indexPath)
-            cell.navigationController.send(navigationController)
-            return cell
-        default:
-            let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
-            cell.navigationController.send(navigationController)
-            return cell
+    private func setupCollectionView() {
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(forCell: FeedCell.self)
+        collectionView.register(forCell: TrendingCell.self)
+        collectionView.register(forCell: SubscriptionsCell.self)
+        collectionView.register(forCell: AccountCell.self)
+        
+        setupDataSource { [navigationController] collectionView, indexPath, menu in
+            switch menu {
+            case .home:
+                let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
+                cell.navigationController.send(navigationController)
+                return cell
+            case .trending:
+                let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
+                cell.navigationController.send(navigationController)
+                return cell
+            case .subscriptions:
+                let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
+                cell.navigationController.send(navigationController)
+                return cell
+            case .account:
+                let cell = collectionView.dequeueReusableCell(withCell: AccountCell.self, for: indexPath)
+                cell.navigationController.send(navigationController)
+                return cell
+            }
         }
+        
+        items.send(Menu.allCases)
     }
-
+    
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
-        let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top
+        let height: CGFloat = view.frame.height - view.safeAreaInsets.bottom - view.safeAreaInsets.top - menuBarHeight
         let width: CGFloat = view.frame.width - view.safeAreaInsets.left - view.safeAreaInsets.right
         return CGSizeMake(width, height)
     }

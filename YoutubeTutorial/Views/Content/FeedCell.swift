@@ -11,12 +11,12 @@ import UIKit
 internal class FeedCell: BaseCell {
     // MARK: UI Components
     
-    private let collectionView: UICollectionView = {
+    private let collectionView: DiffableCollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let collection = DiffableCollectionView<Video>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
@@ -24,7 +24,7 @@ internal class FeedCell: BaseCell {
     
     // MARK: Properties
     
-    private var videos = [Video]()
+    private var videos = CurrentValueSubject<[Video], Never>([Video]())
     
     internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
     
@@ -40,14 +40,6 @@ internal class FeedCell: BaseCell {
     
     // MARK: Private Implementations
     
-    private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(forCell: VideoCell.self)
-    }
-    
-    // MARK: Interfaces
-    
     private func bindData() {
         NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .home)
             .receive(on: DispatchQueue.main)
@@ -58,10 +50,8 @@ internal class FeedCell: BaseCell {
                 case .finished:
                     break
                 }
-            } receiveValue: { [weak self] videos in
-                guard let self else { return }
-                self.videos = videos
-                self.collectionView.reloadData()
+            } receiveValue: { [collectionView] videos in
+                collectionView.items.send(videos)
             }
             .store(in: &cancellables)
         
@@ -86,16 +76,17 @@ internal class FeedCell: BaseCell {
     }
 }
 
-extension FeedCell: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    internal func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return videos.count
-    }
+// MARK: Collection View
 
-    internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let video = videos[safe: indexPath.item] else { return UICollectionViewCell() }
-        let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
-        cell.setupCell(video)
-        return cell
+extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    private func setupCollectionView() {
+        collectionView.delegate = self
+        collectionView.register(forCell: VideoCell.self)
+        collectionView.setupDataSource { collectionView, indexPath, video in
+            let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
+            cell.setupCell(video)
+            return cell
+        }
     }
 
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

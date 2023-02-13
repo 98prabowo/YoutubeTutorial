@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct Channel {
+internal struct Channel: Hashable {
     internal let name: String
     internal let profileImageName: String
 }
