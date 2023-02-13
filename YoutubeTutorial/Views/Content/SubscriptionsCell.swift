@@ -76,7 +76,7 @@ internal class SubscriptionsCell: BaseCell {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension SubscriptionsCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {

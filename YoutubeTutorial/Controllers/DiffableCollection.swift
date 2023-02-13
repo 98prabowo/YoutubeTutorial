@@ -95,7 +95,7 @@ internal class DiffableCollectionView<ItemIdentifierType>: UICollectionView wher
     
     private var cancellables = Set<AnyCancellable>()
     
-    private var itemSource: ItemSource?
+    internal var itemSource: ItemSource?
     
     internal init(frame: CGRect, layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)

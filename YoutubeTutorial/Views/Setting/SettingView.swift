@@ -68,7 +68,7 @@ internal final class SettingView: UIView {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
@@ -89,8 +89,7 @@ extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
     }
     
     internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SettingCell,
-              let setting = cell.setting else { return }
+        guard let setting = self.collectionView.itemSource?.itemIdentifier(for: indexPath) else { return }
         tapButton.send(setting)
     }
 }

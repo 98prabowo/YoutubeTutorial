@@ -76,7 +76,7 @@ internal class AccountCell: BaseCell {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension AccountCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {

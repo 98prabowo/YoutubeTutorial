@@ -76,7 +76,7 @@ internal class FeedCell: BaseCell {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {

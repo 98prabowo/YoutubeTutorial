@@ -76,7 +76,7 @@ internal class TrendingCell: BaseCell {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension TrendingCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {

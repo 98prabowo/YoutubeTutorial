@@ -130,7 +130,8 @@ internal final class HomeController: DiffableCollectionController<Menu> {
     }
 }
 
-// MARK: Handle Data and Actions
+// MARK: - Handle Data and Actions
+
 extension HomeController {
     private func showSettings() {
         let settingView = SettingView()
@@ -199,7 +200,8 @@ extension HomeController {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
+
 extension HomeController: UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
         collectionView.isPagingEnabled = true

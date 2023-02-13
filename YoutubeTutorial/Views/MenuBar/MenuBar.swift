@@ -72,7 +72,7 @@ internal final class MenuBar: UIView {
     }
 }
 
-// MARK: Collection View
+// MARK: - Collection View Implementation
 
 extension MenuBar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
