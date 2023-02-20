@@ -15,6 +15,7 @@ internal final class VideoPlayerView: UIView {
     private let controlView: VideoControllerView = {
         let view = VideoControllerView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "VideoPlayerView.controlView"
         return view
     }()
     
@@ -65,9 +66,8 @@ internal final class VideoPlayerView: UIView {
         guard let player else { return }
         player.periodicTimePublisher()
             .sink { [controlView] time in
-                if time.value == 0 {
-                    controlView.state.send(.playing(isHidden: true))
-                }
+                guard time.value == 0 else { return }
+                controlView.state.send(.playing(isHidden: true, source: .system))
             }
             .store(in: &cancellables)
         
@@ -81,7 +81,9 @@ internal final class VideoPlayerView: UIView {
     private func bindAction() {
         tap()
             .sink { [controlView] in
-                controlView.state.send(.playing(isHidden: false))
+                var state = controlView.state.value
+                state.toggleHidden()
+                controlView.state.send(state)
             }
             .store(in: &cancellables)
         

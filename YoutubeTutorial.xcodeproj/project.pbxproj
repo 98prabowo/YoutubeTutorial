@@ -65,6 +65,7 @@
 		D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */; };
 		D6A8DC50298A353500DA16BD /* home.json in Resources */ = {isa = PBXBuildFile; fileRef = D6A8DC4F298A353500DA16BD /* home.json */; };
 		D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8DC51298A356700DA16BD /* NetworkManager.swift */; };
+		D6BAAF2229A37BFE0056E8C0 /* PreviousValueOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,6 +148,7 @@
 		D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Extensions.swift"; sourceTree = "<group>"; };
 		D6A8DC4F298A353500DA16BD /* home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = home.json; sourceTree = "<group>"; };
 		D6A8DC51298A356700DA16BD /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousValueOperator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +230,7 @@
 				D634D208298C07B9002BCF24 /* Control */,
 				D634D207298C07B2002BCF24 /* Gesture */,
 				D66A953A2990EDF8003D2B6B /* Map */,
+				D6BAAF2329A37C130056E8C0 /* Operators */,
 			);
 			path = Combines;
 			sourceTree = "<group>";
@@ -340,8 +343,7 @@
 		D651874D2988893D00362A46 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D635AE4929896C9C000B5659 /* BaseCell.swift */,
-				D63258F8298A57C6006363CF /* ShimmerView.swift */,
+				D6BAAF1E29A3668D0056E8C0 /* Base */,
 				D634D21D298C685A002BCF24 /* Content */,
 				D63258FF298A7274006363CF /* MenuBar */,
 				D63D2487298AF9AD006FCDA3 /* Setting */,
@@ -416,6 +418,23 @@
 				D682F771298117540053A5FE /* YoutubeTutorialUITestsLaunchTests.swift */,
 			);
 			path = YoutubeTutorialUITests;
+			sourceTree = "<group>";
+		};
+		D6BAAF1E29A3668D0056E8C0 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				D635AE4929896C9C000B5659 /* BaseCell.swift */,
+				D63258F8298A57C6006363CF /* ShimmerView.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		D6BAAF2329A37C130056E8C0 /* Operators */ = {
+			isa = PBXGroup;
+			children = (
+				D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */,
+			);
+			path = Operators;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -587,6 +606,7 @@
 				D634D211298C0D82002BCF24 /* BarButtonSubscription.swift in Sources */,
 				D64D8AB1299AB58B00F2FAC1 /* VideoView.swift in Sources */,
 				D635AE4D29897D2D000B5659 /* Video.swift in Sources */,
+				D6BAAF2229A37BFE0056E8C0 /* PreviousValueOperator.swift in Sources */,
 				D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */,
 				D634D21C298C1666002BCF24 /* Menu.swift in Sources */,
 				D66A95332990E5CA003D2B6B /* TrendingCell.swift in Sources */,

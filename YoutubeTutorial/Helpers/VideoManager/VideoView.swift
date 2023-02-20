@@ -13,6 +13,7 @@ internal final class VideoView: UIView {
     private let videoPlayer: VideoPlayerView = {
         let player = VideoPlayerView(for: EndPoint.video.url)
         player.translatesAutoresizingMaskIntoConstraints = false
+        player.accessibilityIdentifier = "VideoView.videoPlayer"
         return player
     }()
     

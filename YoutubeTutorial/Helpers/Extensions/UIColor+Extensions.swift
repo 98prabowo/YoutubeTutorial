@@ -25,5 +25,5 @@ extension UIColor {
     internal static var redMenuIcon: UIColor = UIColor(red: 91, green: 14, blue: 13)
     
     /// Color code for youtube tutorial video controller background.
-    internal static var videoControllerBackground: UIColor = UIColor(white: 0.0, alpha: 0.5)
+    internal static var videoControllerBackground: UIColor = UIColor(white: 0.0, alpha: 0.6)
 }

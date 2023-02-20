@@ -56,6 +56,7 @@ internal class FeedCell: BaseCell {
             } receiveValue: { [collectionView] videos in
                 let diffableData = DiffableData<DefaultSection, Video>(section: .main, items: videos)
                 collectionView.items.send([diffableData])
+                
             }
             .store(in: &cancellables)
         
