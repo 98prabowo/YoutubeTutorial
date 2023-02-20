@@ -20,6 +20,7 @@ internal final class SettingView: UIView {
         collection.backgroundColor = .white
         collection.isScrollEnabled = false
         collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.accessibilityIdentifier = "SettingView.collectionView"
         return collection
     }()
     

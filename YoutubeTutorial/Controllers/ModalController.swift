@@ -28,12 +28,14 @@ internal final class ModalController: UIViewController {
         let view = UIView()
         view.alpha = 0.0
         view.backgroundColor = UIColor(white: 0.0, alpha: 0.6)
+        view.accessibilityIdentifier = "ModalController.backgroundView"
         return view
     }()
     
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
+        view.accessibilityIdentifier = "ModalController.containerView"
         return view
     }()
     
@@ -41,6 +43,7 @@ internal final class ModalController: UIViewController {
         let view = UIView()
         view.backgroundColor = .tertiarySystemFill
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "ModalController.dragView"
         return view
     }()
     
@@ -51,6 +54,7 @@ internal final class ModalController: UIViewController {
         btn.contentHorizontalAlignment = .fill
         btn.setImage(UIImage(systemName: "xmark"), for: .normal)
         btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.accessibilityIdentifier = "ModalController.closeButton"
         return btn
     }()
     
@@ -85,6 +89,7 @@ internal final class ModalController: UIViewController {
     
     internal init(_ view: UIView, size: Size = .fitContent, style: Style = .flat) {
         contentView = view
+        contentView.accessibilityIdentifier = "ModalController.contentView"
         self.size = size
         self.style = style
         super.init(nibName: nil, bundle: nil)

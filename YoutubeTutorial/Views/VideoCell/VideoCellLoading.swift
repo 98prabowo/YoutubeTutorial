@@ -16,6 +16,7 @@ internal final class VideoCellLoading: UIView {
         shimmer.setContentHuggingPriority(.defaultLow, for: .vertical)
         shimmer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
+        shimmer.accessibilityIdentifier = "VideoCellLoading.thumbnailImageShimmer"
         return shimmer
     }()
     
@@ -23,6 +24,7 @@ internal final class VideoCellLoading: UIView {
         let view = UIView()
         view.backgroundColor = .secondarySystemFill
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "VideoCellLoading.separatorView"
         return view
     }()
     
@@ -33,6 +35,7 @@ internal final class VideoCellLoading: UIView {
         shimmer.setContentHuggingPriority(.required, for: .vertical)
         shimmer.setContentHuggingPriority(.required, for: .horizontal)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
+        shimmer.accessibilityIdentifier = "VideoCellLoading.profileImageShimmer"
         return shimmer
     }()
 
@@ -44,6 +47,7 @@ internal final class VideoCellLoading: UIView {
         shimmer.setContentCompressionResistancePriority(.required, for: .vertical)
         shimmer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
+        shimmer.accessibilityIdentifier = "VideoCellLoading.titleShimmer"
         return shimmer
     }()
 
@@ -52,6 +56,7 @@ internal final class VideoCellLoading: UIView {
         shimmer.size = CGSizeMake(300, 20)
         shimmer.setContentCompressionResistancePriority(.required, for: .vertical)
         shimmer.translatesAutoresizingMaskIntoConstraints = false
+        shimmer.accessibilityIdentifier = "VideoCellLoading.subtitleShimmer"
         return shimmer
     }()
     
@@ -75,6 +80,7 @@ internal final class VideoCellLoading: UIView {
         titleStack.distribution = .fillEqually
         titleStack.spacing = 4.0
         titleStack.translatesAutoresizingMaskIntoConstraints = false
+        titleStack.accessibilityIdentifier = "VideoCellLoading.titleStack"
         
         let profileStack = UIStackView(arrangedSubviews: [profileImageShimmer, titleStack])
         profileStack.axis = .horizontal
@@ -82,6 +88,7 @@ internal final class VideoCellLoading: UIView {
         profileStack.distribution = .fill
         profileStack.spacing = 8.0
         profileStack.translatesAutoresizingMaskIntoConstraints = false
+        profileStack.accessibilityIdentifier = "VideoCellLoading.profileStack"
         
         let rootStack = UIStackView(arrangedSubviews: [thumbnailImageShimmer, profileStack])
         rootStack.axis = .vertical
@@ -89,6 +96,7 @@ internal final class VideoCellLoading: UIView {
         rootStack.distribution = .fill
         rootStack.spacing = 16.0
         rootStack.translatesAutoresizingMaskIntoConstraints = false
+        rootStack.accessibilityIdentifier = "VideoCellLoading.rootStack"
         
         return rootStack
     }

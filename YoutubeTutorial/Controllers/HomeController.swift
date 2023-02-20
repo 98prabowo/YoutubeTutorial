@@ -15,12 +15,14 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         let label = UILabel(frame: CGRectMake(0, 0, view.frame.width - 32, view.frame.height))
         label.textColor = .white
         label.font = .systemFont(ofSize: 20)
+        label.accessibilityIdentifier = "HomeController.titleLabel"
         return label
     }()
     
     private let menuBar: MenuBar = {
         let menu = MenuBar()
         menu.translatesAutoresizingMaskIntoConstraints = false
+        menu.accessibilityIdentifier = "HomeController.menuBar"
         return menu
     }()
     
@@ -29,6 +31,7 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         btn.image = UIImage(systemName: "magnifyingglass")
         btn.style = .plain
         btn.tintColor = .white
+        btn.accessibilityIdentifier = "HomeController.searchBtn"
         return btn
     }()
     
@@ -37,12 +40,14 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         btn.image = UIImage(systemName: "ellipsis.circle.fill")
         btn.style = .plain
         btn.tintColor = .white
+        btn.accessibilityIdentifier = "HomeController.settingBtn"
         return btn
     }()
     
     private let statusBarView: UIView = {
         let view = UIView()
         view.backgroundColor = .redNavBar
+        view.accessibilityIdentifier = "HomeController.statusBarView"
         return view
     }()
     

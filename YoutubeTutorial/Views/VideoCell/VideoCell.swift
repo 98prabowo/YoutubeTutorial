@@ -14,12 +14,14 @@ internal final class VideoCell: BaseCell {
     private let loadingCell: VideoCellLoading = {
         let loading = VideoCellLoading()
         loading.translatesAutoresizingMaskIntoConstraints = false
+        loading.accessibilityIdentifier = "VideoCell.loadingCell"
         return loading
     }()
     
     private let contentCell: VideoCellContent = {
         let content = VideoCellContent()
         content.translatesAutoresizingMaskIntoConstraints = false
+        content.accessibilityIdentifier = "VideoCell.contentCell"
         return content
     }()
     

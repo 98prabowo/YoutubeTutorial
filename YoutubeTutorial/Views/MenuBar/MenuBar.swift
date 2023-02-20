@@ -19,6 +19,7 @@ internal final class MenuBar: UIView {
         let collection = DiffableCollectionView<DefaultSection, Menu>(frame: .zero, layout: layout)
         collection.backgroundColor = .redNavBar
         collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.accessibilityIdentifier = "MenuBar.collectionView"
         return collection
     }()
     
@@ -26,6 +27,7 @@ internal final class MenuBar: UIView {
         let view = UIView()
         view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "MenuBar.horizontalView"
         return view
     }()
     

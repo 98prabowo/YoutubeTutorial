@@ -17,6 +17,7 @@ internal final class SettingCell: BaseCell {
         imageView.setContentCompressionResistancePriority(.required, for: .vertical)
         imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.accessibilityIdentifier = "SettingCell.settingIcon"
         return imageView
     }()
     
@@ -27,6 +28,7 @@ internal final class SettingCell: BaseCell {
         label.lineBreakMode = .byWordWrapping
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "SettingCell.settingLabel"
         return label
     }()
     

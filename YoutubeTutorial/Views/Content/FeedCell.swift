@@ -19,6 +19,7 @@ internal class FeedCell: BaseCell {
         let collection = DiffableCollectionView<DefaultSection, Video>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.accessibilityIdentifier = "FeedCell.collectionView"
         return collection
     }()
     

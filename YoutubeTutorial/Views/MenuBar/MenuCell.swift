@@ -16,6 +16,7 @@ internal final class MenuCell: BaseCell {
         imageView.tintColor = .redMenuIcon
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.accessibilityIdentifier = "MenuCell.tabIcon"
         return imageView
     }()
     

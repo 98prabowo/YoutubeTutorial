@@ -17,6 +17,7 @@ internal final class VideoCellContent: UIView {
         imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
         imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.accessibilityIdentifier = "VideoCellContent.thumbnailImage"
         return imageView
     }()
     
@@ -24,6 +25,7 @@ internal final class VideoCellContent: UIView {
         let view = UIView()
         view.backgroundColor = .secondarySystemFill
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "VideoCellContent.separatorView"
         return view
     }()
     
@@ -35,6 +37,7 @@ internal final class VideoCellContent: UIView {
         imageView.setContentHuggingPriority(.required, for: .vertical)
         imageView.setContentHuggingPriority(.required, for: .horizontal)
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.accessibilityIdentifier = "VideoCellContent.profileImage"
         return imageView
     }()
 
@@ -48,6 +51,7 @@ internal final class VideoCellContent: UIView {
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "VideoCellContent.title"
         return label
     }()
 
@@ -59,6 +63,7 @@ internal final class VideoCellContent: UIView {
         label.lineBreakMode = .byTruncatingTail
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "VideoCellContent.subtitle"
         return label
     }()
     
@@ -82,6 +87,7 @@ internal final class VideoCellContent: UIView {
         titleStack.distribution = .fillProportionally
         titleStack.spacing = 4.0
         titleStack.translatesAutoresizingMaskIntoConstraints = false
+        titleStack.accessibilityIdentifier = "VideoCellContent.titleStack"
         
         let profileStack = UIStackView(arrangedSubviews: [profileImage, titleStack])
         profileStack.axis = .horizontal
@@ -89,6 +95,7 @@ internal final class VideoCellContent: UIView {
         profileStack.distribution = .fill
         profileStack.spacing = 8.0
         profileStack.translatesAutoresizingMaskIntoConstraints = false
+        profileStack.accessibilityIdentifier = "VideoCellContent.profileStack"
         
         let rootStack = UIStackView(arrangedSubviews: [thumbnailImage, profileStack])
         rootStack.axis = .vertical
@@ -96,6 +103,7 @@ internal final class VideoCellContent: UIView {
         rootStack.distribution = .fillProportionally
         rootStack.spacing = 16.0
         rootStack.translatesAutoresizingMaskIntoConstraints = false
+        rootStack.accessibilityIdentifier = "VideoCellContent.rootStack"
         
         return rootStack
     }
