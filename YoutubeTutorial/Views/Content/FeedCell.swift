@@ -16,7 +16,7 @@ internal class FeedCell: BaseCell {
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        let collection = DiffableCollectionView<Video>(frame: .zero, layout: layout)
+        let collection = DiffableCollectionView<DefaultSection, Video>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
@@ -24,9 +24,11 @@ internal class FeedCell: BaseCell {
     
     // MARK: Properties
     
-    private var videos = CurrentValueSubject<[Video], Never>([Video]())
+    internal var topInset: CGFloat?
     
-    internal var parentVC = CurrentValueSubject<UIViewController?, Never>(nil)
+    internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
+    
+    private var videos = CurrentValueSubject<[Video], Never>([Video]())
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -34,8 +36,8 @@ internal class FeedCell: BaseCell {
     
     override internal func setupViews() {
         pinSubview(collectionView)
-        setupCollectionView()
         bindData()
+        setupCollectionView()
     }
     
     // MARK: Private Implementations
@@ -51,21 +53,17 @@ internal class FeedCell: BaseCell {
                     break
                 }
             } receiveValue: { [collectionView] videos in
-                collectionView.items.send(videos)
+                let diffableData = DiffableData<DefaultSection, Video>(section: .main, items: videos)
+                collectionView.items.send([diffableData])
             }
             .store(in: &cancellables)
         
-        parentVC
-            .defaultToZero { $0?.navigationController?.navigationBar.frame.height }
+        navigationController
+            .defaultToZero { $0?.navigationBar.frame.height }
             .receive(on: DispatchQueue.main)
-            .sink { [collectionView] navigationBarHeight in
-                collectionView.contentInset = UIEdgeInsets(
-                    top: navigationBarHeight,
-                    left: 0.0,
-                    bottom: 0.0,
-                    right: 0.0
-                )
-                collectionView.scrollIndicatorInsets = UIEdgeInsets(
+            .sink { [weak self] navigationBarHeight in
+                guard let self else { return }
+                self.collectionView.contentInset = UIEdgeInsets(
                     top: navigationBarHeight,
                     left: 0.0,
                     bottom: 0.0,
@@ -82,7 +80,7 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.register(forCell: VideoCell.self)
-        collectionView.setupDataSource { collectionView, indexPath, video in
+        collectionView.setupDataSource([.main]) { collectionView, indexPath, video in
             let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
             cell.setupCell(video)
             return cell
@@ -93,14 +91,15 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let inset: CGFloat = 16
         // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
         let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)
-        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70
+        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 80
         return CGSizeMake(frame.width, cellHeight)
     }
     
     internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let topInset = parentVC.value?.view.safeAreaInsets.top,
-              let navbarHeight = parentVC.value?.navigationController?.navigationBar.frame.height else { return }
-        let videoLauncher = VideoView(topInset: topInset - navbarHeight)
+        let insetTop: CGFloat = topInset ?? 0.0
+        let navbarHeight: CGFloat = navigationController.value?.navigationBar.frame.height ?? 0.0
+        let statusBarHeight: CGFloat = insetTop - navbarHeight < 0.0 ? 0.0 : insetTop - navbarHeight
+        let videoLauncher = VideoView(topInset: statusBarHeight)
         videoLauncher.showVideoPlayer()
     }
 }

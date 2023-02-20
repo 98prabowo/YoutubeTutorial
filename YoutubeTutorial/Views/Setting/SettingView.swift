@@ -16,7 +16,7 @@ internal final class SettingView: UIView {
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        let collection = DiffableCollectionView<Setting>(frame: .zero, layout: layout)
+        let collection = DiffableCollectionView<DefaultSection, Setting>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.isScrollEnabled = false
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -74,14 +74,14 @@ extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.register(forCell: SettingCell.self)
-        collectionView.setupDataSource { [iconSize, verticalInset] collectionView, indexPath, setting in
+        collectionView.setupDataSource([.main]) { [iconSize, verticalInset] collectionView, indexPath, setting in
             let cell = collectionView.dequeueReusableCell(withCell: SettingCell.self, for: indexPath)
             cell.setting = setting
             cell.iconSize = iconSize
             cell.verticalInset = verticalInset
             return cell
         }
-        collectionView.items.send(settings)
+        collectionView.items.send([DiffableData<DefaultSection, Setting>(section: .main, items: settings)])
     }
     
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {

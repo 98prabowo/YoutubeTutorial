@@ -16,7 +16,7 @@ internal final class MenuBar: UIView {
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        let collection = DiffableCollectionView<Menu>(frame: .zero, layout: layout)
+        let collection = DiffableCollectionView<DefaultSection, Menu>(frame: .zero, layout: layout)
         collection.backgroundColor = .redNavBar
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
@@ -77,14 +77,16 @@ internal final class MenuBar: UIView {
 extension MenuBar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
         collectionView.delegate = self
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(forCell: MenuCell.self)
-        collectionView.setupDataSource { collectionView, indexPath, menu in
+        collectionView.setupDataSource([.main]) { collectionView, indexPath, menu in
             let cell = collectionView.dequeueReusableCell(withCell: MenuCell.self, for: indexPath)
             cell.menu.send(menu)
             return cell
         }
         
-        collectionView.items.send(menus)
+        collectionView.items.send([DiffableData<DefaultSection, Menu>(section: .main, items: menus)])
         
         // Set initial cell selection. Need to dispatch to main to make it serial with collection view.
         DispatchQueue.main.async {

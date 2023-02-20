@@ -10,29 +10,28 @@ import UIKit
 
 internal enum DefaultSection { case main }
 
-internal class DiffableCollectionController<ItemIdentifierType>: UICollectionViewController where ItemIdentifierType : Hashable, ItemIdentifierType : Sendable {
+internal struct DiffableData<SectionIdentifierType,ItemIdentifierType>: Hashable where SectionIdentifierType : Hashable, SectionIdentifierType : Sendable, ItemIdentifierType : Hashable, ItemIdentifierType : Sendable {
+    internal var section: SectionIdentifierType
+    internal var items: [ItemIdentifierType]
+}
+
+internal class DiffableCollectionController<SectionIdentifierType,ItemIdentifierType>: UICollectionViewController where SectionIdentifierType : Hashable, SectionIdentifierType : Sendable, ItemIdentifierType : Hashable, ItemIdentifierType : Sendable {
     // MARK: - Value Types
     
-    internal typealias DataSource = UICollectionViewDiffableDataSource<DefaultSection, ItemIdentifierType>
-    internal typealias Snapshot = NSDiffableDataSourceSnapshot<DefaultSection, ItemIdentifierType>
+    internal typealias DataSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+    internal typealias Snapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     
     // MARK: Properties
     
-    internal var items = CurrentValueSubject<[ItemIdentifierType], Never>([])
+    internal var data = CurrentValueSubject<[DiffableData<SectionIdentifierType, ItemIdentifierType>], Never>([])
     
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellable: AnyCancellable?
+    
+    private var snapshot = Snapshot()
     
     private var dataSource: DataSource?
     
     // MARK: Lifecycles
-    
-    internal init(layout: UICollectionViewLayout) {
-        super.init(collectionViewLayout: layout)
-    }
-
-    required internal init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 
     override internal func viewDidLoad() {
         super.viewDidLoad()
@@ -41,59 +40,62 @@ internal class DiffableCollectionController<ItemIdentifierType>: UICollectionVie
     
     // MARK: Implementations
     
-    internal func setupDataSource(cellProvider: @escaping DataSource.CellProvider) {
-        let source = DataSource(
-            collectionView: collectionView,
-            cellProvider: cellProvider
-        )
-        dataSource = source
-        setupSnapshot(items.value, animating: false)
-    }
-    
-    private func setupSnapshot(_ items: [ItemIdentifierType], animating: Bool) {
-        var snapshot = Snapshot()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(items)
+    private func setupSnapshot(_ data: [DiffableData<SectionIdentifierType, ItemIdentifierType>], animating: Bool) {
+        if !self.data.value.isEmpty {
+            snapshot.deleteAllItems()
+        }
+        snapshot.appendSections(data.map(\.section))
+        snapshot.appendItems(data.flatMap(\.items))
         dataSource?.apply(snapshot, animatingDifferences: animating)
     }
     
     private func bindData() {
-        items
+        cancellable = data
+            .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self else { return }
                 self.setupSnapshot(data, animating: true)
             }
-            .store(in: &cancellables)
     }
     
-    internal func append(_ item: ItemIdentifierType) {
-        var currentItems = items.value
-        currentItems.append(item)
-        items.send(currentItems)
-    }
+    // MARK: Interfaces
     
-    internal func remove(_ item: ItemIdentifierType) {
-        var currentItems = items.value
-        if let index = currentItems.firstIndex(of: item) {
-            currentItems.remove(at: index)
-            items.send(currentItems)
+    internal func setupDataSource(_ defaultSection: [SectionIdentifierType], cellProvider: @escaping DataSource.CellProvider) {
+        let source = DataSource(
+            collectionView: collectionView,
+            cellProvider: cellProvider
+        )
+        dataSource = source
+        let defaultData: [DiffableData<SectionIdentifierType, ItemIdentifierType>] = defaultSection.map {
+            DiffableData(section: $0, items: [])
         }
+        setupSnapshot(defaultData, animating: false)
+    }
+    
+    internal func remove(_ sections: [SectionIdentifierType]) {
+        snapshot.deleteSections(sections)
+    }
+    
+    internal func remove(_ items: [ItemIdentifierType]) {
+        snapshot.deleteItems(items)
     }
 }
 
-internal class DiffableCollectionView<ItemIdentifierType>: UICollectionView where ItemIdentifierType : Hashable, ItemIdentifierType : Sendable {
+internal class DiffableCollectionView<SectionIdentifierType,ItemIdentifierType>: UICollectionView where SectionIdentifierType : Hashable, SectionIdentifierType : Sendable, ItemIdentifierType : Hashable, ItemIdentifierType : Sendable {
     // MARK: - Value Types
     
-    internal typealias ItemSource = UICollectionViewDiffableDataSource<DefaultSection, ItemIdentifierType>
-    internal typealias Snapshot = NSDiffableDataSourceSnapshot<DefaultSection, ItemIdentifierType>
+    internal typealias ItemSource = UICollectionViewDiffableDataSource<SectionIdentifierType, ItemIdentifierType>
+    internal typealias Snapshot = NSDiffableDataSourceSnapshot<SectionIdentifierType, ItemIdentifierType>
     
     // MARK: Properties
     
-    internal var items = CurrentValueSubject<[ItemIdentifierType], Never>([])
+    internal var items = CurrentValueSubject<[DiffableData<SectionIdentifierType, ItemIdentifierType>], Never>([])
     
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellable: AnyCancellable?
+    
+    private var snapshot = Snapshot()
     
     internal var itemSource: ItemSource?
     
@@ -108,46 +110,45 @@ internal class DiffableCollectionView<ItemIdentifierType>: UICollectionView wher
     
     // MARK: Implementations
     
-    private func setupSnapshot(_ items: [ItemIdentifierType], animating: Bool) {
-        var snapshot = Snapshot()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(items)
+    private func setupSnapshot(_ items: [DiffableData<SectionIdentifierType, ItemIdentifierType>], animating: Bool) {
+        if !self.items.value.isEmpty {
+            snapshot.deleteAllItems()
+        }
+        snapshot.appendSections(items.map(\.section))
+        snapshot.appendItems(items.flatMap(\.items))
         itemSource?.apply(snapshot, animatingDifferences: animating)
     }
     
     private func bindData() {
-        items
+        cancellable = items
+            .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self else { return }
                 self.setupSnapshot(data, animating: true)
             }
-            .store(in: &cancellables)
     }
     
     // MARK: Interfaces
     
-    internal func setupDataSource(cellProvider: @escaping ItemSource.CellProvider) {
+    internal func setupDataSource(_ defaultSection: [SectionIdentifierType], cellProvider: @escaping ItemSource.CellProvider) {
         let source = ItemSource(
             collectionView: self,
             cellProvider: cellProvider
         )
         itemSource = source
-        setupSnapshot(items.value, animating: false)
-    }
-    
-    internal func append(_ item: ItemIdentifierType) {
-        var currentItems = items.value
-        currentItems.append(item)
-        items.send(currentItems)
-    }
-    
-    internal func remove(_ item: ItemIdentifierType) {
-        var currentItems = items.value
-        if let index = currentItems.firstIndex(of: item) {
-            currentItems.remove(at: index)
-            items.send(currentItems)
+        let defaultData: [DiffableData<SectionIdentifierType, ItemIdentifierType>] = defaultSection.map {
+            DiffableData(section: $0, items: [])
         }
+        setupSnapshot(defaultData, animating: false)
+    }
+    
+    internal func remove(_ sections: [SectionIdentifierType]) {
+        snapshot.deleteSections(sections)
+    }
+    
+    internal func remove(_ items: [ItemIdentifierType]) {
+        snapshot.deleteItems(items)
     }
 }
