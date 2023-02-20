@@ -18,9 +18,12 @@ extension UIColor {
         self.init(red: red/255, green: green/255, blue: blue/255, alpha: 1)
     }
     
-    /// Color code for youtube tutorial navigation bar
+    /// Color code for youtube tutorial navigation bar.
     internal static var redNavBar: UIColor = UIColor(red: 230, green: 32, blue: 31)
     
-    /// Color code for youtube tutorial menu bar icon
+    /// Color code for youtube tutorial menu bar icon.
     internal static var redMenuIcon: UIColor = UIColor(red: 91, green: 14, blue: 13)
+    
+    /// Color code for youtube tutorial video controller background.
+    internal static var videoControllerBackground: UIColor = UIColor(white: 0.0, alpha: 0.5)
 }

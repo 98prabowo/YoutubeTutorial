@@ -7,11 +7,11 @@
 
 import UIKit
 
-internal class VideoView: UIView {
+internal final class VideoView: UIView {
     // MARK: UI Components
     
     private let videoPlayer: VideoPlayerView = {
-        let player = VideoPlayerView()
+        let player = VideoPlayerView(for: EndPoint.video.url)
         player.translatesAutoresizingMaskIntoConstraints = false
         return player
     }()
@@ -80,7 +80,7 @@ internal class VideoView: UIView {
             guard let self else { return }
             self.frame = window.frame
         } completion: { [videoPlayer] _ in
-            videoPlayer.play(from: EndPoint.video.url)
+            videoPlayer.play()
         }
     }
 }

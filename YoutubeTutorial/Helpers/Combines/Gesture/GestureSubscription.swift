@@ -8,12 +8,12 @@
 import Combine
 import UIKit
 
-internal final class GestureSubscription<S: Subscriber>: Subscription where S.Input == GestureType, S.Failure == Never {
-    private var subscriber: S?
+internal final class GestureSubscription<SubscriberType: Subscriber>: Subscription where SubscriberType.Input == GestureType, SubscriberType.Failure == Never {
+    private var subscriber: SubscriberType?
     private let gestureType: GestureType
     private let view: UIView
     
-    internal init(subscriber: S, view: UIView, gestureType: GestureType) {
+    internal init(subscriber: SubscriberType, view: UIView, gestureType: GestureType) {
         self.subscriber = subscriber
         self.gestureType = gestureType
         self.view = view
