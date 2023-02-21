@@ -7,13 +7,12 @@
 
 import UIKit
 
-internal final class VideoCellContent: UIView {
+internal final class VideoCellContent: UICollectionViewCell {
     // MARK: UI Components
     
-    private let thumbnailImage: UIImageView = {
-        let imageView = UIImageView()
+    private let thumbnailImage: AsyncImageView = {
+        let imageView = AsyncImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
         imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
         imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -29,11 +28,10 @@ internal final class VideoCellContent: UIView {
         return view
     }()
     
-    private let profileImage: UIImageView = {
-        let imageView = UIImageView()
+    private let profileImage: AsyncImageView = {
+        let imageView = AsyncImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 22
-        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 22.0
         imageView.setContentHuggingPriority(.required, for: .vertical)
         imageView.setContentHuggingPriority(.required, for: .horizontal)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -41,7 +39,7 @@ internal final class VideoCellContent: UIView {
         return imageView
     }()
 
-    private let title: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .body)
         label.numberOfLines = 2
@@ -55,17 +53,56 @@ internal final class VideoCellContent: UIView {
         return label
     }()
 
-    private let subtitle: UILabel = {
+    private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .caption1)
         label.textColor = .secondaryLabel
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.accessibilityIdentifier = "VideoCellContent.subtitle"
         return label
     }()
+    
+    private let titleStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .leading
+        stack.distribution = .fillProportionally
+        stack.spacing = 4.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellContent.titleStack"
+        return stack
+    }()
+    
+    private let profileStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .fill
+        stack.spacing = 8.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellContent.profileStack"
+        return stack
+    }()
+    
+    private let rootStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.distribution = .fill
+        stack.spacing = 16.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellContent.rootStack"
+        return stack
+    }()
+    
+    // MARK: Properties
+    
+    private let profileImageSize: CGFloat = 44.0
     
     // MARK: Lifecycles
     
@@ -80,72 +117,54 @@ internal final class VideoCellContent: UIView {
     
     // MARK: Layouts
     
-    private func setupStackLayout() -> UIStackView {
-        let titleStack = UIStackView(arrangedSubviews: [title, subtitle])
-        titleStack.axis = .vertical
-        titleStack.alignment = .leading
-        titleStack.distribution = .fillProportionally
-        titleStack.spacing = 4.0
-        titleStack.translatesAutoresizingMaskIntoConstraints = false
-        titleStack.accessibilityIdentifier = "VideoCellContent.titleStack"
-        
-        let profileStack = UIStackView(arrangedSubviews: [profileImage, titleStack])
-        profileStack.axis = .horizontal
-        profileStack.alignment = .center
-        profileStack.distribution = .fill
-        profileStack.spacing = 8.0
-        profileStack.translatesAutoresizingMaskIntoConstraints = false
-        profileStack.accessibilityIdentifier = "VideoCellContent.profileStack"
-        
-        let rootStack = UIStackView(arrangedSubviews: [thumbnailImage, profileStack])
-        rootStack.axis = .vertical
-        rootStack.alignment = .leading
-        rootStack.distribution = .fillProportionally
-        rootStack.spacing = 16.0
-        rootStack.translatesAutoresizingMaskIntoConstraints = false
-        rootStack.accessibilityIdentifier = "VideoCellContent.rootStack"
-        
-        return rootStack
-    }
-    
     private func setupViews() {
         backgroundColor = .white
-        
-        let rootView = setupStackLayout()
-        addSubview(rootView)
-        addSubview(separatorView)
-        
+        titleStack.addArrangedSubview(titleLabel)
+        titleStack.addArrangedSubview(subtitleLabel)
+        profileStack.addArrangedSubview(profileImage)
+        profileStack.addArrangedSubview(titleStack)
+        rootStack.addArrangedSubview(thumbnailImage)
+        rootStack.addArrangedSubview(profileStack)
+        contentView.addSubview(rootStack)
+        contentView.addSubview(separatorView)
+    }
+    
+    private func setupLayout() {
         NSLayoutConstraint.activate([
-            profileImage.widthAnchor.constraint(equalToConstant: 44),
-            profileImage.heightAnchor.constraint(equalToConstant: 44)
+            profileImage.widthAnchor.constraint(equalToConstant: profileImageSize),
+            profileImage.heightAnchor.constraint(equalToConstant: profileImageSize)
         ])
         
-        NSLayoutConstraint.activate([
-            rootView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            rootView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            rootView.topAnchor.constraint(equalTo: topAnchor, constant: 16)
-        ])
+        let rootTrailingConstraint = rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16.0)
+        rootTrailingConstraint.priority = .init(999.0)
+        rootTrailingConstraint.isActive = true
+        rootTrailingConstraint.identifier = "VideoCellContent.rootTrailingConstraint"
         
         NSLayoutConstraint.activate([
-            separatorView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            separatorView.topAnchor.constraint(equalTo: rootView.bottomAnchor, constant: 16),
-            separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            separatorView.heightAnchor.constraint(equalToConstant: 1)
+            rootStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16.0),
+            rootStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16.0)
+        ])
+        
+        let spaceConstraint = separatorView.topAnchor.constraint(equalTo: rootStack.bottomAnchor, constant: 16.0)
+        spaceConstraint.priority = .defaultHigh
+        spaceConstraint.isActive = true
+        spaceConstraint.identifier = "VideoCellContent.spaceConstraint"
+        
+        NSLayoutConstraint.activate([
+            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: 1.0)
         ])
     }
     
-    // MARK: Implementations
+    // MARK: Interfaces
     
-    internal func setupCell(
-        title: String,
-        subtitle: String,
-        thumbnailImage: UIImage,
-        profileImage: UIImage
-    ) {
-        self.title.text = title
-        self.subtitle.text = subtitle
-        self.thumbnailImage.image = thumbnailImage
-        self.profileImage.image = profileImage
+    internal func setupCell(_ video: Video) {
+        titleLabel.text = video.title
+        subtitleLabel.text = video.subtitle
+        thumbnailImage.url = video.thumbnailImageName
+        profileImage.url = video.channel.profileImageName
+        setupLayout()
     }
 }

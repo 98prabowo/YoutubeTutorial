@@ -71,53 +71,73 @@ internal final class VideoCellLoading: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Layouts
+    private let titleStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.distribution = .fillEqually
+        stack.spacing = 4.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellLoading.titleStack"
+        return stack
+    }()
     
-    private func setupStackLayout() -> UIStackView {
-        let titleStack = UIStackView(arrangedSubviews: [titleShimmer, subtitleShimmer])
-        titleStack.axis = .vertical
-        titleStack.alignment = .fill
-        titleStack.distribution = .fillEqually
-        titleStack.spacing = 4.0
-        titleStack.translatesAutoresizingMaskIntoConstraints = false
-        titleStack.accessibilityIdentifier = "VideoCellLoading.titleStack"
-        
-        let profileStack = UIStackView(arrangedSubviews: [profileImageShimmer, titleStack])
-        profileStack.axis = .horizontal
-        profileStack.alignment = .fill
-        profileStack.distribution = .fill
-        profileStack.spacing = 8.0
-        profileStack.translatesAutoresizingMaskIntoConstraints = false
-        profileStack.accessibilityIdentifier = "VideoCellLoading.profileStack"
-        
-        let rootStack = UIStackView(arrangedSubviews: [thumbnailImageShimmer, profileStack])
-        rootStack.axis = .vertical
-        rootStack.alignment = .fill
-        rootStack.distribution = .fill
-        rootStack.spacing = 16.0
-        rootStack.translatesAutoresizingMaskIntoConstraints = false
-        rootStack.accessibilityIdentifier = "VideoCellLoading.rootStack"
-        
-        return rootStack
-    }
+    private let profileStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .fill
+        stack.distribution = .fill
+        stack.spacing = 8.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellLoading.profileStack"
+        return stack
+    }()
+    
+    private let rootStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.distribution = .fill
+        stack.spacing = 16.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoCellLoading.rootStack"
+        return stack
+    }()
+    
+    // MARK: Layouts
     
     private func setupViews() {
         backgroundColor = .white
-        
-        let rootView = setupStackLayout()
-        addSubview(rootView)
+        titleStack.addArrangedSubview(titleShimmer)
+        titleStack.addArrangedSubview(subtitleShimmer)
+        profileStack.addArrangedSubview(profileImageShimmer)
+        profileStack.addArrangedSubview(titleStack)
+        rootStack.addArrangedSubview(thumbnailImageShimmer)
+        rootStack.addArrangedSubview(profileStack)
+        addSubview(rootStack)
         addSubview(separatorView)
-
+        setupLayout()
+    }
+    
+    private func setupLayout() {
+        let rootTrailingConstraint = rootStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16.0)
+        rootTrailingConstraint.priority = .init(999)
+        rootTrailingConstraint.isActive = true
+        rootTrailingConstraint.identifier = "VideoCellLoading.setupLayout"
+        
         NSLayoutConstraint.activate([
-            rootView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            rootView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            rootView.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            rootStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            rootStack.topAnchor.constraint(equalTo: topAnchor, constant: 16),
         ])
+        
+        let spaceConstraint = separatorView.topAnchor.constraint(equalTo: rootStack.bottomAnchor, constant: 16.0)
+        spaceConstraint.priority = .defaultHigh
+        spaceConstraint.isActive = true
+        spaceConstraint.identifier = "VideoCellLoading.spaceConstraint"
 
         NSLayoutConstraint.activate([
             separatorView.leadingAnchor.constraint(equalTo: leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            separatorView.topAnchor.constraint(equalTo: rootView.bottomAnchor, constant: 16),
             separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1)
         ])

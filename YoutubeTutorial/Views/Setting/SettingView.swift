@@ -83,9 +83,11 @@ extension SettingView: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
         collectionView.register(forCell: SettingCell.self)
         collectionView.setupDataSource([.main]) { [iconSize, verticalInset] collectionView, indexPath, setting in
             let cell = collectionView.dequeueReusableCell(withCell: SettingCell.self, for: indexPath)
-            cell.setting = setting
-            cell.iconSize = iconSize
-            cell.verticalInset = verticalInset
+            cell.setupCell(
+                setting: setting,
+                iconSize: iconSize,
+                inset: verticalInset
+            )
             return cell
         }
         collectionView.items.send([DiffableData<DefaultSection, Setting>(section: .main, items: settings)])

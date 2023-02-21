@@ -48,10 +48,14 @@ internal class TrendingCell: BaseCell {
     private func bindData() {
         NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .trending)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
+            .sink { [weak self] completion in
+                guard let self else { return }
                 switch completion {
                 case let .failure(error):
-                    print("Home Cell Error: \(error.localizedDescription)")
+                    #if DEBUG
+                    let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
+                    print("\(id) network error: \(error.localizedDescription)")
+                    #endif
                 case .finished:
                     break
                 }
@@ -83,9 +87,9 @@ internal class TrendingCell: BaseCell {
 extension TrendingCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
         collectionView.delegate = self
-        collectionView.register(forCell: VideoCell.self)
+        collectionView.register(forCell: VideoCellContent.self)
         collectionView.setupDataSource([.main]) { collectionView, indexPath, video in
-            let cell = collectionView.dequeueReusableCell(withCell: VideoCell.self, for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withCell: VideoCellContent.self, for: indexPath)
             cell.setupCell(video)
             return cell
         }
@@ -95,7 +99,7 @@ extension TrendingCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLa
         let inset: CGFloat = 16
         // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
         let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)
-        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 80
+        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70.0
         return CGSizeMake(frame.width, cellHeight)
     }
     

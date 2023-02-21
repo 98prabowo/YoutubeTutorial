@@ -7,15 +7,13 @@
 
 import UIKit
 
-internal final class SettingCell: BaseCell {
+internal final class SettingCell: UICollectionViewCell {
     // MARK: UI Components
     
     private let settingIcon: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .scaleAspectFit
-        imageView.setContentCompressionResistancePriority(.required, for: .vertical)
-        imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.accessibilityIdentifier = "SettingCell.settingIcon"
         return imageView
@@ -26,10 +24,20 @@ internal final class SettingCell: BaseCell {
         label.numberOfLines = 1
         label.font = .preferredFont(forTextStyle: .callout)
         label.lineBreakMode = .byWordWrapping
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.accessibilityIdentifier = "SettingCell.settingLabel"
         return label
+    }()
+    
+    private let rootStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 16.0
+        stack.alignment = .center
+        stack.distribution = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "SettingCell.rootStack"
+        return stack
     }()
     
     // MARK: Properties
@@ -50,36 +58,26 @@ internal final class SettingCell: BaseCell {
         }
     }
     
-    internal var setting: Setting? {
-        didSet {
-            settingLabel.text = setting?.title
-            settingIcon.image = setting?.icon
-        }
-    }
+    // MARK: Lifecycles
     
-    internal var iconSize: CGFloat = 0.0 {
-        didSet {
-            setupLayout()
-        }
-    }
-    
-    internal var verticalInset: CGFloat = 0.0 {
-        didSet {
-            setupLayout()
-        }
+    internal func setupCell(setting: Setting, iconSize: CGFloat, inset: CGFloat) {
+        settingLabel.text = setting.title
+        settingIcon.image = setting.icon
+        rootStack.addArrangedSubview(settingIcon)
+        rootStack.addArrangedSubview(settingLabel)
+        setupLayout(iconSize: iconSize, inset: inset)
     }
     
     // MARK: Layouts
     
-    internal func setupLayout() {
-        let rootStack = UIStackView(arrangedSubviews: [settingIcon, settingLabel])
-        rootStack.axis = .horizontal
-        rootStack.spacing = 16.0
-        rootStack.alignment = .center
-        rootStack.distribution = .fill
-        rootStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        pinSubview(rootStack, padding: UIEdgeInsets(inset: verticalInset))
+    private func setupLayout(iconSize: CGFloat, inset: CGFloat) {
+        contentView.addSubview(rootStack)
+        NSLayoutConstraint.activate([
+            rootStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: inset),
+            rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: inset),
+            rootStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: inset),
+            rootStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: inset)
+        ])
         
         NSLayoutConstraint.activate([
             settingIcon.heightAnchor.constraint(equalToConstant: iconSize),
