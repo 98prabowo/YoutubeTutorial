@@ -74,6 +74,7 @@ internal final class VideoPlayerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     deinit {
         player = nil
     }

@@ -89,6 +89,12 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         bindAction()
     }
     
+#if DEBUG
+    deinit {
+        print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
+    }
+#endif
+    
     override internal func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()

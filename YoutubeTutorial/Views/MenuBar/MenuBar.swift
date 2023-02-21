@@ -54,6 +54,12 @@ internal final class MenuBar: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+#if DEBUG
+    deinit {
+        print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
+    }
+#endif
+    
     // MARK: Layouts
     
     private func setupLayout() {

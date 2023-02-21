@@ -139,9 +139,11 @@ internal final class VideoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+#if DEBUG
     deinit {
         print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
     }
+#endif
     
     // MARK: Layouts
     

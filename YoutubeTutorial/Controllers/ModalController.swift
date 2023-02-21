@@ -101,6 +101,12 @@ internal final class ModalController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+#if DEBUG
+    deinit {
+        print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
+    }
+#endif
+    
     override internal func viewDidLoad() {
         super.viewDidLoad()
         setupGesture()

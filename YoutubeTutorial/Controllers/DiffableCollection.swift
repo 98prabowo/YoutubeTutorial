@@ -32,6 +32,12 @@ internal class DiffableCollectionController<SectionIdentifierType,ItemIdentifier
     private var dataSource: DataSource?
     
     // MARK: Lifecycles
+    
+#if DEBUG
+    deinit {
+        print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
+    }
+#endif
 
     override internal func viewDidLoad() {
         super.viewDidLoad()

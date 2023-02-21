@@ -18,4 +18,10 @@ internal class BaseCell: UICollectionViewCell {
     required internal init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+#if DEBUG
+    deinit {
+        print(">>> \(String(describing: Self.self)) deinitialize safely 👍🏽")
+    }
+#endif
 }
