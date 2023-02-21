@@ -183,14 +183,17 @@ internal final class VideoView: UIView {
         heightConstraintVideoPlayer?.isActive = true
         heightConstraintVideoPlayer?.identifier = "VideoView.heightConstraintVideoPlayer"
         
+        videoPlayer.resizePlayerLayer(with: CGSizeMake(window.bounds.width, initialHeight))
+        
         layoutIfNeeded()
+        videoPlayer.layoutIfNeeded()
     }
     
     private func setupLayoutNoScreen() {
         minimizeStack.removeFromSuperview()
     }
     
-    private func setupLayoutNormal() {
+    private func setupLayoutNormal(_ previousState: VideoPlayerView.ScreenState? = nil) {
         guard let window = windowUI else { return }
         
         videoPlayer.removeFromSuperview()
@@ -198,18 +201,10 @@ internal final class VideoView: UIView {
         
         addSubview(videoPlayer)
         
-        // Handle video view contraint
-        heightConstraint?.constant = window.frame.height
-        
-        bottomContraint?.isActive = false
-        bottomContraint = bottomAnchor.constraint(equalTo: window.bottomAnchor)
-        bottomContraint?.isActive = true
-        
         // Handle video player constraint
         widthConstraintVideoPlayer?.isActive = false
         
-        // Use video pixel aspect ratio w: 16 h: 9
-        let videoHeight: CGFloat = window.frame.width * (9 / 16)
+        let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
         heightConstraintVideoPlayer?.isActive = false
         heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: videoHeight)
         heightConstraintVideoPlayer?.isActive = true
@@ -227,10 +222,23 @@ internal final class VideoView: UIView {
         trailingConstraintVideoPlayer?.isActive = true
         trailingConstraintVideoPlayer?.identifier = "VideoView.trailingConstraintVideoPlayer"
         
+        videoPlayer.layoutIfNeeded()
+        
+        videoPlayer.resizePlayerLayer(with: CGSizeMake(window.bounds.width, videoHeight))
+        
+        // Handle video view contraint
+        heightConstraint?.constant = window.frame.height
+        
+        bottomContraint?.isActive = false
+        bottomContraint = bottomAnchor.constraint(equalTo: window.bottomAnchor)
+        bottomContraint?.isActive = true
+        
         UIView.animate(withDuration: 0.1) { [weak self] in
             guard let self else { return }
+            self.videoPlayer.layoutIfNeeded()
             self.layoutIfNeeded()
         } completion: { [videoPlayer] _ in
+            guard let previousState, previousState == .noScreen else { return }
             videoPlayer.play()
         }
     }
@@ -283,12 +291,13 @@ internal final class VideoView: UIView {
         
         heightConstraintVideoPlayer?.constant = videoHeight
         
-        // Use video pixel aspect ratio w: 16 h: 9
-        let videoWidth: CGFloat = videoHeight * (16 / 9)
+        let videoWidth: CGFloat = videoHeight * (16 / 9) // Use video pixel aspect ratio w: 16 h: 9
         widthConstraintVideoPlayer?.isActive = false
         widthConstraintVideoPlayer = videoPlayer.widthAnchor.constraint(equalToConstant: videoWidth)
         widthConstraintVideoPlayer?.isActive = true
         widthConstraintVideoPlayer?.identifier = "VideoView.widthConstraintVideoPlayer"
+        
+        videoPlayer.resizePlayerLayer(with: CGSizeMake(videoWidth, videoHeight))
         
         // Handle minimize stack
         minimizeStack.addArrangedSubview(videoPlayer)
@@ -306,6 +315,7 @@ internal final class VideoView: UIView {
             options: .curveEaseOut
         ) { [weak self] in
             guard let self else { return }
+            self.videoPlayer.layoutIfNeeded()
             self.layoutIfNeeded()
         }
     }
@@ -322,15 +332,16 @@ internal final class VideoView: UIView {
             .dropFirst()
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
+            .withPrevious(.noScreen)
+            .sink { [weak self] previousState, currentState in
                 guard let self else { return }
-                switch state {
+                switch currentState {
                 case .noScreen:
                     self.removeFromSuperview()
                     self.closePlayer.send(())
                     
                 case .normal:
-                    self.setupLayoutNormal()
+                    self.setupLayoutNormal(previousState)
                     
                 case .maximize:
                     // TODO: Handle when screen is maximize here...

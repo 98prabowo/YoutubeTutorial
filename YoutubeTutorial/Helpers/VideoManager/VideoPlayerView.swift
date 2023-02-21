@@ -82,7 +82,6 @@ internal final class VideoPlayerView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        playerLayer.frame = bounds
     }
     
     private func setupLayout() {
@@ -223,5 +222,18 @@ internal final class VideoPlayerView: UIView {
         newTime = newTime < 0.0 ? 0.0 : newTime
         let time: CMTime = CMTimeMake(value: Int64(newTime * 1000 as Float64), timescale: 1000)
         player.seek(to: time)
+    }
+    
+    internal func resizePlayerLayer(with size: CGSize) {
+        if playerLayer.bounds.width > size.width ||
+            playerLayer.bounds.height > size.height {
+            playerLayer.frame = CGRectMake(0.0, 0.0, size.width, size.height)
+        } else {
+            // Disable `CALayer` implicit animations
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            playerLayer.frame = CGRectMake(0.0, 0.0, size.width, size.height)
+            CATransaction.commit()
+        }
     }
 }
