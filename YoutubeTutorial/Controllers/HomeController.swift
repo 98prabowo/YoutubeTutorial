@@ -217,17 +217,17 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
             case .home:
                 let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
                 cell.navigationController.send(self?.navigationController)
-                cell.topInset = self?.view?.safeAreaInsets.top
+                cell.areaInsets = self?.view?.safeAreaInsets
                 return cell
             case .trending:
                 let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
                 cell.navigationController.send(self?.navigationController)
-                cell.topInset = self?.view?.safeAreaInsets.top
+                cell.areaInsets = self?.view?.safeAreaInsets
                 return cell
             case .subscriptions:
                 let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
                 cell.navigationController.send(self?.navigationController)
-                cell.topInset = self?.view?.safeAreaInsets.top
+                cell.areaInsets = self?.view?.safeAreaInsets
                 return cell
             case .account:
                 let cell = collectionView.dequeueReusableCell(withCell: UICollectionViewCell.self, for: indexPath)

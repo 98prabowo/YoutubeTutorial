@@ -23,9 +23,11 @@ internal class FeedCell: BaseCell {
         return collection
     }()
     
+    private var videoLauncher: VideoView?
+    
     // MARK: Properties
     
-    internal var topInset: CGFloat?
+    internal var areaInsets: UIEdgeInsets?
     
     internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
     
@@ -97,11 +99,37 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         return CGSizeMake(frame.width, cellHeight)
     }
     
-    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let insetTop: CGFloat = topInset ?? 0.0
+    internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let video = collectionView.itemSource?.itemIdentifier(for: indexPath) else { return }
+        
+        let topInset: CGFloat = areaInsets?.top ?? 0.0
+        let leftInset: CGFloat = areaInsets?.left ?? 0.0
+        let bottomInset: CGFloat = areaInsets?.bottom ?? 0.0
+        let rightInset: CGFloat = areaInsets?.right ?? 0.0
         let navbarHeight: CGFloat = navigationController.value?.navigationBar.frame.height ?? 0.0
-        let statusBarHeight: CGFloat = insetTop - navbarHeight < 0.0 ? 0.0 : insetTop - navbarHeight
-        let videoLauncher = VideoView(topInset: statusBarHeight)
-        videoLauncher.showVideoPlayer()
+        let statusBarHeight: CGFloat = topInset - navbarHeight < 0.0 ? 0.0 : topInset - navbarHeight
+        let launcher = VideoView(
+            video,
+            areaInsets: UIEdgeInsets(
+                top: statusBarHeight,
+                left: leftInset,
+                bottom: bottomInset,
+                right: rightInset
+            )
+        )
+        
+        launcher.showVideoPlayer()
+        
+        launcher.closePlayer
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self else { return }
+                self.videoLauncher = nil
+                print(">>> deinitialize")
+            }
+            .store(in: &launcher.cancellables)
+        
+        videoLauncher = launcher
     }
 }
