@@ -53,8 +53,8 @@ internal class SubscriptionsCell: BaseCell {
                 switch completion {
                 case let .failure(error):
                     #if DEBUG
-                    let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
-                    print("\(id) network error: \(error.localizedDescription)")
+                        let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
+                        print("\(id) network error: \(error.localizedDescription)")
                     #endif
                 case .finished:
                     break
@@ -121,7 +121,7 @@ extension SubscriptionsCell: UICollectionViewDelegate, UICollectionViewDelegateF
             )
         )
         
-        launcher.showVideoPlayer()
+        launcher.startVideoPlayer()
         
         launcher.closePlayer
             .dropFirst()

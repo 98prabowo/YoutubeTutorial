@@ -20,7 +20,7 @@ internal struct VideoPlayerTimePublisher: Publisher {
         self.interval = interval
     }
     
-    internal func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+    internal func receive<S>(subscriber: S) where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
         let subscription = VideoPlayerTimeSubscription(
             subscriber: subscriber,
             player: player,
@@ -40,7 +40,7 @@ internal struct VideoPlayerFinishPublisher: Publisher {
         self.player = player
     }
     
-    internal func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+    internal func receive<S>(subscriber: S) where S: Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
         let subscription = VideoPlayerFinishSubscription(
             subscriber: subscriber,
             player: player

@@ -61,11 +61,13 @@
 		D682F7812981291C0053A5FE /* Identifiable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */; };
 		D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F7822981295A0053A5FE /* UIView+Extensions.swift */; };
 		D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */; };
+		D68C810D29A897B6002FF4EF /* Float64+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */; };
 		D6A8DC50298A353500DA16BD /* home.json in Resources */ = {isa = PBXBuildFile; fileRef = D6A8DC4F298A353500DA16BD /* home.json */; };
 		D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8DC51298A356700DA16BD /* NetworkManager.swift */; };
 		D6BAAF2229A37BFE0056E8C0 /* PreviousValueOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */; };
 		D6BAAF2529A56CDC0056E8C0 /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */; };
 		D6BAAF2929A57D280056E8C0 /* VideoCellLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2729A57D280056E8C0 /* VideoCellLoading.swift */; };
+		D6BAAF2B29A5CDCC0056E8C0 /* CancelOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,11 +146,13 @@
 		D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identifiable+Extensions.swift"; sourceTree = "<group>"; };
 		D682F7822981295A0053A5FE /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Extensions.swift"; sourceTree = "<group>"; };
+		D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float64+Extensions.swift"; sourceTree = "<group>"; };
 		D6A8DC4F298A353500DA16BD /* home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = home.json; sourceTree = "<group>"; };
 		D6A8DC51298A356700DA16BD /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousValueOperator.swift; sourceTree = "<group>"; };
 		D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
 		D6BAAF2729A57D280056E8C0 /* VideoCellLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCellLoading.swift; sourceTree = "<group>"; };
+		D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelOperator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -207,6 +211,7 @@
 				D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */,
 				D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */,
 				D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */,
+				D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -433,6 +438,7 @@
 			isa = PBXGroup;
 			children = (
 				D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */,
+				D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */,
 			);
 			path = Operators;
 			sourceTree = "<group>";
@@ -597,6 +603,7 @@
 				D682F7812981291C0053A5FE /* Identifiable+Extensions.swift in Sources */,
 				D635AE4F29897FA2000B5659 /* Collection+Extensions.swift in Sources */,
 				D648638C29999349007DA5B4 /* EndPoint.swift in Sources */,
+				D6BAAF2B29A5CDCC0056E8C0 /* CancelOperator.swift in Sources */,
 				D634D21A298C1608002BCF24 /* HTTPURLResponse+Extensions.swift in Sources */,
 				D6BAAF2529A56CDC0056E8C0 /* AsyncImageView.swift in Sources */,
 				D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */,
@@ -608,6 +615,7 @@
 				D635AE4D29897D2D000B5659 /* Video.swift in Sources */,
 				D6BAAF2229A37BFE0056E8C0 /* PreviousValueOperator.swift in Sources */,
 				D634D206298C0597002BCF24 /* GesturePublisherImplementations.swift in Sources */,
+				D68C810D29A897B6002FF4EF /* Float64+Extensions.swift in Sources */,
 				D634D21C298C1666002BCF24 /* Menu.swift in Sources */,
 				D66A95332990E5CA003D2B6B /* TrendingCell.swift in Sources */,
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,

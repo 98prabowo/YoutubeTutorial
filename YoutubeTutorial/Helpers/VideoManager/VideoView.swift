@@ -11,12 +11,7 @@ import UIKit
 internal final class VideoView: UIView {
     // MARK: UI Components
     
-    private let videoPlayer: VideoPlayerView = {
-        let player = VideoPlayerView(for: EndPoint.video.url)
-        player.translatesAutoresizingMaskIntoConstraints = false
-        player.accessibilityIdentifier = "VideoView.videoPlayer"
-        return player
-    }()
+    private var videoPlayer: VideoPlayerView?
     
     private var titleLabel: UILabel = {
         let label = UILabel()
@@ -45,11 +40,11 @@ internal final class VideoView: UIView {
     }()
     
     private lazy var titleStack: UIStackView = {
-        let titleStack = UIStackView(arrangedSubviews: [titleLabel, channelLabel])
+        let titleStack = UIStackView()
         titleStack.axis = .vertical
         titleStack.alignment = .leading
-        titleStack.distribution = .fillProportionally
-        titleStack.spacing = 0.0
+        titleStack.distribution = .fill
+        titleStack.spacing = 8.0
         titleStack.translatesAutoresizingMaskIntoConstraints = false
         titleStack.accessibilityIdentifier = "VideoPlayerView.titleStack"
         return titleStack
@@ -121,10 +116,7 @@ internal final class VideoView: UIView {
     
     // MARK: Lifecycles
     
-    internal init(
-        _ video: Video,
-        areaInsets: UIEdgeInsets
-    ) {
+    internal init(_ video: Video, areaInsets: UIEdgeInsets) {
         self.video = video
         self.areaInsets = areaInsets
         super.init(frame: .zero)
@@ -148,7 +140,7 @@ internal final class VideoView: UIView {
     // MARK: Layouts
     
     private func setupLayout() {
-        guard let window = windowUI else { return }
+        guard let window = windowUI, let videoPlayer else { return }
         window.addSubview(self)
         addSubview(videoPlayer)
         
@@ -192,11 +184,15 @@ internal final class VideoView: UIView {
     }
     
     private func setupLayoutNoScreen() {
+        videoPlayer?.removeFromSuperview()
         minimizeStack.removeFromSuperview()
+        removeFromSuperview()
+        
+        videoPlayer = nil
     }
     
     private func setupLayoutNormal(_ previousState: VideoPlayerView.ScreenState? = nil) {
-        guard let window = windowUI else { return }
+        guard let window = windowUI, let videoPlayer else { return }
         
         videoPlayer.removeFromSuperview()
         minimizeStack.removeFromSuperview()
@@ -237,7 +233,7 @@ internal final class VideoView: UIView {
         
         UIView.animate(withDuration: 0.1) { [weak self] in
             guard let self else { return }
-            self.videoPlayer.layoutIfNeeded()
+            self.videoPlayer?.layoutIfNeeded()
             self.layoutIfNeeded()
         } completion: { [videoPlayer] _ in
             guard let previousState, previousState == .noScreen else { return }
@@ -246,7 +242,7 @@ internal final class VideoView: UIView {
     }
     
     private func setupLayoutMinimize() {
-        guard let window = windowUI else { return }
+        guard let window = windowUI, let videoPlayer else { return }
         
         removeFromSuperview()
         videoPlayer.removeFromSuperview()
@@ -317,19 +313,29 @@ internal final class VideoView: UIView {
             options: .curveEaseOut
         ) { [weak self] in
             guard let self else { return }
-            self.videoPlayer.layoutIfNeeded()
+            self.videoPlayer?.layoutIfNeeded()
             self.layoutIfNeeded()
         }
     }
+    
+    private func setupLayoutMaximize() {}
     
     // MARK: Implementations
     
     private func setupViews() {
         titleLabel.text = video.title
         channelLabel.text = video.channel.name
+        titleStack.addArrangedSubview(titleLabel)
+        titleStack.addArrangedSubview(channelLabel)
+        
+        videoPlayer = VideoPlayerView(for: EndPoint.video.url)
+        videoPlayer?.translatesAutoresizingMaskIntoConstraints = false
+        videoPlayer?.accessibilityIdentifier = "VideoView.videoPlayer"
     }
     
     private func bindData() {
+        guard let videoPlayer else { return }
+        
         videoPlayer.screenState
             .dropFirst()
             .removeDuplicates()
@@ -339,16 +345,13 @@ internal final class VideoView: UIView {
                 guard let self else { return }
                 switch currentState {
                 case .noScreen:
-                    self.removeFromSuperview()
-                    self.closePlayer.send(())
-                    
+                    videoPlayer.stopPlaying()
+                    self.videoPlayer = nil
+                    self.setupLayoutNoScreen()
                 case .normal:
                     self.setupLayoutNormal(previousState)
-                    
                 case .maximize:
-                    // TODO: Handle when screen is maximize here...
-                    break
-                    
+                    self.setupLayoutMaximize()
                 case .minimize:
                     self.setupLayoutMinimize()
                 }
@@ -359,17 +362,14 @@ internal final class VideoView: UIView {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [playbackButton] state in
-                switch state {
-                case .loading, .finished:
-                    break
-                case .playing, .paused:
-                    playbackButton.setImage(state.playbackIcon, for: .normal)
-                }
+                playbackButton.setImage(state.playbackIcon, for: .normal)
             }
             .store(in: &cancellables)
     }
     
     private func bindAction() {
+        guard let videoPlayer else { return }
+        
         tap()
             .sink { [videoPlayer] in
                 switch videoPlayer.screenState.value {
@@ -400,16 +400,28 @@ internal final class VideoView: UIView {
             .store(in: &cancellables)
         
         closeButton.action()
-            .sink { [videoPlayer] in
+            .sink { [videoPlayer, closePlayer] in
                 videoPlayer.screenState.send(.noScreen)
+                closePlayer.send(())
             }
             .store(in: &cancellables)
     }
     
     // MARK: Interfaces
     
-    internal func showVideoPlayer() {
+    internal func stopVideoPlayer() {
+        guard let videoPlayer else { return }
+        videoPlayer.screenState.send(.noScreen)
+    }
+    
+    internal func startVideoPlayer() {
+        guard let videoPlayer else { return }
         setupLayout()
+        videoPlayer.screenState.send(.normal)
+    }
+    
+    internal func showFullScreen() {
+        guard let videoPlayer else { return }
         videoPlayer.screenState.send(.normal)
     }
 }

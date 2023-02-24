@@ -12,6 +12,8 @@ import UIKit
 internal final class VideoControllerView: UIView {
     // MARK: Type Values
     
+    internal typealias VideoDuration = (current: Float64, max: Float64)
+    
     internal enum State: Equatable {
         case loading
         case playing(isHidden: Bool, source: ToggleSource)
@@ -155,8 +157,8 @@ internal final class VideoControllerView: UIView {
         return btn
     }()
     
-    private lazy var playbackStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [backwardButton, playbackButton, forwardButton])
+    private let playbackStack: UIStackView = {
+        let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
         stack.distribution = .equalCentering
@@ -166,11 +168,77 @@ internal final class VideoControllerView: UIView {
         return stack
     }()
     
+    private let durationLabel: UILabel = {
+        let label = UILabel()
+        label.text = "00.00"
+        label.textColor = .systemGray
+        label.textAlignment = .left
+        label.font = .boldSystemFont(ofSize: 14)
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "VideoControllerView.durationLabel"
+        return label
+    }()
+    
+    private let sliderScrubber: UISlider = {
+        let slider = UISlider()
+        slider.tintColor = .systemRed
+        slider.thumbTintColor = .systemRed
+        slider.maximumTrackTintColor = .systemGray
+        slider.setThumbImage(UIImage(named: "normal_thumb"), for: .normal)
+        slider.setThumbImage(UIImage(named: "highlighted_thumb"), for: .highlighted)
+        slider.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        slider.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.accessibilityIdentifier = "VideoControllerView.sliderScrubber"
+        return slider
+    }()
+    
+    private let maxDurationLabel: UILabel = {
+        let label = UILabel()
+        label.text = "05.00"
+        label.textColor = .white
+        label.textAlignment = .right
+        label.font = .boldSystemFont(ofSize: 14)
+        label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "VideoControllerView.maxDurationLabel"
+        return label
+    }()
+    
+    private let maximizeButton: UIButton = {
+        let btn = UIButton(type: .system)
+        let img = UIImage(named: "maximize")
+        btn.setImage(img, for: .normal)
+        btn.tintColor = .white
+        btn.contentVerticalAlignment = .fill
+        btn.contentHorizontalAlignment = .fill
+        btn.imageEdgeInsets = UIEdgeInsets(inset: 2.0)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.accessibilityIdentifier = "VideoControllerView.maximizeButton"
+        return btn
+    }()
+    
+    private let scrubberStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .fill
+        stack.spacing = 8.0
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.accessibilityIdentifier = "VideoControllerView.scrubberStack"
+        return stack
+    }()
+    
     // MARK: Properties
     
     internal let state = CurrentValueSubject<State, Never>(.loading)
     
     internal let action = CurrentValueSubject<Action, Never>(.emptyAction)
+    
+    internal let duration = CurrentValueSubject<VideoDuration, Never>((0.0, 0.0))
+    
+    internal let sliderValue = PassthroughSubject<VideoDuration, Never>()
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -179,6 +247,7 @@ internal final class VideoControllerView: UIView {
     override internal init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .videoControllerBackground
+        setupViews()
         bindData()
         bindAction()
     }
@@ -189,9 +258,20 @@ internal final class VideoControllerView: UIView {
     
     // MARK: Layouts
     
+    private func setupViews() {
+        playbackStack.addArrangedSubview(backwardButton)
+        playbackStack.addArrangedSubview(playbackButton)
+        playbackStack.addArrangedSubview(forwardButton)
+        scrubberStack.addArrangedSubview(durationLabel)
+        scrubberStack.addArrangedSubview(sliderScrubber)
+        scrubberStack.addArrangedSubview(maxDurationLabel)
+        scrubberStack.addArrangedSubview(maximizeButton)
+    }
+    
     private func layoutLoadingView() {
         minimizeButton.removeFromSuperview()
         playbackStack.removeFromSuperview()
+        scrubberStack.removeFromSuperview()
         
         addSubview(loadingView)
         
@@ -204,10 +284,13 @@ internal final class VideoControllerView: UIView {
     private func layoutPlaybackButton() {
         loadingView.stopAnimating()
         loadingView.removeFromSuperview()
+        minimizeButton.removeFromSuperview()
         playbackStack.removeFromSuperview()
+        scrubberStack.removeFromSuperview()
         
         addSubview(minimizeButton)
         addSubview(playbackStack)
+        addSubview(scrubberStack)
         
         NSLayoutConstraint.activate([
             minimizeButton.topAnchor.constraint(equalTo: topAnchor, constant: 18.0),
@@ -234,6 +317,17 @@ internal final class VideoControllerView: UIView {
         NSLayoutConstraint.activate([
             playbackStack.centerXAnchor.constraint(equalTo: centerXAnchor),
             playbackStack.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            maximizeButton.widthAnchor.constraint(equalToConstant: 18.0),
+            maximizeButton.heightAnchor.constraint(equalToConstant: 18.0)
+        ])
+        
+        NSLayoutConstraint.activate([
+            scrubberStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 10.0),
+            scrubberStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -10.0),
+            scrubberStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10.0)
         ])
     }
     
@@ -290,13 +384,14 @@ internal final class VideoControllerView: UIView {
     
     private func bindData() {
         // Handle user inactivity
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             state.eraseToAnyPublisher(),
-            action.eraseToAnyPublisher()
+            action.eraseToAnyPublisher(),
+            sliderScrubber.action(.valueChanged)
         )
         .debounce(for: .seconds(2.0), scheduler: DispatchQueue.main)
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] state, _ in
+        .sink { [weak self] state, _, _ in
             guard let self,
                   state.isPlayingPresentControl else { return }
             self.state.send(.playing(isHidden: true, source: .inactive))
@@ -351,6 +446,16 @@ internal final class VideoControllerView: UIView {
                 }
             }
             .store(in: &cancellables)
+        
+        duration
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates { $0.current == $1.current }
+            .sink { [durationLabel, maxDurationLabel, sliderScrubber] current, max in
+                durationLabel.text = current.formattedDuration
+                maxDurationLabel.text = max.formattedDuration
+                sliderScrubber.value = Float(current / max)
+            }
+            .store(in: &cancellables)
     }
     
     private func bindAction() {
@@ -391,6 +496,16 @@ internal final class VideoControllerView: UIView {
             .sink { [weak self] in
                 guard let self else { return }
                 self.action.send(.didTapBackwardButton)
+            }
+            .store(in: &cancellables)
+        
+        sliderScrubber.action(.valueChanged)
+            .sink { [duration, sliderScrubber, sliderValue] in
+                let videoDuration: VideoDuration = (
+                    Float64(sliderScrubber.value) * duration.value.max,
+                    duration.value.max
+                )
+                sliderValue.send(videoDuration)
             }
             .store(in: &cancellables)
     }

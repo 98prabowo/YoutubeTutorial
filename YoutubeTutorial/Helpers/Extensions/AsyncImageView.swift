@@ -83,8 +83,8 @@ internal final class AsyncImageView: UIView {
                     self.pinSubview(self.imageView)
                     
                     #if DEBUG
-                    let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
-                    print("\(id) network error: \(error.localizedDescription)")
+                        let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
+                        print("\(id) network error: \(error.localizedDescription)")
                     #endif
                 case .finished:
                     break

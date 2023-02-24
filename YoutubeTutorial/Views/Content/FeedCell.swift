@@ -27,6 +27,8 @@ internal class FeedCell: BaseCell {
     
     // MARK: Properties
     
+    internal var previousIndex: IndexPath?
+    
     internal var areaInsets: UIEdgeInsets?
     
     internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
@@ -53,8 +55,8 @@ internal class FeedCell: BaseCell {
                 switch completion {
                 case let .failure(error):
                     #if DEBUG
-                    let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
-                    print("\(id) network error: \(error.localizedDescription)")
+                        let id: String = self.accessibilityIdentifier ?? String(describing: Self.self)
+                        print("\(id) network error: \(error.localizedDescription)")
                     #endif
                 case .finished:
                     break
@@ -104,7 +106,16 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
     }
     
     internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let video = collectionView.itemSource?.itemIdentifier(for: indexPath) else { return }
+        guard let video = collectionView.itemSource?.itemIdentifier(for: indexPath),
+              previousIndex != indexPath
+        else {
+            videoLauncher?.showFullScreen()
+            return
+        }
+        
+        previousIndex = indexPath
+        videoLauncher?.stopVideoPlayer()
+        videoLauncher = nil
         
         let topInset: CGFloat = areaInsets?.top ?? 0.0
         let leftInset: CGFloat = areaInsets?.left ?? 0.0
@@ -112,7 +123,8 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         let rightInset: CGFloat = areaInsets?.right ?? 0.0
         let navbarHeight: CGFloat = navigationController.value?.navigationBar.frame.height ?? 0.0
         let statusBarHeight: CGFloat = topInset - navbarHeight < 0.0 ? 0.0 : topInset - navbarHeight
-        let launcher = VideoView(
+        
+        videoLauncher = VideoView(
             video,
             areaInsets: UIEdgeInsets(
                 top: statusBarHeight,
@@ -122,18 +134,15 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             )
         )
         
-        launcher.showVideoPlayer()
-        
-        launcher.closePlayer
-            .dropFirst()
+        guard let videoLauncher else { return }
+        videoLauncher.startVideoPlayer()
+        videoLauncher.closePlayer
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 guard let self else { return }
                 self.videoLauncher = nil
-                print(">>> deinitialize")
+                self.previousIndex = nil
             }
-            .store(in: &launcher.cancellables)
-        
-        videoLauncher = launcher
+            .store(in: &videoLauncher.cancellables)
     }
 }

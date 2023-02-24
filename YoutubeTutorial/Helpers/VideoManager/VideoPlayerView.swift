@@ -31,7 +31,7 @@ internal final class VideoPlayerView: UIView {
     // MARK: Properties
     
     private lazy var asset: AVURLAsset? = {
-        guard let url = URL(string: self.urlString) else { return nil }
+        guard let url = URL(string: urlString) else { return nil }
         let asset: AVURLAsset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
         return asset
     }()
@@ -48,15 +48,21 @@ internal final class VideoPlayerView: UIView {
         return player
     }()
     
+    private lazy var playerLayer: AVPlayerLayer = {
+        let layer = AVPlayerLayer(player: player)
+        layer.contentsGravity = .resizeAspect
+        return layer
+    }()
+    
     internal let screenState = CurrentValueSubject<ScreenState, Never>(.noScreen)
     
     private let seekDuration: Float64 = 10 // seconds
     
-    private lazy var playerLayer = AVPlayerLayer(player: player)
+    private var dataCancellables = Set<AnyCancellable>()
     
-    private var cancellables = Set<AnyCancellable>()
+    private var actionCancellables = Set<AnyCancellable>()
     
-    internal let urlString: String
+    private let urlString: String
     
     // MARK: Lifecycles
     
@@ -74,16 +80,7 @@ internal final class VideoPlayerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    deinit {
-        player = nil
-    }
-    
     // MARK: Layouts
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
     
     private func setupLayout() {
         layer.addSublayer(playerLayer)
@@ -108,16 +105,47 @@ internal final class VideoPlayerView: UIView {
         guard let player else { return }
         player.periodicTimePublisher()
             .sink { [controlView] time in
+                if let item = player.currentItem {
+                    let currentDuration: Float64 = CMTimeGetSeconds(item.currentTime())
+                    let maxDuration: Float64 = CMTimeGetSeconds(item.duration)
+                    controlView.duration.send((currentDuration, maxDuration))
+                }
+                
                 guard time.value == 0 else { return }
                 controlView.state.send(.playing(isHidden: true, source: .system))
             }
-            .store(in: &cancellables)
+            .store(in: &dataCancellables)
         
         player.finishPlayPublisher()
             .sink { [controlView] in
                 controlView.state.send(.finished(isHidden: false))
             }
-            .store(in: &cancellables)
+            .store(in: &dataCancellables)
+        
+        player.publisher(for: \.status)
+            .sink { status in
+                switch status {
+                case .unknown:
+                    print("unknown")
+                case .failed:
+                    print("failed")
+                case .readyToPlay:
+                    print("ready")
+                @unknown default:
+                    print("unknown")
+                }
+                print(status.rawValue)
+            }
+            .store(in: &dataCancellables)
+        
+        controlView.sliderValue
+            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
+            .sink { current, _ in
+                let seekTime: CMTime = CMTimeMake(value: Int64(current), timescale: 1)
+                print(seekTime)
+                player.seek(to: seekTime)
+            }
+            .store(in: &dataCancellables)
     }
     
     private func bindAction() {
@@ -129,11 +157,14 @@ internal final class VideoPlayerView: UIView {
                     state.toggleHidden()
                     controlView.state.send(state)
                     
-                case .noScreen, .minimize:
+                case .minimize:
+                    screenState.send(.normal)
+                    
+                case .noScreen:
                     break
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &actionCancellables)
         
         controlView.action
             .receive(on: DispatchQueue.main)
@@ -156,7 +187,7 @@ internal final class VideoPlayerView: UIView {
                     self.goBackward()
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &actionCancellables)
         
         screenState
             .removeDuplicates()
@@ -184,15 +215,26 @@ internal final class VideoPlayerView: UIView {
                     self.setupLayoutMinimize()
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &actionCancellables)
     }
     
     // MARK: Interfaces
     
+    internal func stopPlaying() {
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
+        player = nil
+        playerLayer.removeFromSuperlayer()
+        dataCancellables.cancelAll()
+    }
+    
     internal func play() {
         guard let player else { return }
         player.play()
-        print("Video url:", urlString)
+        
+        #if DEBUG
+            print("Video url:", urlString)
+        #endif
     }
     
     internal func pause() {
@@ -202,7 +244,7 @@ internal final class VideoPlayerView: UIView {
     
     internal func replay() {
         guard let player else { return }
-        player.seek(to: CMTime.zero)
+        player.seek(to: .zero)
         player.play()
     }
     
@@ -212,7 +254,7 @@ internal final class VideoPlayerView: UIView {
         let playerCurrentTime: Float64 = CMTimeGetSeconds(player.currentTime())
         let newTime: Float64 = playerCurrentTime + seekDuration
         guard newTime < CMTimeGetSeconds(duration) else { return }
-        let time: CMTime = CMTimeMake(value: Int64(newTime * 1000 as Float64), timescale: 1000)
+        let time: CMTime = CMTimeMake(value: Int64(newTime), timescale: 1)
         player.seek(to: time)
     }
     
@@ -221,7 +263,7 @@ internal final class VideoPlayerView: UIView {
         let playerCurrentTime = CMTimeGetSeconds(player.currentTime())
         var newTime: Float64 = playerCurrentTime - seekDuration
         newTime = newTime < 0.0 ? 0.0 : newTime
-        let time: CMTime = CMTimeMake(value: Int64(newTime * 1000 as Float64), timescale: 1000)
+        let time: CMTime = CMTimeMake(value: Int64(newTime), timescale: 1)
         player.seek(to: time)
     }
     
