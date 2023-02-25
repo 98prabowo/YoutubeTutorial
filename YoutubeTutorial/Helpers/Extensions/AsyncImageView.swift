@@ -74,7 +74,7 @@ internal final class AsyncImageView: UIView {
                 guard let self else { return }
                 switch completion {
                 case let .failure(error):
-                    let noImage: UIImage? = UIImage(systemName: "photo")
+                    let noImage: UIImage? = UIImage(systemName: "no_image")
                     self.imageView.contentMode = .scaleAspectFit
                     self.imageView.tintColor = .secondaryLabel
                     self.imageView.image = noImage

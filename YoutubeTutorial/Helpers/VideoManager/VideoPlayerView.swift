@@ -122,28 +122,16 @@ internal final class VideoPlayerView: UIView {
             }
             .store(in: &dataCancellables)
         
-        player.publisher(for: \.status)
-            .sink { status in
-                switch status {
-                case .unknown:
-                    print("unknown")
-                case .failed:
-                    print("failed")
-                case .readyToPlay:
-                    print("ready")
-                @unknown default:
-                    print("unknown")
-                }
-                print(status.rawValue)
-            }
-            .store(in: &dataCancellables)
-        
         controlView.sliderValue
-            .debounce(for: .seconds(0.1), scheduler: DispatchQueue.main)
-            .sink { current, _ in
+            .receive(on: DispatchQueue.main)
+            .dropFirst()
+            .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
+            .sink { [controlView] current, _ in
                 let seekTime: CMTime = CMTimeMake(value: Int64(current), timescale: 1)
-                print(seekTime)
                 player.seek(to: seekTime)
+                guard controlView.state.value == .finished(isHidden: false) else { return }
+                controlView.state.send(.playing(isHidden: false, source: .userInteraction))
+                controlView.action.send(.didTapPlayButton)
             }
             .store(in: &dataCancellables)
     }
@@ -173,8 +161,12 @@ internal final class VideoPlayerView: UIView {
                 switch action {
                 case .emptyAction:
                     break
+                case .didTapNormalizeButton:
+                    self.screenState.send(.normal)
                 case .didTapMinimizeButton:
                     self.screenState.send(.minimize)
+                case .didTapMaximizeButton:
+                    self.screenState.send(.maximize)
                 case .didTapPlayButton:
                     self.play()
                 case .didTapPauseButton:
@@ -205,14 +197,14 @@ internal final class VideoPlayerView: UIView {
                     let state = self.controlView.state.value
                     self.controlView.state.send(state)
                     
+                case .minimize:
+                    self.setupLayoutMinimize()
+                    
                 case .maximize:
                     self.pinSubview(self.controlView)
                     var state = self.controlView.state.value
                     state.showControlPanel()
                     self.controlView.state.send(state)
-                    
-                case .minimize:
-                    self.setupLayoutMinimize()
                 }
             }
             .store(in: &actionCancellables)

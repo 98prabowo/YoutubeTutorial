@@ -87,7 +87,9 @@ internal final class VideoControllerView: UIView {
     
     internal enum Action: Equatable {
         case emptyAction
+        case didTapNormalizeButton
         case didTapMinimizeButton
+        case didTapMaximizeButton
         case didTapPlayButton
         case didTapPauseButton
         case didTapReplayButton
@@ -133,8 +135,7 @@ internal final class VideoControllerView: UIView {
     
     private let forwardButton: UIButton = {
         let btn = UIButton(type: .system)
-        let img = UIImage(systemName: "goforward.10")
-        btn.setImage(img, for: .normal)
+        btn.setImage(UIImage(systemName: "goforward.10"), for: .normal)
         btn.tintColor = .white
         btn.contentVerticalAlignment = .fill
         btn.contentHorizontalAlignment = .fill
@@ -146,8 +147,7 @@ internal final class VideoControllerView: UIView {
     
     private let backwardButton: UIButton = {
         let btn = UIButton(type: .system)
-        let img = UIImage(systemName: "gobackward.10")
-        btn.setImage(img, for: .normal)
+        btn.setImage(UIImage(systemName: "gobackward.10"), for: .normal)
         btn.tintColor = .white
         btn.contentVerticalAlignment = .fill
         btn.contentHorizontalAlignment = .fill
@@ -232,13 +232,17 @@ internal final class VideoControllerView: UIView {
     
     // MARK: Properties
     
+    internal let screenState = CurrentValueSubject<VideoPlayerView.ScreenState, Never>(.noScreen)
+    
     internal let state = CurrentValueSubject<State, Never>(.loading)
     
     internal let action = CurrentValueSubject<Action, Never>(.emptyAction)
     
     internal let duration = CurrentValueSubject<VideoDuration, Never>((0.0, 0.0))
     
-    internal let sliderValue = PassthroughSubject<VideoDuration, Never>()
+    internal let sliderValue = CurrentValueSubject<VideoDuration, Never>((0.0, 0.0))
+    
+    private let isMaximize = CurrentValueSubject<Bool, Never>(false)
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -387,10 +391,10 @@ internal final class VideoControllerView: UIView {
         Publishers.CombineLatest3(
             state.eraseToAnyPublisher(),
             action.eraseToAnyPublisher(),
-            sliderScrubber.action(.valueChanged)
+            sliderValue.eraseToAnyPublisher()
         )
-        .debounce(for: .seconds(2.0), scheduler: DispatchQueue.main)
         .receive(on: DispatchQueue.main)
+        .debounce(for: .seconds(2.0), scheduler: DispatchQueue.main)
         .sink { [weak self] state, _, _ in
             guard let self,
                   state.isPlayingPresentControl else { return }
@@ -450,19 +454,45 @@ internal final class VideoControllerView: UIView {
         duration
             .receive(on: DispatchQueue.main)
             .removeDuplicates { $0.current == $1.current }
-            .sink { [durationLabel, maxDurationLabel, sliderScrubber] current, max in
-                durationLabel.text = current.formattedDuration
-                maxDurationLabel.text = max.formattedDuration
-                sliderScrubber.value = Float(current / max)
+            .sink { [weak self] current, max in
+                guard let self else { return }
+                self.maxDurationLabel.text = max.formattedDuration
+                guard !self.sliderScrubber.isTracking else { return }
+                self.durationLabel.text = current.formattedDuration
+                self.sliderScrubber.value = Float(current / max)
             }
             .store(in: &cancellables)
     }
     
     private func bindAction() {
         minimizeButton.action()
-            .sink { [weak self] in
-                guard let self else { return }
-                self.action.send(.didTapMinimizeButton)
+            .sink { [screenState, action] in
+                guard screenState.value == .normal else { return }
+                action.send(.didTapMinimizeButton)
+            }
+            .store(in: &cancellables)
+        
+        maximizeButton.action()
+            .sink { [action, isMaximize] in
+                if isMaximize.value {
+                    action.send(.didTapNormalizeButton)
+                } else {
+                    action.send(.didTapMaximizeButton)
+                }
+                let _isMaximize: Bool = !isMaximize.value
+                isMaximize.send(_isMaximize)
+            }
+            .store(in: &cancellables)
+        
+        isMaximize
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [maximizeButton] isMaximize in
+                if isMaximize {
+                    maximizeButton.setImage(UIImage(named: "normalize"), for: .normal)
+                } else {
+                    maximizeButton.setImage(UIImage(named: "maximize"), for: .normal)
+                }
             }
             .store(in: &cancellables)
         
@@ -500,12 +530,14 @@ internal final class VideoControllerView: UIView {
             .store(in: &cancellables)
         
         sliderScrubber.action(.valueChanged)
-            .sink { [duration, sliderScrubber, sliderValue] in
+            .sink { [weak self] in
+                guard let self else { return }
                 let videoDuration: VideoDuration = (
-                    Float64(sliderScrubber.value) * duration.value.max,
-                    duration.value.max
+                    Float64(self.sliderScrubber.value) * self.duration.value.max,
+                    self.duration.value.max
                 )
-                sliderValue.send(videoDuration)
+                self.durationLabel.text = videoDuration.current.formattedDuration
+                self.sliderValue.send(videoDuration)
             }
             .store(in: &cancellables)
     }

@@ -194,15 +194,30 @@ internal final class VideoView: UIView {
     private func setupLayoutNormal(_ previousState: VideoPlayerView.ScreenState? = nil) {
         guard let window = windowUI, let videoPlayer else { return }
         
+        let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
+        
+        if previousState == .maximize {
+            UIView.animate(
+                withDuration: 0.5,
+                delay: 0.0,
+                options: .curveEaseOut
+            ) { [areaInsets] in
+                videoPlayer.transform = .identity
+                videoPlayer.frame = CGRectMake(0.0, areaInsets.top, window.frame.height, videoHeight)
+            }
+            videoPlayer.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
         videoPlayer.removeFromSuperview()
-        minimizeStack.removeFromSuperview()
+        
+        if previousState == .minimize {
+            minimizeStack.removeFromSuperview()
+            // Handle video player constraint
+            widthConstraintVideoPlayer?.isActive = false
+        }
         
         addSubview(videoPlayer)
         
-        // Handle video player constraint
-        widthConstraintVideoPlayer?.isActive = false
-        
-        let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
         heightConstraintVideoPlayer?.isActive = false
         heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: videoHeight)
         heightConstraintVideoPlayer?.isActive = true
@@ -318,7 +333,28 @@ internal final class VideoView: UIView {
         }
     }
     
-    private func setupLayoutMaximize() {}
+    private func setupLayoutMaximize() {
+        guard let window = windowUI, let videoPlayer else { return }
+        
+        videoPlayer.removeFromSuperview()
+        videoPlayer.translatesAutoresizingMaskIntoConstraints = true
+        addSubview(videoPlayer)
+        
+        heightConstraintVideoPlayer?.isActive = false
+        
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0.0,
+            options: .curveEaseOut
+        ) {
+            let videoWidth: CGFloat = window.frame.height
+            let videoHeight: CGFloat = window.frame.width
+            videoPlayer.resizePlayerLayer(with: CGSizeMake(videoWidth, videoHeight))
+            videoPlayer.transform = CGAffineTransform(rotationAngle: .pi / 2)
+            videoPlayer.bounds = CGRectMake(0, 0, videoWidth, videoHeight)
+            videoPlayer.center = window.center
+        }
+    }
     
     // MARK: Implementations
     
@@ -350,10 +386,10 @@ internal final class VideoView: UIView {
                     self.setupLayoutNoScreen()
                 case .normal:
                     self.setupLayoutNormal(previousState)
-                case .maximize:
-                    self.setupLayoutMaximize()
                 case .minimize:
                     self.setupLayoutMinimize()
+                case .maximize:
+                    self.setupLayoutMaximize()
                 }
             }
             .store(in: &cancellables)
