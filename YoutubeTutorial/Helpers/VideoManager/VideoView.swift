@@ -85,11 +85,13 @@ internal final class VideoView: UIView {
     
     private var bottomContraint: NSLayoutConstraint?
     
-    private var topConstraintVideoPlayer: NSLayoutConstraint?
-    
     private var leadingConstraintVideoPlayer: NSLayoutConstraint?
     
     private var trailingConstraintVideoPlayer: NSLayoutConstraint?
+    
+    private var topConstraintVideoPlayer: NSLayoutConstraint?
+    
+    private var bottomConstraintVideoPlayer: NSLayoutConstraint?
     
     private var heightConstraintVideoPlayer: NSLayoutConstraint?
     
@@ -98,8 +100,6 @@ internal final class VideoView: UIView {
     // MARK: Properties
     
     internal let closePlayer = PassthroughSubject<Void, Never>()
-    
-    private let finalSize: CGSize = CGSize(width: 250.0, height: 100.0)
     
     internal var cancellables = Set<AnyCancellable>()
     
@@ -194,6 +194,8 @@ internal final class VideoView: UIView {
     private func setupLayoutNormal(_ previousState: VideoPlayerView.ScreenState? = nil) {
         guard let window = windowUI, let videoPlayer else { return }
         
+        backgroundColor = .white
+        
         let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
         
         if previousState == .maximize {
@@ -218,15 +220,6 @@ internal final class VideoView: UIView {
         
         addSubview(videoPlayer)
         
-        heightConstraintVideoPlayer?.isActive = false
-        heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: videoHeight)
-        heightConstraintVideoPlayer?.isActive = true
-        heightConstraintVideoPlayer?.identifier = "VideoView.heightConstraintVideoPlayer"
-        
-        topConstraintVideoPlayer = videoPlayer.topAnchor.constraint(equalTo: topAnchor, constant: areaInsets.top)
-        topConstraintVideoPlayer?.isActive = true
-        topConstraintVideoPlayer?.identifier = "VideoView.topConstraintVideoPlayer"
-        
         leadingConstraintVideoPlayer = videoPlayer.leadingAnchor.constraint(equalTo: leadingAnchor)
         leadingConstraintVideoPlayer?.isActive = true
         leadingConstraintVideoPlayer?.identifier = "VideoView.leadingConstraintVideoPlayer"
@@ -234,6 +227,17 @@ internal final class VideoView: UIView {
         trailingConstraintVideoPlayer = videoPlayer.trailingAnchor.constraint(equalTo: trailingAnchor)
         trailingConstraintVideoPlayer?.isActive = true
         trailingConstraintVideoPlayer?.identifier = "VideoView.trailingConstraintVideoPlayer"
+        
+        topConstraintVideoPlayer = videoPlayer.topAnchor.constraint(equalTo: topAnchor, constant: areaInsets.top)
+        topConstraintVideoPlayer?.isActive = true
+        topConstraintVideoPlayer?.identifier = "VideoView.topConstraintVideoPlayer"
+        
+        bottomConstraintVideoPlayer?.isActive = false
+        
+        heightConstraintVideoPlayer?.isActive = false
+        heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: videoHeight)
+        heightConstraintVideoPlayer?.isActive = true
+        heightConstraintVideoPlayer?.identifier = "VideoView.heightConstraintVideoPlayer"
         
         videoPlayer.layoutIfNeeded()
         
@@ -258,6 +262,8 @@ internal final class VideoView: UIView {
     
     private func setupLayoutMinimize() {
         guard let window = windowUI, let videoPlayer else { return }
+        
+        backgroundColor = .white
         
         removeFromSuperview()
         videoPlayer.removeFromSuperview()
@@ -301,6 +307,7 @@ internal final class VideoView: UIView {
         leadingConstraintVideoPlayer?.isActive = false
         trailingConstraintVideoPlayer?.isActive = false
         topConstraintVideoPlayer?.isActive = false
+        bottomConstraintVideoPlayer?.isActive = false
         
         heightConstraintVideoPlayer?.constant = videoHeight
         
@@ -336,6 +343,11 @@ internal final class VideoView: UIView {
     private func setupLayoutMaximize() {
         guard let window = windowUI, let videoPlayer else { return }
         
+        backgroundColor = .black
+        
+        let videoWidth: CGFloat = window.frame.height
+        let videoHeight: CGFloat = window.frame.width
+        
         videoPlayer.removeFromSuperview()
         videoPlayer.translatesAutoresizingMaskIntoConstraints = true
         addSubview(videoPlayer)
@@ -347,12 +359,38 @@ internal final class VideoView: UIView {
             delay: 0.0,
             options: .curveEaseOut
         ) {
-            let videoWidth: CGFloat = window.frame.height
-            let videoHeight: CGFloat = window.frame.width
             videoPlayer.resizePlayerLayer(with: CGSizeMake(videoWidth, videoHeight))
             videoPlayer.transform = CGAffineTransform(rotationAngle: .pi / 2)
             videoPlayer.bounds = CGRectMake(0, 0, videoWidth, videoHeight)
             videoPlayer.center = window.center
+        }
+    }
+    
+    private func setupLayoutMaximizeDeviceRotation(orientation: UIDeviceOrientation) {
+        guard let window = windowUI, let videoPlayer else { return }
+        switch orientation {
+        case .landscapeLeft:
+            UIView.animate(
+                withDuration: 0.5,
+                delay: 0.0,
+                options: .curveEaseOut
+            ) {
+                videoPlayer.transform = CGAffineTransform(rotationAngle: .pi / 2)
+                videoPlayer.center = window.center
+            }
+        case .landscapeRight:
+            UIView.animate(
+                withDuration: 0.5,
+                delay: 0.0,
+                options: .curveEaseOut
+            ) {
+                videoPlayer.transform = CGAffineTransform(rotationAngle: -(.pi / 2))
+                videoPlayer.center = window.center
+            }
+        case .portrait, .portraitUpsideDown, .faceUp, .faceDown, .unknown:
+            break
+        @unknown default:
+            break
         }
     }
     
@@ -364,7 +402,7 @@ internal final class VideoView: UIView {
         titleStack.addArrangedSubview(titleLabel)
         titleStack.addArrangedSubview(channelLabel)
         
-        videoPlayer = VideoPlayerView(for: EndPoint.video.url)
+        videoPlayer = VideoPlayerView(for: EndPoint.video.url, areaInsets: areaInsets)
         videoPlayer?.translatesAutoresizingMaskIntoConstraints = false
         videoPlayer?.accessibilityIdentifier = "VideoView.videoPlayer"
     }
@@ -401,6 +439,17 @@ internal final class VideoView: UIView {
                 playbackButton.setImage(state.playbackIcon, for: .normal)
             }
             .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
+            .receive(on: DispatchQueue.main)
+            .mapToVoid()
+            .sink { [weak self] in
+                guard let self,
+                      videoPlayer.screenState.value == .maximize else { return }
+                let orientation: UIDeviceOrientation = UIDevice.current.orientation
+                self.setupLayoutMaximizeDeviceRotation(orientation: orientation)
+            }
+            .store(in: &cancellables)
     }
     
     private func bindAction() {
@@ -424,13 +473,13 @@ internal final class VideoView: UIView {
                     return
                 case .playing:
                     videoPlayer.controlView.state.send(.paused(isHidden: false))
-                    videoPlayer.controlView.action.send(.didTapPauseButton)
+                    videoPlayer.controlView.action.send(.control(action: .didTapPauseButton))
                 case .paused:
                     videoPlayer.controlView.state.send(.playing(isHidden: false, source: .userInteraction))
-                    videoPlayer.controlView.action.send(.didTapPlayButton)
+                    videoPlayer.controlView.action.send(.control(action: .didTapPlayButton))
                 case .finished:
                     videoPlayer.controlView.state.send(.playing(isHidden: true, source: .userInteraction))
-                    videoPlayer.controlView.action.send(.didTapReplayButton)
+                    videoPlayer.controlView.action.send(.control(action: .didTapReplayButton))
                 }
             }
             .store(in: &cancellables)

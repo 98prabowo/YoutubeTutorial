@@ -24,8 +24,8 @@ internal class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         UINavigationBar.appearance().compactAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
         
-        let vc = HomeController()
-        window?.rootViewController = UINavigationController(rootViewController: vc)
+        let navVC: UINavigationController = MainNavigationController()
+        window?.rootViewController = navVC
         window?.makeKeyAndVisible()
     }
 

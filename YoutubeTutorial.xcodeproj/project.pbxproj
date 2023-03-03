@@ -62,12 +62,16 @@
 		D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F7822981295A0053A5FE /* UIView+Extensions.swift */; };
 		D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */; };
 		D68C810D29A897B6002FF4EF /* Float64+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */; };
+		D68C811629A9A996002FF4EF /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68C811529A9A996002FF4EF /* AppUtility.swift */; };
 		D6A8DC50298A353500DA16BD /* home.json in Resources */ = {isa = PBXBuildFile; fileRef = D6A8DC4F298A353500DA16BD /* home.json */; };
 		D6A8DC52298A356700DA16BD /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A8DC51298A356700DA16BD /* NetworkManager.swift */; };
 		D6BAAF2229A37BFE0056E8C0 /* PreviousValueOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */; };
 		D6BAAF2529A56CDC0056E8C0 /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */; };
 		D6BAAF2929A57D280056E8C0 /* VideoCellLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2729A57D280056E8C0 /* VideoCellLoading.swift */; };
 		D6BAAF2B29A5CDCC0056E8C0 /* CancelOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */; };
+		D6F9C07629B1E315005C813F /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07529B1E315005C813F /* NotificationName.swift */; };
+		D6F9C07A29B1F57E005C813F /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07929B1F57E005C813F /* MainNavigationController.swift */; };
+		D6F9C07C29B1F600005C813F /* UINavigationController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,12 +151,16 @@
 		D682F7822981295A0053A5FE /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Extensions.swift"; sourceTree = "<group>"; };
 		D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float64+Extensions.swift"; sourceTree = "<group>"; };
+		D68C811529A9A996002FF4EF /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
 		D6A8DC4F298A353500DA16BD /* home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = home.json; sourceTree = "<group>"; };
 		D6A8DC51298A356700DA16BD /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		D6BAAF2129A37BFE0056E8C0 /* PreviousValueOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousValueOperator.swift; sourceTree = "<group>"; };
 		D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
 		D6BAAF2729A57D280056E8C0 /* VideoCellLoading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoCellLoading.swift; sourceTree = "<group>"; };
 		D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelOperator.swift; sourceTree = "<group>"; };
+		D6F9C07529B1E315005C813F /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
+		D6F9C07929B1F57E005C813F /* MainNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNavigationController.swift; sourceTree = "<group>"; };
+		D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,6 +220,8 @@
 				D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */,
 				D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */,
 				D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */,
+				D6F9C07529B1E315005C813F /* NotificationName.swift */,
+				D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -340,6 +350,7 @@
 				D634D1FE298C00DA002BCF24 /* Combines */,
 				D634D1FC298C00C2002BCF24 /* Extensions */,
 				D634D1FD298C00D2002BCF24 /* NetworkManager */,
+				D6F9C07D29B1F7D2005C813F /* Utility */,
 				D64D8AB2299AB5AC00F2FAC1 /* VideoManager */,
 			);
 			path = Helpers;
@@ -360,10 +371,11 @@
 		D651874E2988896D00362A46 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D648638F2999B964007DA5B4 /* DiffableCollection.swift */,
 				D682F752298117530053A5FE /* HomeController.swift */,
+				D6F9C07929B1F57E005C813F /* MainNavigationController.swift */,
 				D63D2483298AD300006FCDA3 /* ModalController.swift */,
 				D634D1FA298BEFB0002BCF24 /* SettingController.swift */,
-				D648638F2999B964007DA5B4 /* DiffableCollection.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -441,6 +453,14 @@
 				D6BAAF2A29A5CDCC0056E8C0 /* CancelOperator.swift */,
 			);
 			path = Operators;
+			sourceTree = "<group>";
+		};
+		D6F9C07D29B1F7D2005C813F /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				D68C811529A9A996002FF4EF /* AppUtility.swift */,
+			);
+			path = Utility;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -593,6 +613,7 @@
 				D634D21F298C6863002BCF24 /* FeedCell.swift in Sources */,
 				D6BAAF2929A57D280056E8C0 /* VideoCellLoading.swift in Sources */,
 				D63258F9298A57C6006363CF /* ShimmerView.swift in Sources */,
+				D6F9C07629B1E315005C813F /* NotificationName.swift in Sources */,
 				D634D1FB298BEFB0002BCF24 /* SettingController.swift in Sources */,
 				D635AE4829896C30000B5659 /* MenuCell.swift in Sources */,
 				D682F753298117530053A5FE /* HomeController.swift in Sources */,
@@ -604,6 +625,7 @@
 				D635AE4F29897FA2000B5659 /* Collection+Extensions.swift in Sources */,
 				D648638C29999349007DA5B4 /* EndPoint.swift in Sources */,
 				D6BAAF2B29A5CDCC0056E8C0 /* CancelOperator.swift in Sources */,
+				D6F9C07C29B1F600005C813F /* UINavigationController+Extensions.swift in Sources */,
 				D634D21A298C1608002BCF24 /* HTTPURLResponse+Extensions.swift in Sources */,
 				D6BAAF2529A56CDC0056E8C0 /* AsyncImageView.swift in Sources */,
 				D634D20C298C0990002BCF24 /* ControlPublisher.swift in Sources */,
@@ -619,8 +641,10 @@
 				D634D21C298C1666002BCF24 /* Menu.swift in Sources */,
 				D66A95332990E5CA003D2B6B /* TrendingCell.swift in Sources */,
 				D682F74F298117530053A5FE /* AppDelegate.swift in Sources */,
+				D68C811629A9A996002FF4EF /* AppUtility.swift in Sources */,
 				D64D8ABD299ADFAA00F2FAC1 /* VideoControllerView.swift in Sources */,
 				D634D204298C02E2002BCF24 /* GestureSubscription.swift in Sources */,
+				D6F9C07A29B1F57E005C813F /* MainNavigationController.swift in Sources */,
 				D651875029888A3600362A46 /* UIColor+Extensions.swift in Sources */,
 				D64863902999B964007DA5B4 /* DiffableCollection.swift in Sources */,
 				D682F751298117530053A5FE /* SceneDelegate.swift in Sources */,
@@ -800,13 +824,13 @@
 				DEVELOPMENT_TEAM = 5DY684J9X8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YoutubeTutorial/Cores/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				INFOPLIST_KEY_UIRequiresFullScreen = NO;
-				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -831,13 +855,13 @@
 				DEVELOPMENT_TEAM = 5DY684J9X8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YoutubeTutorial/Cores/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				INFOPLIST_KEY_UIRequiresFullScreen = NO;
-				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

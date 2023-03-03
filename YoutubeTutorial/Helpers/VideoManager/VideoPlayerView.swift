@@ -17,12 +17,23 @@ internal final class VideoPlayerView: UIView {
         case normal
         case minimize
         case maximize
+        
+        internal var screenButtonIcon: UIImage? {
+            switch self {
+            case .normal:
+                return UIImage(named: "maximize")
+            case .maximize:
+                return UIImage(named: "normalize")
+            case .noScreen, .minimize:
+                return nil
+            }
+        }
     }
     
     // MARK: UI Components
     
-    internal let controlView: VideoControllerView = {
-        let view = VideoControllerView()
+    internal lazy var controlView: VideoControllerView = {
+        let view = VideoControllerView(areaInsets: areaInsets)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.accessibilityIdentifier = "VideoPlayerView.controlView"
         return view
@@ -64,10 +75,13 @@ internal final class VideoPlayerView: UIView {
     
     private let urlString: String
     
+    private let areaInsets: UIEdgeInsets
+    
     // MARK: Lifecycles
     
-    internal init(for urlString: String) {
+    internal init(for urlString: String, areaInsets: UIEdgeInsets) {
         self.urlString = urlString
+        self.areaInsets = areaInsets
         super.init(frame: .zero)
         backgroundColor = .black
         clipsToBounds = true
@@ -97,6 +111,11 @@ internal final class VideoPlayerView: UIView {
     
     private func setupLayoutMinimize() {
         controlView.removeFromSuperview()
+    }
+    
+    private func setupLayoutMaximize() {
+        controlView.removeFromSuperview()
+        pinSubview(controlView)
     }
     
     // MARK: Implementations
@@ -131,7 +150,7 @@ internal final class VideoPlayerView: UIView {
                 player.seek(to: seekTime)
                 guard controlView.state.value == .finished(isHidden: false) else { return }
                 controlView.state.send(.playing(isHidden: false, source: .userInteraction))
-                controlView.action.send(.didTapPlayButton)
+                controlView.action.send(.control(action: .didTapPlayButton))
             }
             .store(in: &dataCancellables)
     }
@@ -159,24 +178,32 @@ internal final class VideoPlayerView: UIView {
             .sink { [weak self] action in
                 guard let self else { return }
                 switch action {
-                case .emptyAction:
+                case .noAction:
                     break
-                case .didTapNormalizeButton:
-                    self.screenState.send(.normal)
-                case .didTapMinimizeButton:
-                    self.screenState.send(.minimize)
-                case .didTapMaximizeButton:
-                    self.screenState.send(.maximize)
-                case .didTapPlayButton:
-                    self.play()
-                case .didTapPauseButton:
-                    self.pause()
-                case .didTapReplayButton:
-                    self.replay()
-                case .didTapForwardButton:
-                    self.goForward()
-                case .didTapBackwardButton:
-                    self.goBackward()
+                    
+                case let .screen(screenAction):
+                    switch screenAction {
+                    case .didTapNormalizeButton:
+                        self.screenState.send(.normal)
+                    case .didTapMinimizeButton:
+                        self.screenState.send(.minimize)
+                    case .didTapMaximizeButton:
+                        self.screenState.send(.maximize)
+                    }
+                    
+                case let .control(controlAction):
+                    switch controlAction {
+                    case .didTapPlayButton:
+                        self.play()
+                    case .didTapPauseButton:
+                        self.pause()
+                    case .didTapReplayButton:
+                        self.replay()
+                    case .didTapForwardButton:
+                        self.goForward()
+                    case .didTapBackwardButton:
+                        self.goBackward()
+                    }
                 }
             }
             .store(in: &actionCancellables)
@@ -187,24 +214,18 @@ internal final class VideoPlayerView: UIView {
             .sink { [weak self] state in
                 guard let self else { return }
                 
+                self.controlView.screenState.send(state)
+                
                 switch state {
                 case .noScreen:
                     self.setupLayoutNoScreen()
                     self.pause()
-                    
                 case .normal:
                     self.setupLayoutNormal()
-                    let state = self.controlView.state.value
-                    self.controlView.state.send(state)
-                    
                 case .minimize:
                     self.setupLayoutMinimize()
-                    
                 case .maximize:
-                    self.pinSubview(self.controlView)
-                    var state = self.controlView.state.value
-                    state.showControlPanel()
-                    self.controlView.state.send(state)
+                    self.setupLayoutMaximize()
                 }
             }
             .store(in: &actionCancellables)

@@ -53,13 +53,9 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
     
     // MARK: Properties
     
-    override internal var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
-    }
+    private let statusBarFrame = CurrentValueSubject<CGRect, Never>(.zero)
     
     private var cancellables = Set<AnyCancellable>()
-    
-    private var statusBarFrame = CurrentValueSubject<CGRect, Never>(.zero)
     
     private var contentIndex: IndexPath = IndexPath(row: 0, section: 0)
     
@@ -97,8 +93,8 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
     
     override internal func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setNeedsStatusBarAppearanceUpdate()
         navigationController?.hidesBarsOnSwipe = true
+        AppUtility.lockOrientation(.portrait)
     }
     
     override func viewWillLayoutSubviews() {
