@@ -18,7 +18,7 @@ extension UIView: Identifiable {
     ///   - metrics: A dictionary of constants that appear in the visual format string. The dictionary’s keys must be the string values used in the visual format string. Their values must be `NSNumber` objects..
     internal func pinSubview(
         _ view: UIView,
-        padding: UIEdgeInsets = .zero,
+        _ padding: UIEdgeInsets = .zero,
         size: CGSize = .zero,
         options: NSLayoutConstraint.FormatOptions = [],
         metrics: [String : Any]? = nil

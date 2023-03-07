@@ -70,12 +70,7 @@ internal class SubscriptionsCell: BaseCell {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] navigationBarHeight in
                 guard let self else { return }
-                self.collectionView.contentInset = UIEdgeInsets(
-                    top: navigationBarHeight,
-                    left: 0.0,
-                    bottom: 0.0,
-                    right: 0.0
-                )
+                self.collectionView.contentInset = .padding(navigationBarHeight, .top)
             }
             .store(in: &cancellables)
     }

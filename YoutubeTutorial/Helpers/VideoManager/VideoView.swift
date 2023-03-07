@@ -198,7 +198,7 @@ internal final class VideoView: UIView {
         
         let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
         
-        if previousState == .maximize {
+        if case .maximize = previousState {
             UIView.animate(
                 withDuration: 0.5,
                 delay: 0.0,
@@ -445,7 +445,7 @@ internal final class VideoView: UIView {
             .mapToVoid()
             .sink { [weak self] in
                 guard let self,
-                      videoPlayer.screenState.value == .maximize else { return }
+                      case .maximize = videoPlayer.screenState.value else { return }
                 let orientation: UIDeviceOrientation = UIDevice.current.orientation
                 self.setupLayoutMaximizeDeviceRotation(orientation: orientation)
             }

@@ -73,12 +73,7 @@ internal class FeedCell: BaseCell {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] navigationBarHeight in
                 guard let self else { return }
-                self.collectionView.contentInset = UIEdgeInsets(
-                    top: navigationBarHeight,
-                    left: 0.0,
-                    bottom: 0.0,
-                    right: 0.0
-                )
+                self.collectionView.contentInset = .padding(navigationBarHeight, .top)
             }
             .store(in: &cancellables)
     }
@@ -117,22 +112,10 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         videoLauncher?.stopVideoPlayer()
         videoLauncher = nil
         
-        let topInset: CGFloat = areaInsets?.top ?? 0.0
-        let leftInset: CGFloat = areaInsets?.left ?? 0.0
-        let bottomInset: CGFloat = areaInsets?.bottom ?? 0.0
-        let rightInset: CGFloat = areaInsets?.right ?? 0.0
         let navbarHeight: CGFloat = navigationController.value?.navigationBar.frame.height ?? 0.0
-        let statusBarHeight: CGFloat = topInset - navbarHeight < 0.0 ? 0.0 : topInset - navbarHeight
+        let videoInsets: UIEdgeInsets = areaInsets.zeroIfNil.substract(navbarHeight, .top, lowest: 0.0)
         
-        videoLauncher = VideoView(
-            video,
-            areaInsets: UIEdgeInsets(
-                top: statusBarHeight,
-                left: leftInset,
-                bottom: bottomInset,
-                right: rightInset
-            )
-        )
+        videoLauncher = VideoView(video, areaInsets: videoInsets)
         
         guard let videoLauncher else { return }
         videoLauncher.startVideoPlayer()

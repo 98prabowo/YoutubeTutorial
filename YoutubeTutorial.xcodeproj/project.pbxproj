@@ -72,6 +72,8 @@
 		D6F9C07629B1E315005C813F /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07529B1E315005C813F /* NotificationName.swift */; };
 		D6F9C07A29B1F57E005C813F /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07929B1F57E005C813F /* MainNavigationController.swift */; };
 		D6F9C07C29B1F600005C813F /* UINavigationController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */; };
+		D6F9C07F29B5E031005C813F /* VideoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C07E29B5E031005C813F /* VideoButton.swift */; };
+		D6F9C08229B5F80F005C813F /* LockButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F9C08129B5F80F005C813F /* LockButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,6 +163,8 @@
 		D6F9C07529B1E315005C813F /* NotificationName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationName.swift; sourceTree = "<group>"; };
 		D6F9C07929B1F57E005C813F /* MainNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNavigationController.swift; sourceTree = "<group>"; };
 		D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extensions.swift"; sourceTree = "<group>"; };
+		D6F9C07E29B5E031005C813F /* VideoButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoButton.swift; sourceTree = "<group>"; };
+		D6F9C08129B5F80F005C813F /* LockButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,9 +331,11 @@
 		D64D8AB2299AB5AC00F2FAC1 /* VideoManager */ = {
 			isa = PBXGroup;
 			children = (
+				D6F9C08029B5F801005C813F /* Buttons */,
 				D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */,
 				D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */,
 				D64D8ABC299ADFAA00F2FAC1 /* VideoControllerView.swift */,
+				D6F9C07E29B5E031005C813F /* VideoButton.swift */,
 			);
 			path = VideoManager;
 			sourceTree = "<group>";
@@ -461,6 +467,14 @@
 				D68C811529A9A996002FF4EF /* AppUtility.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		D6F9C08029B5F801005C813F /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				D6F9C08129B5F80F005C813F /* LockButton.swift */,
+			);
+			path = Buttons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -606,6 +620,7 @@
 				D682F78529813BBF0053A5FE /* UIEdgeInsets+Extensions.swift in Sources */,
 				D634D200298C00F9002BCF24 /* GesturePublisher.swift in Sources */,
 				D63D2484298AD300006FCDA3 /* ModalController.swift in Sources */,
+				D6F9C08229B5F80F005C813F /* LockButton.swift in Sources */,
 				D634D215298C0FC8002BCF24 /* BarButtonPublisherImplementations.swift in Sources */,
 				D635AE4A29896C9C000B5659 /* BaseCell.swift in Sources */,
 				D635AE4629896143000B5659 /* MenuBar.swift in Sources */,
@@ -653,6 +668,7 @@
 				D634D213298C0F52002BCF24 /* BarButtonPublisher.swift in Sources */,
 				D63D2486298AF828006FCDA3 /* SettingView.swift in Sources */,
 				D64D8AB4299ACC2700F2FAC1 /* VideoPlayerView.swift in Sources */,
+				D6F9C07F29B5E031005C813F /* VideoButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

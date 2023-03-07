@@ -16,7 +16,7 @@ internal final class VideoPlayerView: UIView {
         case noScreen
         case normal
         case minimize
-        case maximize
+        case maximize(isLocked: Bool)
         
         internal var screenButtonIcon: UIImage? {
             switch self {
@@ -33,7 +33,7 @@ internal final class VideoPlayerView: UIView {
     // MARK: UI Components
     
     internal lazy var controlView: VideoControllerView = {
-        let view = VideoControllerView(areaInsets: areaInsets)
+        let view = VideoControllerView(areaInsets: areaInsets, buttons: [.lock])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.accessibilityIdentifier = "VideoPlayerView.controlView"
         return view
@@ -188,7 +188,9 @@ internal final class VideoPlayerView: UIView {
                     case .didTapMinimizeButton:
                         self.screenState.send(.minimize)
                     case .didTapMaximizeButton:
-                        self.screenState.send(.maximize)
+                        self.screenState.send(.maximize(isLocked: false))
+                    case .didTapLockButton:
+                        self.screenState.send(.maximize(isLocked: true))
                     }
                     
                 case let .control(controlAction):
@@ -214,8 +216,10 @@ internal final class VideoPlayerView: UIView {
             .sink { [weak self] state in
                 guard let self else { return }
                 
+                // Sync screen state with screen state in control view
                 self.controlView.screenState.send(state)
                 
+                // Handle layouts and actions
                 switch state {
                 case .noScreen:
                     self.setupLayoutNoScreen()
