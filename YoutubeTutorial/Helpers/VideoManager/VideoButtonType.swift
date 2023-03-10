@@ -1,5 +1,5 @@
 //
-//  VideoButton.swift
+//  VideoButtonType.swift
 //  YoutubeTutorial
 //
 //  Created by Dimas Prabowo on 06/03/23.
@@ -8,8 +8,9 @@
 import Combine
 import UIKit
 
-internal enum VideoButton {
+internal enum VideoButtonType {
     case lock
+    case rate
     case custom(Template)
         
     // MARK: Value Types
@@ -28,6 +29,8 @@ internal enum VideoButton {
         switch self {
         case .lock:
             return "Lock"
+        case .rate:
+            return "Speed"
         case let .custom(template):
             return template.title
         }
@@ -37,6 +40,8 @@ internal enum VideoButton {
         switch self {
         case .lock:
             return UIImage(systemName: "lock")
+        case .rate:
+            return UIImage(systemName: "speedometer")
         case let .custom(template):
             return template.image
         }

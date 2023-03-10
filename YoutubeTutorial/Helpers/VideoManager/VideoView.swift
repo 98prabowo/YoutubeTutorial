@@ -187,7 +187,6 @@ internal final class VideoView: UIView {
         videoPlayer?.removeFromSuperview()
         minimizeStack.removeFromSuperview()
         removeFromSuperview()
-        
         videoPlayer = nil
     }
     
@@ -461,7 +460,7 @@ internal final class VideoView: UIView {
                 case .noScreen, .normal, .maximize:
                     break
                 case .minimize:
-                    videoPlayer.screenState.send(.normal)
+                    videoPlayer.screenState.send(.normal(isLoading: false))
                 }
             }
             .store(in: &cancellables)
@@ -502,11 +501,11 @@ internal final class VideoView: UIView {
     internal func startVideoPlayer() {
         guard let videoPlayer else { return }
         setupLayout()
-        videoPlayer.screenState.send(.normal)
+        videoPlayer.screenState.send(.normal(isLoading: true))
     }
     
     internal func showFullScreen() {
         guard let videoPlayer else { return }
-        videoPlayer.screenState.send(.normal)
+        videoPlayer.screenState.send(.normal(isLoading: false))
     }
 }

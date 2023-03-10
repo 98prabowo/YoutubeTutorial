@@ -23,7 +23,7 @@ internal final class LockButton: UIView {
         let img = UIImageView()
         img.tintColor = .white
         img.translatesAutoresizingMaskIntoConstraints = false
-        img.accessibilityIdentifier = "LockImageView.image"
+        img.accessibilityIdentifier = "LockButton.image"
         return img
     }()
     
@@ -32,7 +32,7 @@ internal final class LockButton: UIView {
         text.textColor = .white
         text.font = .preferredFont(forTextStyle: .callout)
         text.translatesAutoresizingMaskIntoConstraints = false
-        text.accessibilityIdentifier = "LockImageView.title"
+        text.accessibilityIdentifier = "LockButton.title"
         return text
     }()
     
@@ -43,14 +43,14 @@ internal final class LockButton: UIView {
         stack.distribution = .fill
         stack.spacing = 4.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.btnStack"
+        stack.accessibilityIdentifier = "LockButton.btnStack"
         return stack
     }()
     
     private let titleView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.accessibilityIdentifier = "VideoControllerView.titleView"
+        view.accessibilityIdentifier = "LockButton.titleView"
         return view
     }()
     
@@ -60,7 +60,7 @@ internal final class LockButton: UIView {
         text.textColor = .white
         text.font = .preferredFont(forTextStyle: .headline)
         text.translatesAutoresizingMaskIntoConstraints = false
-        text.accessibilityIdentifier = "LockImageView.lockedTitle"
+        text.accessibilityIdentifier = "LockButton.lockedTitle"
         return text
     }()
     
@@ -70,7 +70,7 @@ internal final class LockButton: UIView {
         text.textColor = .white
         text.font = .preferredFont(forTextStyle: .caption2)
         text.translatesAutoresizingMaskIntoConstraints = false
-        text.accessibilityIdentifier = "LockImageView.lockedInstruction"
+        text.accessibilityIdentifier = "LockButton.lockedInstruction"
         return text
     }()
     
@@ -81,7 +81,7 @@ internal final class LockButton: UIView {
         stack.distribution = .fill
         stack.spacing = 4.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.lockedStack"
+        stack.accessibilityIdentifier = "LockButton.lockedStack"
         return stack
     }()
     
@@ -101,7 +101,7 @@ internal final class LockButton: UIView {
     
     // MARK: Lifecycles
     
-    internal init(_ template: VideoButton) {
+    internal init(_ template: VideoButtonType) {
         titleText = template.title
         title.text = template.title
         image.image = template.image
@@ -126,13 +126,13 @@ internal final class LockButton: UIView {
         btnStack.addArrangedSubview(image)
         btnStack.addArrangedSubview(title)
         
-        imageWidthConstraint = image.widthAnchor.constraint(equalToConstant: VideoButton.btnSize.width)
+        imageWidthConstraint = image.widthAnchor.constraint(equalToConstant: VideoButtonType.btnSize.width)
         imageWidthConstraint?.isActive = true
-        imageWidthConstraint?.identifier = "VideoControllerView.imageWidthConstraint"
+        imageWidthConstraint?.identifier = "LockButton.imageWidthConstraint"
         
-        imageHeightConstraint = image.heightAnchor.constraint(equalToConstant: VideoButton.btnSize.height)
+        imageHeightConstraint = image.heightAnchor.constraint(equalToConstant: VideoButtonType.btnSize.height)
         imageHeightConstraint?.isActive = true
-        imageHeightConstraint?.identifier = "VideoControllerView.imageHeightConstraint"
+        imageHeightConstraint?.identifier = "LockButton.imageHeightConstraint"
         
         titleView.pinSubview(btnStack, .padding(10.0))
         pinSubview(titleView)
@@ -144,8 +144,8 @@ internal final class LockButton: UIView {
         lockedStack.removeArrangedSubview(lockedInstruction)
         lockedStack.removeFromSuperview()
         
-        imageWidthConstraint?.constant = VideoButton.btnSize.width
-        imageHeightConstraint?.constant = VideoButton.btnSize.height
+        imageWidthConstraint?.constant = VideoButtonType.btnSize.width
+        imageHeightConstraint?.constant = VideoButtonType.btnSize.height
         
         btnStack.spacing = 4.0
         
@@ -174,7 +174,7 @@ internal final class LockButton: UIView {
         lockedStack.addArrangedSubview(lockedTitle)
         lockedStack.addArrangedSubview(lockedInstruction)
         
-        let buttonSize: CGFloat = VideoButton.btnSize.width * 1.5
+        let buttonSize: CGFloat = VideoButtonType.btnSize.width * 1.5
         
         imageWidthConstraint?.constant = buttonSize
         imageHeightConstraint?.constant = buttonSize

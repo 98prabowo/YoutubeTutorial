@@ -9,7 +9,7 @@ import AVFoundation
 import Combine
 import UIKit
 
-internal final class VideoControllerView: UIView {
+internal final class VideoControlView: UIView {
     // MARK: Type Values
     
     internal typealias VideoDuration = (current: Float64, max: Float64)
@@ -44,11 +44,11 @@ internal final class VideoControllerView: UIView {
             case .loading:
                 break
             case .playing:
-                self = .playing(isHidden: false, source: .userInteraction)
+                self = .playing(isHidden: true, source: .userInteraction)
             case .paused:
-                self = .paused(isHidden: false)
+                self = .paused(isHidden: true)
             case .finished:
-                self = .finished(isHidden: false)
+                self = .finished(isHidden: true)
             }
         }
         
@@ -57,11 +57,11 @@ internal final class VideoControllerView: UIView {
             case .loading:
                 break
             case .playing:
-                self = .playing(isHidden: true, source: .userInteraction)
+                self = .playing(isHidden: false, source: .userInteraction)
             case .paused:
-                self = .paused(isHidden: true)
+                self = .paused(isHidden: false)
             case .finished:
-                self = .finished(isHidden: true)
+                self = .finished(isHidden: false)
             }
         }
         
@@ -94,6 +94,7 @@ internal final class VideoControllerView: UIView {
             case didTapNormalizeButton
             case didTapMinimizeButton
             case didTapMaximizeButton
+            case didTapSpeedButton
             case didTapLockButton
         }
         
@@ -117,7 +118,7 @@ internal final class VideoControllerView: UIView {
         btn.contentHorizontalAlignment = .fill
         btn.imageEdgeInsets = .padding(0.0)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.accessibilityIdentifier = "VideoControllerView.minimizeButton"
+        btn.accessibilityIdentifier = "VideoControlView.minimizeButton"
         return btn
     }()
     
@@ -125,7 +126,7 @@ internal final class VideoControllerView: UIView {
         let aiv = UIActivityIndicatorView(style: .large)
         aiv.startAnimating()
         aiv.translatesAutoresizingMaskIntoConstraints = false
-        aiv.accessibilityIdentifier = "VideoControllerView.loadingView"
+        aiv.accessibilityIdentifier = "VideoControlView.loadingView"
         return aiv
     }()
     
@@ -138,7 +139,7 @@ internal final class VideoControllerView: UIView {
         btn.contentHorizontalAlignment = .fill
         btn.imageEdgeInsets = .padding(0.0)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.accessibilityIdentifier = "VideoControllerView.playbackButton"
+        btn.accessibilityIdentifier = "VideoControlView.playbackButton"
         return btn
     }()
     
@@ -150,7 +151,7 @@ internal final class VideoControllerView: UIView {
         btn.contentHorizontalAlignment = .fill
         btn.imageEdgeInsets = .padding(0.0)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.accessibilityIdentifier = "VideoControllerView.forwardButton"
+        btn.accessibilityIdentifier = "VideoControlView.forwardButton"
         return btn
     }()
     
@@ -162,7 +163,7 @@ internal final class VideoControllerView: UIView {
         btn.contentHorizontalAlignment = .fill
         btn.imageEdgeInsets = .padding(0.0)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.accessibilityIdentifier = "VideoControllerView.backwardButton"
+        btn.accessibilityIdentifier = "VideoControlView.backwardButton"
         return btn
     }()
     
@@ -173,7 +174,7 @@ internal final class VideoControllerView: UIView {
         stack.distribution = .equalSpacing
         stack.spacing = 48.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.playbackStack"
+        stack.accessibilityIdentifier = "VideoControlView.playbackStack"
         return stack
     }()
     
@@ -185,7 +186,7 @@ internal final class VideoControllerView: UIView {
         label.font = .boldSystemFont(ofSize: 14)
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.accessibilityIdentifier = "VideoControllerView.durationLabel"
+        label.accessibilityIdentifier = "VideoControlView.durationLabel"
         return label
     }()
     
@@ -199,7 +200,7 @@ internal final class VideoControllerView: UIView {
         slider.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         slider.setContentHuggingPriority(.defaultLow, for: .horizontal)
         slider.translatesAutoresizingMaskIntoConstraints = false
-        slider.accessibilityIdentifier = "VideoControllerView.sliderScrubber"
+        slider.accessibilityIdentifier = "VideoControlView.sliderScrubber"
         return slider
     }()
     
@@ -211,7 +212,7 @@ internal final class VideoControllerView: UIView {
         label.font = .boldSystemFont(ofSize: 14)
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.accessibilityIdentifier = "VideoControllerView.maxDurationLabel"
+        label.accessibilityIdentifier = "VideoControlView.maxDurationLabel"
         return label
     }()
     
@@ -224,7 +225,7 @@ internal final class VideoControllerView: UIView {
         btn.contentHorizontalAlignment = .fill
         btn.imageEdgeInsets = .padding(2.0)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.accessibilityIdentifier = "VideoControllerView.screenSizeButton"
+        btn.accessibilityIdentifier = "VideoControlView.screenSizeButton"
         return btn
     }()
     
@@ -235,7 +236,7 @@ internal final class VideoControllerView: UIView {
         stack.distribution = .fill
         stack.spacing = 8.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.scrubberStack"
+        stack.accessibilityIdentifier = "VideoControlView.scrubberStack"
         return stack
     }()
     
@@ -246,7 +247,7 @@ internal final class VideoControllerView: UIView {
         stack.distribution = .fillProportionally
         stack.spacing = 8.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.inputBtnStack"
+        stack.accessibilityIdentifier = "VideoControlView.inputBtnStack"
         return stack
     }()
     
@@ -257,11 +258,13 @@ internal final class VideoControllerView: UIView {
         stack.distribution = .fill
         stack.spacing = 0.0
         stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.accessibilityIdentifier = "VideoControllerView.bottomBtnStack"
+        stack.accessibilityIdentifier = "VideoControlView.bottomBtnStack"
         return stack
     }()
     
     private var lockButton: LockButton?
+    
+    private var speedButton: VideoButton?
     
     private var minimizeBtnConstraints = [NSLayoutConstraint]()
     
@@ -293,15 +296,15 @@ internal final class VideoControllerView: UIView {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private var removedButtonIndex: Int = 0
+    private var removedButtonIndex: Int?
     
     private let areaInsets: UIEdgeInsets
     
-    private let buttons: [VideoButton]
+    private let buttons: [VideoButtonType]
     
     // MARK: Lifecycles
     
-    internal init(areaInsets: UIEdgeInsets, buttons: [VideoButton]? = nil) {
+    internal init(areaInsets: UIEdgeInsets, buttons: [VideoButtonType]? = nil) {
         self.areaInsets = areaInsets
         self.buttons = buttons ?? []
         super.init(frame: .zero)
@@ -326,9 +329,37 @@ internal final class VideoControllerView: UIView {
                 self.lockButton = LockButton(btn)
                 guard let lockButton = self.lockButton else { return }
                 self.inputBtnStack.addArrangedSubview(lockButton)
+                lockButton.lockState
+                    .dropFirst()
+                    .receive(on: DispatchQueue.main)
+                    .removeDuplicates()
+                    .sink { [weak self] lockState in
+                        guard let self else { return }
+                        switch lockState {
+                        case .normal:
+                            self.action.send(.screen(action: .didTapMaximizeButton))
+                        case .locked:
+                            self.action.send(.screen(action: .didTapLockButton))
+                        case .unlockForm:
+                            break
+                        }
+                    }
+                    .store(in: &self.cancellables)
                 
-            case let .custom(template):
-                print(template.title)
+            case .rate:
+                self.speedButton = VideoButton(btn)
+                guard let speedButton = self.speedButton else { return }
+                self.inputBtnStack.addArrangedSubview(speedButton)
+                speedButton.tap()
+                    .sink { [weak self] in
+                        guard let self else { return }
+                        self.action.send(.screen(action: .didTapSpeedButton))
+                    }
+                    .store(in: &self.cancellables)
+                
+            case .custom:
+                let button = VideoButton(btn)
+                self.inputBtnStack.addArrangedSubview(button)
             }
         }
         
@@ -429,17 +460,17 @@ internal final class VideoControllerView: UIView {
         scrubberLeadingConstraint?.isActive = false
         scrubberLeadingConstraint = scrubberStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10.0)
         scrubberLeadingConstraint?.isActive = true
-        scrubberLeadingConstraint?.identifier = "VideoControllerView.scrubberLeadingConstraint"
+        scrubberLeadingConstraint?.identifier = "VideoControlView.scrubberLeadingConstraint"
         
         scrubberTrailingConstraint?.isActive = false
         scrubberTrailingConstraint = scrubberStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10.0)
         scrubberTrailingConstraint?.isActive = true
-        scrubberTrailingConstraint?.identifier = "VideoControllerView.scrubberTrailingConstraint"
+        scrubberTrailingConstraint?.identifier = "VideoControlView.scrubberTrailingConstraint"
         
         scrubberBottomConstraint?.isActive = false
         scrubberBottomConstraint = scrubberStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10.0)
         scrubberBottomConstraint?.isActive = true
-        scrubberBottomConstraint?.identifier = "VideoControllerView.scrubberBottomConstraint"
+        scrubberBottomConstraint?.identifier = "VideoControlView.scrubberBottomConstraint"
     }
     
     private func layoutMaximizeScreen(_ state: State) {
@@ -465,13 +496,12 @@ internal final class VideoControllerView: UIView {
         scrubberStack.addArrangedSubview(sliderScrubber)
         scrubberStack.addArrangedSubview(maxDurationLabel)
         
-        if let lockButton {
+        if let lockButton, let rmBtnIndex = removedButtonIndex {
             lockButton.removeFromSuperview()
-            inputBtnStack.insertArrangedSubview(lockButton, at: removedButtonIndex)
-            if case .finished = state,
-               let removedIndex = inputBtnStack.arrangedSubviews.firstIndex(of: lockButton) {
+            if case .finished = state {
                 inputBtnStack.removeArrangedSubview(lockButton)
-                removedButtonIndex = removedIndex
+            } else {
+                inputBtnStack.insertArrangedSubview(lockButton, at: rmBtnIndex)
             }
         }
         
@@ -662,17 +692,17 @@ internal final class VideoControllerView: UIView {
                     
                 case let .playing(isHidden, _):
                     self.updatePlaybackBtn(with: current.playbackIcon)
-                    
+
                     switch self.screenState.value {
                     case .normal:
                         self.layoutNormalScreen()
-                    case let .maximize(isLocked):
-                        guard !isLocked else { break }
+                    case let .maximize(control):
+                        guard control.notLocked else { break }
                         self.layoutMaximizeScreen(current)
                     case .noScreen, .minimize:
                         break
                     }
-                    
+
                     if isHidden {
                         let isAnimating: Bool = previous.isPlayingPresentControl && current == .playing(isHidden: true, source: .inactive)
                         self.hideButton(isAnimating: isAnimating)
@@ -682,17 +712,17 @@ internal final class VideoControllerView: UIView {
                     
                 case let .paused(isHidden):
                     self.updatePlaybackBtn(with: current.playbackIcon)
-                    
+
                     switch self.screenState.value {
                     case .normal:
                         self.layoutNormalScreen()
-                    case let .maximize(isLocked):
-                        guard !isLocked else { break }
+                    case let .maximize(control):
+                        guard control.notLocked else { break }
                         self.layoutMaximizeScreen(current)
                     case .noScreen, .minimize:
                         break
                     }
-                    
+
                     if isHidden {
                         self.directHideButton()
                     } else {
@@ -741,45 +771,28 @@ internal final class VideoControllerView: UIView {
             .sink { [weak self] screen in
                 guard let self else { return }
                 switch screen {
-                case .normal:
+                case let .normal(isLoading):
+                    guard !isLoading else { return }
                     self.screenSizeButton.setImage(screen.screenButtonIcon, for: .normal)
                     self.layoutNormalScreen()
-                case let .maximize(isLocked):
+                case let .maximize(control):
                     self.screenSizeButton.setImage(screen.screenButtonIcon, for: .normal)
-                    if isLocked {
-                        self.layoutLockScreen()
-                    } else {
+                    if control.notLocked {
                         self.layoutMaximizeScreen(self.state.value)
+                    } else {
+                        self.layoutLockScreen()
                     }
                 case .noScreen, .minimize:
                     break
                 }
             }
             .store(in: &cancellables)
-        
-        if let lockButton {
-            lockButton.lockState
-                .dropFirst()
-                .receive(on: DispatchQueue.main)
-                .removeDuplicates()
-                .sink { [action] lockState in
-                    switch lockState {
-                    case .normal:
-                        action.send(.screen(action: .didTapMaximizeButton))
-                    case .locked:
-                        action.send(.screen(action: .didTapLockButton))
-                    case .unlockForm:
-                        break
-                    }
-                }
-                .store(in: &cancellables)
-        }
     }
     
     private func bindAction() {
         minimizeButton.action()
             .sink { [screenState, action] in
-                guard screenState.value == .normal else { return }
+                guard case .normal = screenState.value else { return }
                 action.send(.screen(action: .didTapMinimizeButton))
             }
             .store(in: &cancellables)
