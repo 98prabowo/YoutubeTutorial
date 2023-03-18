@@ -18,6 +18,7 @@ internal final class SettingView: UIView {
         layout.minimumInteritemSpacing = 0
         let collection = DiffableCollectionView<DefaultSection, Setting>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
+        collection.showsVerticalScrollIndicator = true
         collection.isScrollEnabled = false
         collection.translatesAutoresizingMaskIntoConstraints = false
         collection.accessibilityIdentifier = "SettingView.collectionView"

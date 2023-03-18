@@ -96,6 +96,7 @@ internal final class VideoControlView: UIView {
             case didTapMaximizeButton
             case didTapSpeedButton
             case didTapLockButton
+            case didTapResolutionButton
         }
         
         internal enum Control: Equatable {
@@ -264,8 +265,6 @@ internal final class VideoControlView: UIView {
     
     private var lockButton: LockButton?
     
-    private var speedButton: VideoButton?
-    
     private var minimizeBtnConstraints = [NSLayoutConstraint]()
     
     private var playbackCenterXConstraint: NSLayoutConstraint?
@@ -347,13 +346,22 @@ internal final class VideoControlView: UIView {
                     .store(in: &self.cancellables)
                 
             case .rate:
-                self.speedButton = VideoButton(btn)
-                guard let speedButton = self.speedButton else { return }
+                let speedButton = VideoButton(btn)
                 self.inputBtnStack.addArrangedSubview(speedButton)
                 speedButton.tap()
                     .sink { [weak self] in
                         guard let self else { return }
                         self.action.send(.screen(action: .didTapSpeedButton))
+                    }
+                    .store(in: &self.cancellables)
+                
+            case .resolution:
+                let resolutionButton = VideoButton(btn)
+                self.inputBtnStack.addArrangedSubview(resolutionButton)
+                resolutionButton.tap()
+                    .sink { [weak self] in
+                        guard let self else { return }
+                        self.action.send(.screen(action: .didTapResolutionButton))
                     }
                     .store(in: &self.cancellables)
                 

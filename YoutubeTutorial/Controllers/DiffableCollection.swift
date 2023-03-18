@@ -41,6 +41,7 @@ internal class DiffableCollectionController<SectionIdentifierType,ItemIdentifier
 
     override internal func viewDidLoad() {
         super.viewDidLoad()
+        collectionView.register(forCell: UICollectionViewCell.self)
         bindData()
     }
     
@@ -107,6 +108,7 @@ internal class DiffableCollectionView<SectionIdentifierType,ItemIdentifierType>:
     
     internal init(frame: CGRect, layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
+        register(forCell: UICollectionViewCell.self)
         bindData()
     }
 

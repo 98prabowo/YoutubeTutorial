@@ -22,6 +22,7 @@ internal final class VideoPlayerView: UIView {
             case active
             case speedPicker
             case lock
+            case resolution
             
             internal var notLocked: Bool {
                 switch self {
@@ -31,6 +32,8 @@ internal final class VideoPlayerView: UIView {
                     return true
                 case .lock:
                     return false
+                case .resolution:
+                    return true
                 }
             }
         }
@@ -50,13 +53,15 @@ internal final class VideoPlayerView: UIView {
     // MARK: UI Components
     
     internal lazy var controlView: VideoControlView = {
-        let view = VideoControlView(areaInsets: areaInsets, buttons: [.rate, .lock])
+        let view = VideoControlView(areaInsets: areaInsets, buttons: [.rate, .lock, .resolution])
         view.translatesAutoresizingMaskIntoConstraints = false
         view.accessibilityIdentifier = "VideoPlayerView.controlView"
         return view
     }()
     
-    private var speedView: PlaybackSpeedView?
+    private var speedPicker: PlaybackSpeedView?
+    
+    private var resolutionPicker: PlaybackResolutionView?
     
     // MARK: Properties
     
@@ -86,6 +91,8 @@ internal final class VideoPlayerView: UIView {
     
     internal let screenState = CurrentValueSubject<ScreenState, Never>(.noScreen)
     
+    private var currentResolution: VideoDefinition?
+    
     private let seekDuration: Float64 = 10 // seconds
     
     private var playbackRate: Float = 1.0 // seconds
@@ -93,6 +100,8 @@ internal final class VideoPlayerView: UIView {
     private var dataCancellables = Set<AnyCancellable>()
     
     private var actionCancellables = Set<AnyCancellable>()
+    
+    private var streamVariants = [StreamVariant]()
     
     private let urlString: String
     
@@ -140,28 +149,28 @@ internal final class VideoPlayerView: UIView {
     }
     
     private func setupLayoutSpeedPicker() {
-        speedView = PlaybackSpeedView(
+        speedPicker = PlaybackSpeedView(
             areaInsets: areaInsets,
             currentRate: playbackRate
         )
-        speedView?.translatesAutoresizingMaskIntoConstraints = false
+        speedPicker?.translatesAutoresizingMaskIntoConstraints = false
         
-        guard let speedView else { return }
+        guard let speedPicker else { return }
 
         controlView.removeFromSuperview()
         
-        addSubview(speedView)
+        addSubview(speedPicker)
 
         NSLayoutConstraint.activate([
-            speedView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            speedView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            speedView.topAnchor.constraint(equalTo: topAnchor),
-            speedView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            speedPicker.leadingAnchor.constraint(equalTo: leadingAnchor),
+            speedPicker.trailingAnchor.constraint(equalTo: trailingAnchor),
+            speedPicker.topAnchor.constraint(equalTo: topAnchor),
+            speedPicker.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
         
-        speedView.showPanel()
+        speedPicker.showPanel()
         
-        speedView.playbackRate
+        speedPicker.playbackRate
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] rate in
@@ -175,14 +184,14 @@ internal final class VideoPlayerView: UIView {
                     self.playbackRate = rate
                 }
             }
-            .store(in: &speedView.cancellables)
+            .store(in: &speedPicker.cancellables)
         
-        speedView.speedPickerDismissed
+        speedPicker.speedPickerDismissed
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 guard let self else { return }
                 
-                self.speedView = nil
+                self.speedPicker = nil
                 
                 switch self.screenState.value {
                 case .noScreen, .minimize:
@@ -199,11 +208,89 @@ internal final class VideoPlayerView: UIView {
                     self.controlView.state.send(controlState)
                 }
             }
-            .store(in: &speedView.cancellables)
+            .store(in: &speedPicker.cancellables)
     }
     
+    private func setupLayoutResolutionPicker() {
+        guard let url = URL(string: urlString), let player else { return }
+        
+        let currentReso: VideoDefinition = currentResolution ?? .auto(url: url)
+        var resolutions: [VideoDefinition] = streamVariants.removeDuplicate().map(\.definition)
+        resolutions.insert(.auto(url: url), at: streamVariants.endIndex - 1)
+        
+        resolutionPicker = PlaybackResolutionView(
+            areaInsets: areaInsets,
+            currentReso: currentReso,
+            resolutions: resolutions
+        )
+        resolutionPicker?.translatesAutoresizingMaskIntoConstraints = false
+        
+        guard let resolutionPicker else { return }
+        
+        controlView.removeFromSuperview()
+        
+        addSubview(resolutionPicker)
+
+        NSLayoutConstraint.activate([
+            resolutionPicker.leadingAnchor.constraint(equalTo: leadingAnchor),
+            resolutionPicker.trailingAnchor.constraint(equalTo: trailingAnchor),
+            resolutionPicker.topAnchor.constraint(equalTo: topAnchor),
+            resolutionPicker.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        resolutionPicker.showPanel()
+        
+        resolutionPicker.currentReso
+            .receive(on: DispatchQueue.main)
+            .dropFirst()
+            .removeDuplicates()
+            .sink { [weak self] resolution in
+                guard let self else { return }
+                self.currentResolution = resolution
+                self.pause()
+                
+                // Change player's item with user selected
+                let asset: AVURLAsset = AVURLAsset(url: resolution.url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+                let playerItem: AVPlayerItem = AVPlayerItem(asset: asset)
+                player.replaceCurrentItem(with: playerItem)
+                
+                // Continue new payer item with previous item duration
+                let currentTime: Float64 = self.controlView.duration.value.current
+                let time: CMTime = CMTimeMake(value: Int64(currentTime), timescale: 1)
+                player.seek(to: time)
+                
+                guard case .playing = self.controlView.state.value else { return }
+                self.play()
+            }
+            .store(in: &resolutionPicker.cancellables)
+        
+        resolutionPicker.resoPickerDismissed
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self else { return }
+                
+                self.resolutionPicker = nil
+                
+                switch self.screenState.value {
+                case .noScreen, .minimize:
+                    break
+                case let .normal(isLoading):
+                    self.screenState.send(.normal(isLoading: isLoading))
+                    var controlState: VideoControlView.State = self.controlView.state.value
+                    controlState.showControlPanel()
+                    self.controlView.state.send(controlState)
+                case .maximize:
+                    self.screenState.send(.maximize(control: .active))
+                    var controlState: VideoControlView.State = self.controlView.state.value
+                    controlState.showControlPanel()
+                    self.controlView.state.send(controlState)
+                }
+            }
+            .store(in: &resolutionPicker.cancellables)
+    }
+
     // MARK: Implementations
-    
+
     private func bindData() {
         guard let player else { return }
         player.periodicTimePublisher()
@@ -211,6 +298,8 @@ internal final class VideoPlayerView: UIView {
                 if let item = player.currentItem {
                     let currentDuration: Float64 = CMTimeGetSeconds(item.currentTime())
                     let maxDuration: Float64 = CMTimeGetSeconds(item.duration)
+                    guard !(currentDuration.isNaN || currentDuration.isInfinite),
+                          !(maxDuration.isNaN || maxDuration.isInfinite) else { return }
                     controlView.duration.send((currentDuration, maxDuration))
                 }
                 
@@ -218,13 +307,13 @@ internal final class VideoPlayerView: UIView {
                 controlView.state.send(.playing(isHidden: true, source: .system))
             }
             .store(in: &dataCancellables)
-        
+
         player.finishPlayPublisher()
             .sink { [weak self] in
                 guard let self else { return }
-                self.speedView?.removeFromSuperview()
-                self.speedView = nil
-                
+                self.speedPicker?.removeFromSuperview()
+                self.speedPicker = nil
+
                 switch self.screenState.value {
                 case .noScreen, .minimize:
                     break
@@ -233,11 +322,11 @@ internal final class VideoPlayerView: UIView {
                 case .maximize:
                     self.screenState.send(.maximize(control: .active))
                 }
-                
+
                 self.controlView.state.send(.finished(isHidden: false))
             }
             .store(in: &dataCancellables)
-        
+
         controlView.sliderValue
             .receive(on: DispatchQueue.main)
             .dropFirst()
@@ -248,6 +337,20 @@ internal final class VideoPlayerView: UIView {
                 guard controlView.state.value == .finished(isHidden: false) else { return }
                 controlView.state.send(.playing(isHidden: false, source: .userInteraction))
                 controlView.action.send(.control(action: .didTapPlayButton))
+            }
+            .store(in: &dataCancellables)
+
+        NetworkManager.shared.getResolutionPublisher(from: urlString)
+            .sink { completion in
+                switch completion {
+                case let .failure(error):
+                    print(error.localizedDescription)
+                case .finished:
+                    break
+                }
+            } receiveValue: { [weak self] variants in
+                guard let self else { return }
+                self.streamVariants = variants
             }
             .store(in: &dataCancellables)
     }
@@ -290,6 +393,8 @@ internal final class VideoPlayerView: UIView {
                         self.screenState.send(.maximize(control: .speedPicker))
                     case .didTapLockButton:
                         self.screenState.send(.maximize(control: .lock))
+                    case .didTapResolutionButton:
+                        self.screenState.send(.maximize(control: .resolution))
                     }
                     
                 case let .control(controlAction):
@@ -331,6 +436,8 @@ internal final class VideoPlayerView: UIView {
                     self.setupLayoutMaximize()
                 case .maximize(control: .speedPicker):
                     self.setupLayoutSpeedPicker()
+                case .maximize(control: .resolution):
+                    self.setupLayoutResolutionPicker()
                 }
             }
             .store(in: &actionCancellables)

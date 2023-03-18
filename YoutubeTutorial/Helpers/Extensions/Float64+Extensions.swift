@@ -9,6 +9,7 @@ import Foundation
 
 extension Float64 {
     internal var formattedDuration: String {
+        guard !(isNaN || isInfinite) else { return "00:00" }
         let totalSeconds: Int = Int(self)
         let hours: Int = Int(self / 3600)
         let minutes: Int = Int(totalSeconds % 3600 / 60)
