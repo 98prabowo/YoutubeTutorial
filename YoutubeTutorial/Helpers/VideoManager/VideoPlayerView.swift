@@ -59,6 +59,14 @@ internal final class VideoPlayerView: UIView {
         return view
     }()
     
+    private let updateResoBuffer: UIImageView = {
+        let image = UIImageView()
+        image.contentMode = .scaleAspectFill
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.accessibilityIdentifier = "VideoPlayerView.updateResoBuffer"
+        return image
+    }()
+    
     private var speedPicker: PlaybackSpeedView?
     
     private var resolutionPicker: PlaybackResolutionView?
@@ -74,6 +82,7 @@ internal final class VideoPlayerView: UIView {
     private lazy var playerItem: AVPlayerItem? = {
         guard let asset else { return nil }
         let playerItem: AVPlayerItem = AVPlayerItem(asset: asset)
+        playerItem.add(videoOutput)
         return playerItem
     }()
     
@@ -89,9 +98,13 @@ internal final class VideoPlayerView: UIView {
         return layer
     }()
     
+    private var videoOutput: AVPlayerItemVideoOutput = AVPlayerItemVideoOutput(outputSettings: [String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: kCVPixelFormatType_32BGRA)])
+    
     internal let screenState = CurrentValueSubject<ScreenState, Never>(.noScreen)
     
     private var currentResolution: VideoDefinition?
+    
+    private var resoUpdateTime: Int64 = 0
     
     private let seekDuration: Float64 = 10 // seconds
     
@@ -132,19 +145,24 @@ internal final class VideoPlayerView: UIView {
     
     private func setupLayoutNoScreen() {
         controlView.removeFromSuperview()
+        updateResoBuffer.removeFromSuperview()
     }
     
     private func setupLayoutNormal() {
         controlView.removeFromSuperview()
+        updateResoBuffer.removeFromSuperview()
         pinSubview(controlView)
     }
     
     private func setupLayoutMinimize() {
         controlView.removeFromSuperview()
+        updateResoBuffer.removeFromSuperview()
     }
     
     private func setupLayoutMaximize() {
+        updateResoBuffer.removeFromSuperview()
         controlView.removeFromSuperview()
+        pinSubview(updateResoBuffer)
         pinSubview(controlView)
     }
     
@@ -246,19 +264,19 @@ internal final class VideoPlayerView: UIView {
             .removeDuplicates()
             .sink { [weak self] resolution in
                 guard let self else { return }
-                self.currentResolution = resolution
+                
+                let currentTime: CMTime = player.currentTime()
+                guard let image = self.getImageFromBuffer(for: currentTime) else { return }
+                
                 self.pause()
-                
-                // Change player's item with user selected
-                let asset: AVURLAsset = AVURLAsset(url: resolution.url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
-                let playerItem: AVPlayerItem = AVPlayerItem(asset: asset)
-                player.replaceCurrentItem(with: playerItem)
-                
+                self.updateResoBuffer.image = image
+                self.replacePlayerItem(with: resolution.url)
+
                 // Continue new payer item with previous item duration
-                let currentTime: Float64 = self.controlView.duration.value.current
-                let time: CMTime = CMTimeMake(value: Int64(currentTime), timescale: 1)
-                player.seek(to: time)
-                
+                player.seek(to: currentTime, toleranceBefore: .zero, toleranceAfter: .zero)
+                self.currentResolution = resolution
+                self.configVideoOuputBuffer()
+
                 guard case .playing = self.controlView.state.value else { return }
                 self.play()
             }
@@ -290,21 +308,55 @@ internal final class VideoPlayerView: UIView {
     }
 
     // MARK: Implementations
+    
+    private func configVideoOuputBuffer() {
+        player?.currentItem?.remove(videoOutput)
+        let settings = [String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: kCVPixelFormatType_32BGRA)]
+        videoOutput = AVPlayerItemVideoOutput(outputSettings: settings)
+        player?.currentItem?.add(videoOutput)
+    }
+    
+    private func replacePlayerItem(with url: URL) {
+        guard let player else { return }
+        let asset: AVURLAsset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        let playerItem: AVPlayerItem = AVPlayerItem(asset: asset)
+        player.replaceCurrentItem(with: playerItem)
+    }
+    
+    private func getImageFromBuffer(for currentTime: CMTime) -> UIImage? {
+        var presentationItemTime: CMTime = .zero
+        guard videoOutput.hasNewPixelBuffer(forItemTime: currentTime),
+              let pixelBuffer = videoOutput.copyPixelBuffer(forItemTime: currentTime, itemTimeForDisplay: &presentationItemTime) else { return nil }
+        let ciImage: CIImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let context: CIContext = CIContext()
+        guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return UIImage(cgImage: cgImage)
+    }
 
     private func bindData() {
         guard let player else { return }
+        
         player.periodicTimePublisher()
-            .sink { [controlView] time in
+            .sink { [weak self] time in
+                guard let self else { return }
+                
                 if let item = player.currentItem {
                     let currentDuration: Float64 = CMTimeGetSeconds(item.currentTime())
                     let maxDuration: Float64 = CMTimeGetSeconds(item.duration)
                     guard !(currentDuration.isNaN || currentDuration.isInfinite),
                           !(maxDuration.isNaN || maxDuration.isInfinite) else { return }
-                    controlView.duration.send((currentDuration, maxDuration))
+                    self.controlView.duration.send((currentDuration, maxDuration))
+                }
+                
+                if self.playerLayer.isReadyForDisplay,
+                   player.status == .readyToPlay,
+                   time.value > self.resoUpdateTime {
+                    self.updateResoBuffer.image = nil
+                    self.resoUpdateTime = time.value
                 }
                 
                 guard time.value == 0 else { return }
-                controlView.state.send(.playing(isHidden: true, source: .system))
+                self.controlView.state.send(.playing(isHidden: true, source: .system))
             }
             .store(in: &dataCancellables)
 
@@ -333,7 +385,7 @@ internal final class VideoPlayerView: UIView {
             .debounce(for: .seconds(0.2), scheduler: DispatchQueue.main)
             .sink { [controlView] current, _ in
                 let seekTime: CMTime = CMTimeMake(value: Int64(current), timescale: 1)
-                player.seek(to: seekTime)
+                player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
                 guard controlView.state.value == .finished(isHidden: false) else { return }
                 controlView.state.send(.playing(isHidden: false, source: .userInteraction))
                 controlView.action.send(.control(action: .didTapPlayButton))
@@ -472,7 +524,7 @@ internal final class VideoPlayerView: UIView {
     
     internal func replay() {
         guard let player else { return }
-        player.seek(to: .zero)
+        player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
         player.play()
     }
     
@@ -483,7 +535,7 @@ internal final class VideoPlayerView: UIView {
         let newTime: Float64 = playerCurrentTime + seekDuration
         guard newTime < CMTimeGetSeconds(duration) else { return }
         let time: CMTime = CMTimeMake(value: Int64(newTime), timescale: 1)
-        player.seek(to: time)
+        player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
     }
     
     internal func goBackward() {
@@ -492,7 +544,7 @@ internal final class VideoPlayerView: UIView {
         var newTime: Float64 = playerCurrentTime - seekDuration
         newTime = newTime < 0.0 ? 0.0 : newTime
         let time: CMTime = CMTimeMake(value: Int64(newTime), timescale: 1)
-        player.seek(to: time)
+        player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
     }
     
     internal func changeVideo(for urlString: String) {
