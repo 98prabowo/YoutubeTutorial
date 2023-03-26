@@ -248,18 +248,11 @@ internal final class LockButton: UIView {
     }
     
     private func bindActions() {
-        btnStack.tap()
-            .sink { [lockState] in
-                guard case .normal = lockState.value else { return }
-                lockState.send(.locked)
-            }
-            .store(in: &cancellables)
-        
-        lockedStack.tap()
+        tap()
             .sink { [lockState] in
                 switch lockState.value {
                 case .normal:
-                    break
+                    lockState.send(.locked)
                 case .locked:
                     lockState.send(.unlockForm)
                 case .unlockForm:
