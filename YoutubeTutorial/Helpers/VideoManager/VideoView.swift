@@ -449,8 +449,8 @@ internal final class VideoView: UIView {
                 case .minimize:
                     self.setupLayoutMinimize()
                 case .maximize:
-                    guard currentState.isMaximizable,
-                          previousState.isMaximizable else { return }
+                    guard previousState.isMaximizable,
+                          currentState.isMaximizable else { return }
                     self.setupLayoutMaximize()
                 }
             }
