@@ -20,20 +20,17 @@ internal final class VideoPlayerView: UIView {
         
         internal enum ButtonControl: Equatable {
             case active
+            case loading
             case speedPicker
             case lock
             case resolution
             
             internal var notLocked: Bool {
                 switch self {
-                case .active:
-                    return true
-                case .speedPicker:
+                case .active, .loading, .speedPicker, .resolution:
                     return true
                 case .lock:
                     return false
-                case .resolution:
-                    return true
                 }
             }
         }
@@ -52,12 +49,7 @@ internal final class VideoPlayerView: UIView {
     
     // MARK: UI Components
     
-    internal lazy var controlView: VideoControlView = {
-        let view = VideoControlView(areaInsets: areaInsets, buttons: [.rate, .lock, .resolution])
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.accessibilityIdentifier = "VideoPlayerView.controlView"
-        return view
-    }()
+    internal let controlView: VideoControlView
     
     private let updateResoBuffer: UIImageView = {
         let image = UIImageView()
@@ -102,6 +94,8 @@ internal final class VideoPlayerView: UIView {
     
     internal let screenState = CurrentValueSubject<ScreenState, Never>(.noScreen)
     
+    private var previousControlState: VideoControlView.State?
+    
     private var currentResolution: VideoDefinition?
     
     private var resoUpdateTime: Int64 = 0
@@ -122,13 +116,25 @@ internal final class VideoPlayerView: UIView {
     
     // MARK: Lifecycles
     
-    internal init(for urlString: String, areaInsets: UIEdgeInsets) {
+    internal init(
+        for urlString: String,
+        areaInsets: UIEdgeInsets,
+        bottomButtons: [VideoButtonType]
+    ) {
         self.urlString = urlString
         self.areaInsets = areaInsets
+        
+        controlView = VideoControlView(
+            areaInsets: areaInsets,
+            buttons: bottomButtons
+        )
+        controlView.translatesAutoresizingMaskIntoConstraints = false
+        controlView.accessibilityIdentifier = "VideoPlayerView.controlView"
+        
         super.init(frame: .zero)
         backgroundColor = .black
         clipsToBounds = true
-        setupLayout()
+        setupViews()
         bindData()
         bindAction()
     }
@@ -139,7 +145,7 @@ internal final class VideoPlayerView: UIView {
     
     // MARK: Layouts
     
-    private func setupLayout() {
+    private func setupViews() {
         layer.addSublayer(playerLayer)
     }
     
@@ -268,6 +274,8 @@ internal final class VideoPlayerView: UIView {
                 let currentTime: CMTime = player.currentTime()
                 guard let image = self.getImageFromBuffer(for: currentTime) else { return }
                 
+                self.previousControlState = self.controlView.state.value
+                
                 self.pause()
                 self.updateResoBuffer.image = image
                 self.replacePlayerItem(with: resolution.url)
@@ -284,9 +292,10 @@ internal final class VideoPlayerView: UIView {
         
         resolutionPicker.resoPickerDismissed
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
+            .sink { [weak self] isCancelled in
                 guard let self else { return }
                 
+                self.resolutionPicker?.removeFromSuperview()
                 self.resolutionPicker = nil
                 
                 switch self.screenState.value {
@@ -298,7 +307,8 @@ internal final class VideoPlayerView: UIView {
                     controlState.showControlPanel()
                     self.controlView.state.send(controlState)
                 case .maximize:
-                    self.screenState.send(.maximize(control: .active))
+                    let screen: ScreenState = isCancelled ? .maximize(control: .active) : .maximize(control: .loading)
+                    self.screenState.send(screen)
                     var controlState: VideoControlView.State = self.controlView.state.value
                     controlState.showControlPanel()
                     self.controlView.state.send(controlState)
@@ -348,15 +358,30 @@ internal final class VideoPlayerView: UIView {
                     self.controlView.duration.send((currentDuration, maxDuration))
                 }
                 
-                if self.playerLayer.isReadyForDisplay,
-                   player.status == .readyToPlay,
-                   time.value > self.resoUpdateTime {
-                    self.updateResoBuffer.image = nil
-                    self.resoUpdateTime = time.value
+                if let previousControlState = self.previousControlState {
+                    switch previousControlState {
+                    case .loading, .finished:
+                        break
+                    case .playing:
+                        guard self.playerLayer.isReadyForDisplay,
+                              player.status == .readyToPlay,
+                              time.value > self.resoUpdateTime else { break }
+                        self.updateResoBuffer.image = nil
+                        self.resoUpdateTime = time.value
+                        self.controlView.state.send(previousControlState)
+                        self.previousControlState = nil
+                            
+                    case .paused:
+                        self.updateResoBuffer.image = nil
+                        self.resoUpdateTime = time.value
+                        self.controlView.state.send(previousControlState)
+                        self.previousControlState = nil
+                    }
                 }
-                
-                guard time.value == 0 else { return }
-                self.controlView.state.send(.playing(isHidden: true, source: .system))
+                   
+                if time.value == 0 {
+                    self.controlView.state.send(.playing(isHidden: true, source: .system))
+                }
             }
             .store(in: &dataCancellables)
 
@@ -403,6 +428,40 @@ internal final class VideoPlayerView: UIView {
             } receiveValue: { [weak self] variants in
                 guard let self else { return }
                 self.streamVariants = variants
+                if !variants.isEmpty {
+                    let index: Int = self.controlView.buttons.value.count - 1
+                    self.controlView.insertButton(.resolution(total: variants.count), at: index)
+                }
+            }
+            .store(in: &dataCancellables)
+        
+        screenState
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self else { return }
+                
+                // Sync screen state with screen state in control view
+                self.controlView.screenState.send(state)
+                
+                // Handle layouts and actions
+                switch state {
+                case .noScreen:
+                    self.setupLayoutNoScreen()
+                    self.pause()
+                case .normal:
+                    self.setupLayoutNormal()
+                case .minimize:
+                    self.setupLayoutMinimize()
+                case .maximize(control: .active),
+                        .maximize(control: .loading),
+                        .maximize(control: .lock):
+                    self.setupLayoutMaximize()
+                case .maximize(control: .speedPicker):
+                    self.setupLayoutSpeedPicker()
+                case .maximize(control: .resolution):
+                    self.setupLayoutResolutionPicker()
+                }
             }
             .store(in: &dataCancellables)
     }
@@ -462,34 +521,6 @@ internal final class VideoPlayerView: UIView {
                     case .didTapBackwardButton:
                         self.goBackward()
                     }
-                }
-            }
-            .store(in: &actionCancellables)
-        
-        screenState
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
-                guard let self else { return }
-                
-                // Sync screen state with screen state in control view
-                self.controlView.screenState.send(state)
-                
-                // Handle layouts and actions
-                switch state {
-                case .noScreen:
-                    self.setupLayoutNoScreen()
-                    self.pause()
-                case .normal:
-                    self.setupLayoutNormal()
-                case .minimize:
-                    self.setupLayoutMinimize()
-                case .maximize(control: .active), .maximize(control: .lock):
-                    self.setupLayoutMaximize()
-                case .maximize(control: .speedPicker):
-                    self.setupLayoutSpeedPicker()
-                case .maximize(control: .resolution):
-                    self.setupLayoutResolutionPicker()
                 }
             }
             .store(in: &actionCancellables)

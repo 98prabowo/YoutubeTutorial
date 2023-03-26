@@ -11,7 +11,7 @@ import UIKit
 internal enum VideoButtonType {
     case lock
     case rate
-    case resolution
+    case resolution(total: Int)
     case custom(Template)
         
     // MARK: Value Types
@@ -33,7 +33,7 @@ internal enum VideoButtonType {
         case .rate:
             return "Speed"
         case .resolution:
-            return "Resolution"
+            return "Reso"
         case let .custom(template):
             return template.title
         }

@@ -401,7 +401,30 @@ internal final class VideoView: UIView {
         titleStack.addArrangedSubview(titleLabel)
         titleStack.addArrangedSubview(channelLabel)
         
-        videoPlayer = VideoPlayerView(for: EndPoint.video.url, areaInsets: areaInsets)
+        let previousButtonTemplate = VideoButtonType.Template(
+            title: "Prev",
+            image: UIImage(systemName: "backward.end")
+        ) { [weak self] in
+            self?.changeVideo(for: EndPoint.video.url)
+        }
+        
+        let nextButtonTemplate = VideoButtonType.Template(
+            title: "Next",
+            image: UIImage(systemName: "forward.end")
+        ) { [weak self] in
+            self?.changeVideo(for: EndPoint.video.url)
+        }
+        
+        videoPlayer = VideoPlayerView(
+            for: EndPoint.video.url,
+            areaInsets: areaInsets,
+            bottomButtons: [
+                .custom(previousButtonTemplate),
+                .rate,
+                .lock,
+                .custom(nextButtonTemplate)
+            ]
+        )
         videoPlayer?.translatesAutoresizingMaskIntoConstraints = false
         videoPlayer?.accessibilityIdentifier = "VideoView.videoPlayer"
     }
@@ -507,5 +530,10 @@ internal final class VideoView: UIView {
     internal func showFullScreen() {
         guard let videoPlayer else { return }
         videoPlayer.screenState.send(.normal(isLoading: false))
+    }
+    
+    internal func changeVideo(for urlString: String) {
+        guard let videoPlayer else { return }
+        videoPlayer.changeVideo(for: urlString)
     }
 }

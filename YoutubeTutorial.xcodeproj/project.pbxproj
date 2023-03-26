@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D6286AB529D0D58100DDE561 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6286AB429D0D58100DDE561 /* UIStackView+Extensions.swift */; };
 		D63258F9298A57C6006363CF /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258F8298A57C6006363CF /* ShimmerView.swift */; };
 		D63258FE298A6765006363CF /* VideoCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258FD298A6765006363CF /* VideoCellContent.swift */; };
 		D634D1F9298BDF4F002BCF24 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D1F8298BDF4F002BCF24 /* Setting.swift */; };
@@ -101,6 +102,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D6286AB429D0D58100DDE561 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
 		D63258F8298A57C6006363CF /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
 		D63258FD298A6765006363CF /* VideoCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCellContent.swift; sourceTree = "<group>"; };
 		D634D1F8298BDF4F002BCF24 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
@@ -227,20 +229,21 @@
 		D634D1FC298C00C2002BCF24 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				D682F77E298128F60053A5FE /* UICollectionView+Extensions.swift */,
-				D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */,
-				D682F7822981295A0053A5FE /* UIView+Extensions.swift */,
-				D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */,
-				D651874F29888A3600362A46 /* UIColor+Extensions.swift */,
+				D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */,
 				D635AE4E29897FA2000B5659 /* Collection+Extensions.swift */,
 				D635AE5229899128000B5659 /* Date+Extensions.swift */,
-				D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */,
-				D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */,
-				D6BAAF2429A56CDC0056E8C0 /* AsyncImageView.swift */,
 				D68C810C29A897B6002FF4EF /* Float64+Extensions.swift */,
+				D634D219298C1608002BCF24 /* HTTPURLResponse+Extensions.swift */,
+				D682F7802981291C0053A5FE /* Identifiable+Extensions.swift */,
 				D6F9C07529B1E315005C813F /* NotificationName.swift */,
-				D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */,
 				D6F9C09029C4E21F005C813F /* Sequence+Extensions.swift */,
+				D648638D29999E92007DA5B4 /* TimeInterval+Extensions.swift */,
+				D682F77E298128F60053A5FE /* UICollectionView+Extensions.swift */,
+				D651874F29888A3600362A46 /* UIColor+Extensions.swift */,
+				D682F78429813BBF0053A5FE /* UIEdgeInsets+Extensions.swift */,
+				D6F9C07B29B1F600005C813F /* UINavigationController+Extensions.swift */,
+				D682F7822981295A0053A5FE /* UIView+Extensions.swift */,
+				D6286AB429D0D58100DDE561 /* UIStackView+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -643,6 +646,7 @@
 				D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */,
 				D635AE512989832A000B5659 /* Channel.swift in Sources */,
 				D66A95372990E5ED003D2B6B /* AccountCell.swift in Sources */,
+				D6286AB529D0D58100DDE561 /* UIStackView+Extensions.swift in Sources */,
 				D648638E29999E92007DA5B4 /* TimeInterval+Extensions.swift in Sources */,
 				D682F77F298128F60053A5FE /* UICollectionView+Extensions.swift in Sources */,
 				D6F9C09129C4E21F005C813F /* Sequence+Extensions.swift in Sources */,

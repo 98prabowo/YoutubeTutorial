@@ -30,7 +30,7 @@ internal final class PlaybackResolutionView: UIView {
     
     internal let currentReso: CurrentValueSubject<VideoDefinition, Never>
     
-    internal let resoPickerDismissed = PassthroughSubject<Void, Never>()
+    internal let resoPickerDismissed = PassthroughSubject<Bool, Never>()
     
     internal var cancellables = Set<AnyCancellable>()
     
@@ -97,7 +97,7 @@ internal final class PlaybackResolutionView: UIView {
         ])
     }
     
-    private func dismissPanel() {
+    private func dismissPanel(isCancelled: Bool) {
         collectionView.removeFromSuperview()
         collectionView.translatesAutoresizingMaskIntoConstraints = true
         addSubview(collectionView)
@@ -113,7 +113,7 @@ internal final class PlaybackResolutionView: UIView {
             guard let self else { return }
             self.collectionView.removeFromSuperview()
             self.removeFromSuperview()
-            self.resoPickerDismissed.send()
+            self.resoPickerDismissed.send(isCancelled)
         }
     }
     
@@ -135,7 +135,7 @@ internal final class PlaybackResolutionView: UIView {
         cancelView.tap()
             .sink { [weak self] in
                 guard let self else { return }
-                self.dismissPanel()
+                self.dismissPanel(isCancelled: true)
             }
             .store(in: &cancellables)
     }
@@ -190,7 +190,7 @@ extension PlaybackResolutionView: UICollectionViewDelegate, UICollectionViewDele
                 .sink { [weak self] in
                     guard let self else { return }
                     self.currentReso.send(resolution)
-                    self.dismissPanel()
+                    self.dismissPanel(isCancelled: false)
                 }
             
             return cell

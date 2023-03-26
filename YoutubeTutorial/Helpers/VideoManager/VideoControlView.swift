@@ -66,9 +66,12 @@ internal final class VideoControlView: UIView {
         }
         
         internal var isPlayingPresentControl: Bool {
-            self == .playing(isHidden: false, source: .system) ||
-            self == .playing(isHidden: false, source: .inactive) ||
-            self == .playing(isHidden: false, source: .userInteraction)
+            switch self {
+            case .loading, .paused, .finished:
+                return false
+            case let .playing(isHidden, _):
+                return !isHidden
+            }
         }
         
         internal var playbackIcon: UIImage? {
@@ -125,6 +128,7 @@ internal final class VideoControlView: UIView {
     
     private let loadingView: UIActivityIndicatorView = {
         let aiv = UIActivityIndicatorView(style: .large)
+        aiv.color = .white
         aiv.startAnimating()
         aiv.translatesAutoresizingMaskIntoConstraints = false
         aiv.accessibilityIdentifier = "VideoControlView.loadingView"
@@ -245,8 +249,8 @@ internal final class VideoControlView: UIView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.distribution = .fillProportionally
-        stack.spacing = 8.0
+        stack.distribution = .fillEqually
+        stack.spacing = 30.0
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.accessibilityIdentifier = "VideoControlView.inputBtnStack"
         return stack
@@ -299,13 +303,13 @@ internal final class VideoControlView: UIView {
     
     private let areaInsets: UIEdgeInsets
     
-    private let buttons: [VideoButtonType]
+    internal let buttons: CurrentValueSubject<[VideoButtonType], Never>
     
     // MARK: Lifecycles
     
-    internal init(areaInsets: UIEdgeInsets, buttons: [VideoButtonType]? = nil) {
+    internal init(areaInsets: UIEdgeInsets, buttons: [VideoButtonType] = []) {
         self.areaInsets = areaInsets
-        self.buttons = buttons ?? []
+        self.buttons = CurrentValueSubject(buttons)
         super.init(frame: .zero)
         backgroundColor = .videoControllerBackground
         setupInitialLayout()
@@ -320,59 +324,6 @@ internal final class VideoControlView: UIView {
     // MARK: Layouts
     
     private func setupInitialLayout() {
-        buttons.forEach { [weak self] btn in
-            guard let self else { return }
-            
-            switch btn {
-            case .lock:
-                self.lockButton = LockButton(btn)
-                guard let lockButton = self.lockButton else { return }
-                self.inputBtnStack.addArrangedSubview(lockButton)
-                lockButton.lockState
-                    .dropFirst()
-                    .receive(on: DispatchQueue.main)
-                    .removeDuplicates()
-                    .sink { [weak self] lockState in
-                        guard let self else { return }
-                        switch lockState {
-                        case .normal:
-                            self.action.send(.screen(action: .didTapMaximizeButton))
-                        case .locked:
-                            self.action.send(.screen(action: .didTapLockButton))
-                        case .unlockForm:
-                            break
-                        }
-                    }
-                    .store(in: &self.cancellables)
-                
-            case .rate:
-                let speedButton = VideoButton(btn)
-                self.inputBtnStack.addArrangedSubview(speedButton)
-                speedButton.tap()
-                    .sink { [weak self] in
-                        guard let self else { return }
-                        self.action.send(.screen(action: .didTapSpeedButton))
-                    }
-                    .store(in: &self.cancellables)
-                
-            case .resolution:
-                let resolutionButton = VideoButton(btn)
-                self.inputBtnStack.addArrangedSubview(resolutionButton)
-                resolutionButton.tap()
-                    .sink { [weak self] in
-                        guard let self else { return }
-                        self.action.send(.screen(action: .didTapResolutionButton))
-                    }
-                    .store(in: &self.cancellables)
-                
-            case .custom:
-                let button = VideoButton(btn)
-                self.inputBtnStack.addArrangedSubview(button)
-            }
-        }
-        
-        bottomBtnStack.addArrangedSubview(inputBtnStack)
-        
         minimizeBtnConstraints = [
             minimizeButton.topAnchor.constraint(equalTo: topAnchor, constant: 18.0),
             minimizeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10.0),
@@ -382,11 +333,15 @@ internal final class VideoControlView: UIView {
     }
     
     private func layoutLoadingView() {
+        loadingView.removeFromSuperview()
         minimizeButton.removeFromSuperview()
         playbackStack.removeFromSuperview()
         scrubberStack.removeFromSuperview()
+        screenSizeButton.removeFromSuperview()
+        bottomBtnStack.removeFromSuperview()
         
         addSubview(loadingView)
+        loadingView.startAnimating()
         
         NSLayoutConstraint.activate([
             loadingView.centerXAnchor.constraint(equalTo: centerXAnchor),
@@ -482,6 +437,9 @@ internal final class VideoControlView: UIView {
     }
     
     private func layoutMaximizeScreen(_ state: State) {
+        loadingView.stopAnimating()
+        loadingView.removeFromSuperview()
+        
         screenSizeButton.removeFromSuperview()
         minimizeButton.removeFromSuperview()
         
@@ -579,6 +537,68 @@ internal final class VideoControlView: UIView {
     }
     
     // MARK: Implementations
+    
+    private func createLockButton(_ template: VideoButtonType) -> LockButton {
+        let button = LockButton(template)
+        inputBtnStack.addArrangedSubview(button)
+        button.lockState
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] lockState in
+                guard let self else { return }
+                switch lockState {
+                case .normal:
+                    self.action.send(.screen(action: .didTapMaximizeButton))
+                case .locked:
+                    self.action.send(.screen(action: .didTapLockButton))
+                case .unlockForm:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        return button
+    }
+    
+    @discardableResult
+    private func createVideoButton(_ template: VideoButtonType, action: @escaping () -> Void) -> VideoButton {
+        let button = VideoButton(template)
+        inputBtnStack.addArrangedSubview(button)
+        button.tap()
+            .sink { [action] in action() }
+            .store(in: &cancellables)
+        return button
+    }
+    
+    private func setupBottomButton(_ buttons: [VideoButtonType]) {
+        inputBtnStack.removeAllArrangedSubviews()
+        
+        buttons.forEach { [weak self] btn in
+            guard let self else { return }
+                
+            switch btn {
+            case .lock:
+                self.lockButton = createLockButton(btn)
+                
+            case .rate:
+                createVideoButton(btn) { [weak self] in
+                    guard let self else { return }
+                    self.action.send(.screen(action: .didTapSpeedButton))
+                }
+                
+            case .resolution:
+                createVideoButton(btn) { [weak self] in
+                    guard let self else { return }
+                    self.action.send(.screen(action: .didTapResolutionButton))
+                }
+                
+            case let .custom(template):
+                createVideoButton(btn, action: template.action)
+            }
+        }
+        
+        bottomBtnStack.addArrangedSubview(inputBtnStack)
+    }
     
     private func animateHideButton() {
         UIView.animate(withDuration: 1.0) {
@@ -695,7 +715,6 @@ internal final class VideoControlView: UIView {
                 switch current {
                 case .loading:
                     self.alpha = 1.0
-                    self.loadingView.startAnimating()
                     self.layoutLoadingView()
                     
                 case let .playing(isHidden, _):
@@ -785,14 +804,27 @@ internal final class VideoControlView: UIView {
                     self.layoutNormalScreen()
                 case let .maximize(control):
                     self.screenSizeButton.setImage(screen.screenButtonIcon, for: .normal)
-                    if control.notLocked {
+                    switch control {
+                    case .active:
                         self.layoutMaximizeScreen(self.state.value)
-                    } else {
+                    case .loading:
+                        self.state.send(.loading)
+                    case .lock:
                         self.layoutLockScreen()
+                    case .resolution, .speedPicker:
+                        break
                     }
                 case .noScreen, .minimize:
                     break
                 }
+            }
+            .store(in: &cancellables)
+        
+        buttons
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] buttons in
+                guard let self else { return }
+                self.setupBottomButton(buttons)
             }
             .store(in: &cancellables)
     }
@@ -874,5 +906,13 @@ internal final class VideoControlView: UIView {
                 self.sliderValue.send(videoDuration)
             }
             .store(in: &cancellables)
+    }
+    
+    // MARK: Interfaces
+    
+    internal func insertButton(_ button: VideoButtonType, at index: Int) {
+        var _buttons = buttons.value
+        _buttons.insert(button, at: index)
+        buttons.send(_buttons)
     }
 }
