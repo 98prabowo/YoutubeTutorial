@@ -811,7 +811,7 @@ internal final class VideoControlView: UIView {
                         self.state.send(.loading)
                     case .lock:
                         self.layoutLockScreen()
-                    case .resolution, .speedPicker:
+                    case .resolution, .speed:
                         break
                     }
                 case .noScreen, .minimize:

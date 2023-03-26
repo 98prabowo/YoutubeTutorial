@@ -21,13 +21,13 @@ internal final class VideoPlayerView: UIView {
         internal enum ButtonControl: Equatable {
             case active
             case loading
-            case speedPicker
+            case speed
             case lock
             case resolution
             
             internal var notLocked: Bool {
                 switch self {
-                case .active, .loading, .speedPicker, .resolution:
+                case .active, .loading, .speed, .resolution:
                     return true
                 case .lock:
                     return false
@@ -43,6 +43,22 @@ internal final class VideoPlayerView: UIView {
                 return UIImage(named: "normalize")
             case .noScreen, .minimize:
                 return nil
+            }
+        }
+        
+        internal var isMaximizable: Bool {
+            switch self {
+            case .normal:
+                return true
+            case let .maximize(control):
+                switch control {
+                case .active, .loading:
+                    return true
+                case .speed, .lock, .resolution:
+                    return false
+                }
+            case .noScreen, .minimize:
+                return false
             }
         }
     }
@@ -457,7 +473,7 @@ internal final class VideoPlayerView: UIView {
                         .maximize(control: .loading),
                         .maximize(control: .lock):
                     self.setupLayoutMaximize()
-                case .maximize(control: .speedPicker):
+                case .maximize(control: .speed):
                     self.setupLayoutSpeedPicker()
                 case .maximize(control: .resolution):
                     self.setupLayoutResolutionPicker()
@@ -501,7 +517,7 @@ internal final class VideoPlayerView: UIView {
                     case .didTapMaximizeButton:
                         self.screenState.send(.maximize(control: .active))
                     case .didTapSpeedButton:
-                        self.screenState.send(.maximize(control: .speedPicker))
+                        self.screenState.send(.maximize(control: .speed))
                     case .didTapLockButton:
                         self.screenState.send(.maximize(control: .lock))
                     case .didTapResolutionButton:
