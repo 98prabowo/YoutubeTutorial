@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D6286AB529D0D58100DDE561 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6286AB429D0D58100DDE561 /* UIStackView+Extensions.swift */; };
+		D6286AB729D2E46200DDE561 /* VideoDescriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6286AB629D2E46200DDE561 /* VideoDescriptionCell.swift */; };
 		D63258F9298A57C6006363CF /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258F8298A57C6006363CF /* ShimmerView.swift */; };
 		D63258FE298A6765006363CF /* VideoCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63258FD298A6765006363CF /* VideoCellContent.swift */; };
 		D634D1F9298BDF4F002BCF24 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = D634D1F8298BDF4F002BCF24 /* Setting.swift */; };
@@ -103,6 +104,7 @@
 
 /* Begin PBXFileReference section */
 		D6286AB429D0D58100DDE561 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
+		D6286AB629D2E46200DDE561 /* VideoDescriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDescriptionCell.swift; sourceTree = "<group>"; };
 		D63258F8298A57C6006363CF /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
 		D63258FD298A6765006363CF /* VideoCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCellContent.swift; sourceTree = "<group>"; };
 		D634D1F8298BDF4F002BCF24 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
@@ -208,6 +210,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D6286AB829D2E7DE00DDE561 /* VideoDetails */ = {
+			isa = PBXGroup;
+			children = (
+				D6286AB629D2E46200DDE561 /* VideoDescriptionCell.swift */,
+			);
+			path = VideoDetails;
+			sourceTree = "<group>";
+		};
 		D63258FC298A6240006363CF /* VideoCell */ = {
 			isa = PBXGroup;
 			children = (
@@ -347,17 +357,18 @@
 			path = Setting;
 			sourceTree = "<group>";
 		};
-		D64D8AB2299AB5AC00F2FAC1 /* VideoManager */ = {
+		D64D8AB2299AB5AC00F2FAC1 /* VideoPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				D6F9C07E29B5E031005C813F /* VideoButtonType.swift */,
+				D64D8ABC299ADFAA00F2FAC1 /* VideoControlView.swift */,
+				D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */,
+				D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */,
 				D6F9C08029B5F801005C813F /* Buttons */,
 				D6F9C08729C4089A005C813F /* Pickers */,
-				D64D8AB0299AB58B00F2FAC1 /* VideoView.swift */,
-				D64D8AB3299ACC2700F2FAC1 /* VideoPlayerView.swift */,
-				D64D8ABC299ADFAA00F2FAC1 /* VideoControlView.swift */,
-				D6F9C07E29B5E031005C813F /* VideoButtonType.swift */,
+				D6286AB829D2E7DE00DDE561 /* VideoDetails */,
 			);
-			path = VideoManager;
+			path = VideoPlayer;
 			sourceTree = "<group>";
 		};
 		D64D8AB5299AD67D00F2FAC1 /* VideoPlayer */ = {
@@ -377,7 +388,6 @@
 				D634D1FC298C00C2002BCF24 /* Extensions */,
 				D634D1FD298C00D2002BCF24 /* NetworkManager */,
 				D6F9C07D29B1F7D2005C813F /* Utility */,
-				D64D8AB2299AB5AC00F2FAC1 /* VideoManager */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -390,6 +400,7 @@
 				D63258FF298A7274006363CF /* MenuBar */,
 				D63D2487298AF9AD006FCDA3 /* Setting */,
 				D63258FC298A6240006363CF /* VideoCell */,
+				D64D8AB2299AB5AC00F2FAC1 /* VideoPlayer */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -643,6 +654,7 @@
 				D63258FE298A6765006363CF /* VideoCellContent.swift in Sources */,
 				D634D20A298C07D8002BCF24 /* ControlSubscription.swift in Sources */,
 				D634D20E298C0AF3002BCF24 /* ControlPublisherImplementations.swift in Sources */,
+				D6286AB729D2E46200DDE561 /* VideoDescriptionCell.swift in Sources */,
 				D682F7832981295A0053A5FE /* UIView+Extensions.swift in Sources */,
 				D635AE512989832A000B5659 /* Channel.swift in Sources */,
 				D66A95372990E5ED003D2B6B /* AccountCell.swift in Sources */,
