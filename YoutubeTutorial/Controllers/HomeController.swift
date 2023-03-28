@@ -94,7 +94,7 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
     override internal func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.hidesBarsOnSwipe = true
-        AppUtility.lockOrientation(.portrait)
+        AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
     }
     
     override func viewWillLayoutSubviews() {

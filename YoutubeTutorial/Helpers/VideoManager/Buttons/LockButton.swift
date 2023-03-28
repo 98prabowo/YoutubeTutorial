@@ -127,10 +127,12 @@ internal final class LockButton: UIView {
         btnStack.addArrangedSubview(title)
         
         imageWidthConstraint = image.widthAnchor.constraint(equalToConstant: VideoButtonType.btnSize.width)
+        imageWidthConstraint?.priority = UILayoutPriority(999)
         imageWidthConstraint?.isActive = true
         imageWidthConstraint?.identifier = "LockButton.imageWidthConstraint"
         
         imageHeightConstraint = image.heightAnchor.constraint(equalToConstant: VideoButtonType.btnSize.height)
+        imageHeightConstraint?.priority = UILayoutPriority(999)
         imageHeightConstraint?.isActive = true
         imageHeightConstraint?.identifier = "LockButton.imageHeightConstraint"
         
