@@ -123,15 +123,13 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         ])
     }
     
-    // MARK: Private Implementations
-    
     private func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         navigationItem.rightBarButtonItems = [settingBtn, searchBtn]
     }
 }
 
-// MARK: - Handle Data and Actions
+// MARK: - Objects Data and Actions
 
 extension HomeController {
     private func showSettings() {
@@ -212,11 +210,18 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         
         setupDataSource([.main]) { [weak self] collectionView, indexPath, menu in
             let cell = collectionView.dequeueReusableCell(withCell: ContentCell.self, for: indexPath)
-            cell.setupViews(
-                menu,
-                areaInsets: self?.view.safeAreaInsets,
-                navbarHeight: self?.navigationController?.navigationBar.frame.height
-            )
+            
+            // Prepare video insets for status bar
+            var videoInsets: UIEdgeInsets = self?.view.safeAreaInsets ?? .zero
+            let navBarHeight: CGFloat = self?.navigationController?.navigationBar.frame.height ?? 0.0
+            if let statusBarHeight = self?.statusBarFrame.value.height,
+               statusBarHeight > 0.0 {
+                videoInsets = videoInsets.replace(statusBarHeight, .top)
+            } else {
+                videoInsets = videoInsets.substract(navBarHeight, .top, lowest: 0.0)
+            }
+             
+            cell.setupViews(menu, videoInsets: videoInsets, navbarHeight: navBarHeight)
             return cell
         }
 

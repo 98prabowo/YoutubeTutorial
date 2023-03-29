@@ -50,6 +50,65 @@ extension UIEdgeInsets {
         }
     }
     
+    /// Shorter method to handle replacement for `UIEdgeInsets`.
+    ///
+    /// - Parameters:
+    ///   - inset: A value to determine how padding the view you need.
+    ///   - edge: To determinse specific edge for `UIEdgeInset` creation.
+    internal func replace(_ inset: CGFloat, _ edge: Edge? = nil) -> UIEdgeInsets {
+        switch edge {
+        case .horizontal:
+            return UIEdgeInsets(
+                top: self.top,
+                left: inset,
+                bottom: self.bottom,
+                right: inset
+            )
+        case .vertical:
+            return UIEdgeInsets(
+                top: inset,
+                left: self.left,
+                bottom: inset,
+                right: self.right
+            )
+        case .left:
+            return UIEdgeInsets(
+                top: self.top,
+                left: inset,
+                bottom: self.bottom,
+                right: self.right
+            )
+        case .right:
+            return UIEdgeInsets(
+                top: self.top,
+                left: self.left,
+                bottom: self.bottom,
+                right: inset
+            )
+        case .top:
+            return UIEdgeInsets(
+                top: inset,
+                left: self.left,
+                bottom: self.bottom,
+                right: self.right
+            )
+        case .bottom:
+            return UIEdgeInsets(
+                top: self.top,
+                left: self.left,
+                bottom: inset,
+                right: self.right
+            )
+        case .none:
+            return UIEdgeInsets(
+                top: inset,
+                left: inset,
+                bottom: inset,
+                right: inset
+            )
+        }
+    }
+    
     /// Shorter method to handle addition for `UIEdgeInsets`.
     ///
     /// - Parameters:

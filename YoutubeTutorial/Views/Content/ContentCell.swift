@@ -29,9 +29,7 @@ internal class ContentCell: UICollectionViewCell {
     
     private var previousIndex: IndexPath?
     
-    private var areaInsets: UIEdgeInsets?
-    
-    private var navbarHeight: CGFloat?
+    private var videoInsets: UIEdgeInsets = .zero
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -39,11 +37,10 @@ internal class ContentCell: UICollectionViewCell {
     
     // MARK: Layouts
     
-    internal func setupViews(_ menu: Menu, areaInsets: UIEdgeInsets?, navbarHeight: CGFloat?) {
+    internal func setupViews(_ menu: Menu, videoInsets: UIEdgeInsets, navbarHeight: CGFloat) {
         self.menu = menu
-        self.areaInsets = areaInsets
-        self.navbarHeight = navbarHeight
-        collectionView.contentInset = .padding(navbarHeight ?? 0.0, .top)
+        self.videoInsets = videoInsets
+        collectionView.contentInset = .padding(navbarHeight, .top)
         
         pinSubview(collectionView)
         bindData()
@@ -108,12 +105,6 @@ extension ContentCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
         previousIndex = indexPath
         videoLauncher?.stopVideoPlayer()
         videoLauncher = nil
-        
-        let navbarHeight: CGFloat = navbarHeight ?? 0.0
-        let videoInsets: UIEdgeInsets = areaInsets
-            .zeroIfNil
-            .substract(navbarHeight, .top, lowest: 0.0)
-        
         videoLauncher = VideoView(video, menu: menu, areaInsets: videoInsets)
         
         guard let videoLauncher else { return }
