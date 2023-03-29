@@ -96,7 +96,8 @@ extension MenuBar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout 
         
         collectionView.items.send([DiffableData<DefaultSection, Menu>(section: .main, items: menus)])
         
-        // Set initial cell selection. Need to dispatch to main to make it serial with collection view.
+        // Set initial cell selection.
+        // Need to dispatch to main to make it serial with collection view update snapshot task.
         DispatchQueue.main.async {
             self.selectItem(at: self.tapMenu.value)
         }

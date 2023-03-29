@@ -245,6 +245,10 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         // Handle menu selection
         menuBar.selectItem(at: indexPath)
         
+        titleLabel.text = menu.title
+        let titleView = UIBarButtonItem(customView: self.titleLabel)
+        navigationItem.setLeftBarButtonItems([titleView], animated: false)
+        
         // Handle title update
         if let titleView = navigationItem.titleView as? UILabel {
             titleView.text = menu.title
