@@ -13,7 +13,14 @@ internal final class VideoView: UIView {
     
     private var videoPlayer: VideoPlayerView?
     
-    private var titleLabel: UILabel = {
+    private lazy var detailView: VideoDetailView = {
+        let view = VideoDetailView(video, areaInsets: areaInsets)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.accessibilityIdentifier = "VideoPlayerView.detailView"
+        return view
+    }()
+    
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .headline)
         label.textColor = .label
@@ -26,7 +33,7 @@ internal final class VideoView: UIView {
         return label
     }()
     
-    private var channelLabel: UILabel = {
+    private let channelLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .body)
         label.textColor = .label
@@ -61,7 +68,7 @@ internal final class VideoView: UIView {
         return rootStack
     }()
     
-    private var playbackButton: UIButton = {
+    private let playbackButton: UIButton = {
         let btn = UIButton(type: .system)
         let img = UIImage(systemName: "pause.fill")
         btn.setImage(img, for: .normal)
@@ -71,7 +78,7 @@ internal final class VideoView: UIView {
         return btn
     }()
     
-    private var closeButton: UIButton = {
+    private let closeButton: UIButton = {
         let btn = UIButton(type: .system)
         let img = UIImage(systemName: "xmark")
         btn.setImage(img, for: .normal)
@@ -97,6 +104,8 @@ internal final class VideoView: UIView {
     
     private var widthConstraintVideoPlayer: NSLayoutConstraint?
     
+    private var topConstraintVideoDetail: NSLayoutConstraint?
+    
     // MARK: Properties
     
     internal let closePlayer = PassthroughSubject<Void, Never>()
@@ -109,6 +118,10 @@ internal final class VideoView: UIView {
               let window = windowSceneDelegate.window else { return nil }
         return window
     }
+    
+    private let normalBackgroundColor: UIColor = .white
+    
+    private let maximizeBackgroundColor: UIColor = .black
     
     private let video: Video
     
@@ -141,16 +154,22 @@ internal final class VideoView: UIView {
     
     private func setupLayout() {
         guard let window = windowUI, let videoPlayer else { return }
+        
+        videoPlayer.removeFromSuperview()
+        removeFromSuperview()
+        
         window.addSubview(self)
         addSubview(videoPlayer)
         
         let initialHeight: CGFloat = 0.0
         
         // Handle video view contraint
+        bottomContraint?.isActive = false
         bottomContraint = bottomAnchor.constraint(equalTo: window.bottomAnchor)
         bottomContraint?.isActive = true
         bottomContraint?.identifier = "VideoView.bottomContraint"
         
+        heightConstraint?.isActive = false
         heightConstraint = heightAnchor.constraint(equalToConstant: initialHeight)
         heightConstraint?.isActive = true
         heightConstraint?.identifier = "VideoView.heightConstraint"
@@ -161,21 +180,24 @@ internal final class VideoView: UIView {
         ])
         
         // Handle video player constraint
+        topConstraintVideoPlayer?.isActive = false
         topConstraintVideoPlayer = videoPlayer.topAnchor.constraint(equalTo: topAnchor)
-        topConstraintVideoPlayer?.isActive = true
         topConstraintVideoPlayer?.identifier = "VideoView.topConstraintVideoPlayer"
+        topConstraintVideoPlayer?.isActive = true
         
+        leadingConstraintVideoPlayer?.isActive = false
         leadingConstraintVideoPlayer = videoPlayer.leadingAnchor.constraint(equalTo: leadingAnchor)
-        leadingConstraintVideoPlayer?.isActive = true
         leadingConstraintVideoPlayer?.identifier = "VideoView.leadingConstraintVideoPlayer"
+        leadingConstraintVideoPlayer?.isActive = true
         
         trailingConstraintVideoPlayer = videoPlayer.trailingAnchor.constraint(equalTo: trailingAnchor)
         trailingConstraintVideoPlayer?.isActive = true
         trailingConstraintVideoPlayer?.identifier = "VideoView.trailingConstraintVideoPlayer"
         
+        heightConstraintVideoPlayer?.isActive = false
         heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: initialHeight)
-        heightConstraintVideoPlayer?.isActive = true
         heightConstraintVideoPlayer?.identifier = "VideoView.heightConstraintVideoPlayer"
+        heightConstraintVideoPlayer?.isActive = true
         
         videoPlayer.resizePlayerLayer(with: CGSizeMake(window.bounds.width, initialHeight))
         
@@ -190,59 +212,112 @@ internal final class VideoView: UIView {
         videoPlayer = nil
     }
     
+    private func setupLayoutRefresh() {
+        guard let window = windowUI, let videoPlayer else { return }
+        
+        removeFromSuperview()
+        translatesAutoresizingMaskIntoConstraints = true
+        window.addSubview(self)
+        frame = CGRectMake(0.0, window.frame.height, window.frame.width, 0.0)
+        
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0.0,
+            usingSpringWithDamping: 1.0,
+            initialSpringVelocity: 0.5,
+            options: .curveEaseOut
+        )  { [weak self] in
+            guard let self else { return }
+            self.frame = CGRectMake(0.0, 0.0, window.frame.width, window.frame.height)
+        } completion: { [weak self, videoPlayer] _ in
+            guard let self else { return }
+            self.setupLayoutNormal()
+            videoPlayer.play()
+        }
+    }
+    
+    private func animatePlayerRotationToNormal(
+        _ previousState: VideoPlayerView.ScreenState?,
+        _ videoPlayer: VideoPlayerView,
+        _ window: UIWindow,
+        _ videoHeight: CGFloat
+    ) {
+        guard case .maximize = previousState else { return }
+        
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0.0,
+            options: .curveEaseOut
+        ) { [areaInsets] in
+            videoPlayer.transform = .identity
+            videoPlayer.frame = CGRectMake(0.0, areaInsets.top, window.frame.height, videoHeight)
+        }
+        videoPlayer.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    private func removeMinimizeStack(_ previousState: VideoPlayerView.ScreenState?) {
+        guard previousState == .minimize else { return }
+        minimizeStack.removeFromSuperview()
+        widthConstraintVideoPlayer?.isActive = false
+    }
+    
     private func setupLayoutNormal(_ previousState: VideoPlayerView.ScreenState? = nil) {
         guard let window = windowUI, let videoPlayer else { return }
         
-        backgroundColor = .white
+        backgroundColor = normalBackgroundColor
+
+        // Use video pixel aspect ratio w: 16 h: 9
+        let videoHeight: CGFloat = window.frame.width * (9 / 16)
         
-        let videoHeight: CGFloat = window.frame.width * (9 / 16) // Use video pixel aspect ratio w: 16 h: 9
+        animatePlayerRotationToNormal(previousState, videoPlayer, window, videoHeight)
         
-        if case .maximize = previousState {
-            UIView.animate(
-                withDuration: 0.5,
-                delay: 0.0,
-                options: .curveEaseOut
-            ) { [areaInsets] in
-                videoPlayer.transform = .identity
-                videoPlayer.frame = CGRectMake(0.0, areaInsets.top, window.frame.height, videoHeight)
-            }
-            videoPlayer.translatesAutoresizingMaskIntoConstraints = false
-        }
-        
+        detailView.removeFromSuperview()
         videoPlayer.removeFromSuperview()
+        removeMinimizeStack(previousState)
         
-        if previousState == .minimize {
-            minimizeStack.removeFromSuperview()
-            // Handle video player constraint
-            widthConstraintVideoPlayer?.isActive = false
-        }
-        
+        addSubview(detailView)
         addSubview(videoPlayer)
         
+        // Layout video player constraint
+        leadingConstraintVideoPlayer?.isActive = false
         leadingConstraintVideoPlayer = videoPlayer.leadingAnchor.constraint(equalTo: leadingAnchor)
-        leadingConstraintVideoPlayer?.isActive = true
         leadingConstraintVideoPlayer?.identifier = "VideoView.leadingConstraintVideoPlayer"
+        leadingConstraintVideoPlayer?.isActive = true
         
+        trailingConstraintVideoPlayer?.isActive = false
         trailingConstraintVideoPlayer = videoPlayer.trailingAnchor.constraint(equalTo: trailingAnchor)
-        trailingConstraintVideoPlayer?.isActive = true
         trailingConstraintVideoPlayer?.identifier = "VideoView.trailingConstraintVideoPlayer"
+        trailingConstraintVideoPlayer?.isActive = true
         
+        topConstraintVideoPlayer?.isActive = false
         topConstraintVideoPlayer = videoPlayer.topAnchor.constraint(equalTo: topAnchor, constant: areaInsets.top)
-        topConstraintVideoPlayer?.isActive = true
         topConstraintVideoPlayer?.identifier = "VideoView.topConstraintVideoPlayer"
+        topConstraintVideoPlayer?.isActive = true
         
         bottomConstraintVideoPlayer?.isActive = false
         
         heightConstraintVideoPlayer?.isActive = false
         heightConstraintVideoPlayer = videoPlayer.heightAnchor.constraint(equalToConstant: videoHeight)
-        heightConstraintVideoPlayer?.isActive = true
         heightConstraintVideoPlayer?.identifier = "VideoView.heightConstraintVideoPlayer"
+        heightConstraintVideoPlayer?.isActive = true
         
         videoPlayer.layoutIfNeeded()
-        
         videoPlayer.resizePlayerLayer(with: CGSizeMake(window.bounds.width, videoHeight))
         
-        // Handle video view contraint
+        // Layout video details
+        topConstraintVideoDetail?.isActive = false
+        topConstraintVideoDetail = detailView.topAnchor.constraint(equalTo: videoPlayer.bottomAnchor)
+        topConstraintVideoDetail?.priority = UILayoutPriority(rawValue: 999)
+        topConstraintVideoDetail?.identifier = "VideoView.topConstraintVideoDetail"
+        topConstraintVideoDetail?.isActive = true
+        
+        NSLayoutConstraint.activate([
+            detailView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            detailView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            detailView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        // Layout video view contraint
         heightConstraint?.constant = window.frame.height
         
         bottomContraint?.isActive = false
@@ -254,7 +329,7 @@ internal final class VideoView: UIView {
             self.videoPlayer?.layoutIfNeeded()
             self.layoutIfNeeded()
         } completion: { [videoPlayer] _ in
-            guard let previousState, previousState == .noScreen else { return }
+            guard previousState == .noScreen else { return }
             videoPlayer.play()
         }
     }
@@ -262,10 +337,11 @@ internal final class VideoView: UIView {
     private func setupLayoutMinimize() {
         guard let window = windowUI, let videoPlayer else { return }
         
-        backgroundColor = .white
+        backgroundColor = normalBackgroundColor
         
         removeFromSuperview()
         videoPlayer.removeFromSuperview()
+        detailView.removeFromSuperview()
         
         window.addSubview(self)
         
@@ -342,11 +418,12 @@ internal final class VideoView: UIView {
     private func setupLayoutMaximize() {
         guard let window = windowUI, let videoPlayer else { return }
         
-        backgroundColor = .black
+        backgroundColor = maximizeBackgroundColor
         
         let videoWidth: CGFloat = window.frame.height
         let videoHeight: CGFloat = window.frame.width
         
+        detailView.removeFromSuperview()
         videoPlayer.removeFromSuperview()
         videoPlayer.translatesAutoresizingMaskIntoConstraints = true
         addSubview(videoPlayer)
@@ -461,6 +538,15 @@ internal final class VideoView: UIView {
             .receive(on: DispatchQueue.main)
             .sink { [playbackButton] state in
                 playbackButton.setImage(state.playbackIcon, for: .normal)
+            }
+            .store(in: &cancellables)
+        
+        detailView.selectedVideo
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] video in
+                guard let self else { return }
+                self.videoPlayer?.changeVideo(for: EndPoint.video.url)
+                self.setupLayoutRefresh()
             }
             .store(in: &cancellables)
         

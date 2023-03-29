@@ -1,5 +1,5 @@
 //
-//  FeedCell.swift
+//  ContentCell.swift
 //  YoutubeTutorial
 //
 //  Created by Dimas Prabowo on 03/02/23.
@@ -8,18 +8,19 @@
 import Combine
 import UIKit
 
-internal class FeedCell: BaseCell {
+internal class ContentCell: UICollectionViewCell {
     // MARK: UI Components
     
     private let collectionView: DiffableCollectionView = {
-        let layout = UICollectionViewFlowLayout()
+        let layout = VideoFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collection = DiffableCollectionView<DefaultSection, Video>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
-        collection.accessibilityIdentifier = "FeedCell.collectionView"
+        collection.accessibilityIdentifier = "ContentCell.collectionView"
         return collection
     }()
     
@@ -27,19 +28,24 @@ internal class FeedCell: BaseCell {
     
     // MARK: Properties
     
-    internal var previousIndex: IndexPath?
+    private var previousIndex: IndexPath?
     
-    internal var areaInsets: UIEdgeInsets?
+    private var areaInsets: UIEdgeInsets?
     
-    internal var navigationController = CurrentValueSubject<UINavigationController?, Never>(nil)
-    
-    private var videos = CurrentValueSubject<[Video], Never>([Video]())
+    private var navbarHeight: CGFloat?
     
     private var cancellables = Set<AnyCancellable>()
     
+    private var menu: Menu?
+    
     // MARK: Layouts
     
-    override internal func setupViews() {
+    internal func setupViews(_ menu: Menu, areaInsets: UIEdgeInsets?, navbarHeight: CGFloat?) {
+        self.menu = menu
+        self.areaInsets = areaInsets
+        self.navbarHeight = navbarHeight
+        collectionView.contentInset = .padding(navbarHeight ?? 0.0, .top)
+        
         pinSubview(collectionView)
         bindData()
         setupCollectionView()
@@ -48,7 +54,7 @@ internal class FeedCell: BaseCell {
     // MARK: Private Implementations
     
     private func bindData() {
-        NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .home)
+        menu?.service
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
@@ -67,21 +73,12 @@ internal class FeedCell: BaseCell {
                 
             }
             .store(in: &cancellables)
-        
-        navigationController
-            .defaultToZero { $0?.navigationBar.frame.height }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] navigationBarHeight in
-                guard let self else { return }
-                self.collectionView.contentInset = .padding(navigationBarHeight, .top)
-            }
-            .store(in: &cancellables)
     }
 }
 
-// MARK: - Collection View Implementation
+// MARK: - Collection View Implementations
 
-extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension ContentCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.register(forCell: VideoCellContent.self)
@@ -90,14 +87,6 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
             cell.setupCell(video)
             return cell
         }
-    }
-
-    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
-        let inset: CGFloat = 16
-        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
-        let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)
-        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70.0
-        return CGSizeMake(frame.width, cellHeight)
     }
     
     internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -112,8 +101,10 @@ extension FeedCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
         videoLauncher?.stopVideoPlayer()
         videoLauncher = nil
         
-        let navbarHeight: CGFloat = navigationController.value?.navigationBar.frame.height ?? 0.0
-        let videoInsets: UIEdgeInsets = areaInsets.zeroIfNil.substract(navbarHeight, .top, lowest: 0.0)
+        let navbarHeight: CGFloat = navbarHeight ?? 0.0
+        let videoInsets: UIEdgeInsets = areaInsets
+            .zeroIfNil
+            .substract(navbarHeight, .top, lowest: 0.0)
         
         videoLauncher = VideoView(video, areaInsets: videoInsets)
         

@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 28/03/23.
 //
 
+import Combine
 import UIKit
 
 internal final class VideoDescriptionCell: UICollectionViewCell {
@@ -25,7 +26,7 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
     
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .caption1)
+        label.font = .preferredFont(forTextStyle: .caption2)
         label.textColor = .secondaryLabel
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
@@ -75,6 +76,8 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
     
     private let profileImageSize: CGFloat = 44.0
     
+    internal var cancellable: AnyCancellable?
+    
     // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
@@ -104,9 +107,9 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
         ])
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16.0),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16.0),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16.0)
         ])
         
         let subtitleLabelTopConstraint = subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8.0)
@@ -115,8 +118,8 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
         subtitleLabelTopConstraint.identifier = "VideoDescriptionCell.subtitleLabelTopConstraint"
         
         NSLayoutConstraint.activate([
-            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16.0),
+            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16.0)
         ])
         
         let profileStackTopConstraint = profileStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16.0)
@@ -125,10 +128,20 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
         profileStackTopConstraint.identifier = "VideoDescriptionCell.profileStackTopConstraint"
         
         NSLayoutConstraint.activate([
-            profileStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            profileStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            profileStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            profileStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16.0),
+            profileStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16.0),
+            profileStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16.0)
         ])
+    }
+    
+    override internal func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        let targetSize: CGSize = CGSizeMake(layoutAttributes.frame.width, 0.0)
+        layoutAttributes.frame.size = contentView.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
+        return layoutAttributes
     }
     
     // MARK: Interfaces
@@ -137,6 +150,7 @@ internal final class VideoDescriptionCell: UICollectionViewCell {
         titleLabel.text = video.title
         subtitleLabel.text = video.subtitle
         profileImage.url = video.channel.profileImageName
+        profileLabel.text = video.channel.name
         setupLayout()
     }
 }

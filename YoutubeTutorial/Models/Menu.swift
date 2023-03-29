@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 02/02/23.
 //
 
+import Combine
 import UIKit
 
 internal enum Menu: CaseIterable, Hashable {
@@ -36,6 +37,19 @@ internal enum Menu: CaseIterable, Hashable {
             return UIImage(systemName: "play.square.stack.fill")
         case .account:
             return UIImage(systemName: "person.fill")
+        }
+    }
+    
+    internal var service: Future<[Video], NetworkError> {
+        switch self {
+        case .home:
+            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .home)
+        case .trending:
+            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .trending)
+        case .subscriptions:
+            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .subscriptions)
+        case .account:
+            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .account)
         }
     }
 }

@@ -208,33 +208,16 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
         collectionView.isPagingEnabled = true
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
-        collectionView.register(forCell: FeedCell.self)
-        collectionView.register(forCell: TrendingCell.self)
-        collectionView.register(forCell: SubscriptionsCell.self)
-        collectionView.register(forCell: AccountCell.self)
-        collectionView.register(forCell: UICollectionViewCell.self)
+        collectionView.register(forCell: ContentCell.self)
         
         setupDataSource([.main]) { [weak self] collectionView, indexPath, menu in
-            switch menu {
-            case .home:
-                let cell = collectionView.dequeueReusableCell(withCell: FeedCell.self, for: indexPath)
-                cell.navigationController.send(self?.navigationController)
-                cell.areaInsets = self?.view?.safeAreaInsets
-                return cell
-            case .trending:
-                let cell = collectionView.dequeueReusableCell(withCell: TrendingCell.self, for: indexPath)
-                cell.navigationController.send(self?.navigationController)
-                cell.areaInsets = self?.view?.safeAreaInsets
-                return cell
-            case .subscriptions:
-                let cell = collectionView.dequeueReusableCell(withCell: SubscriptionsCell.self, for: indexPath)
-                cell.navigationController.send(self?.navigationController)
-                cell.areaInsets = self?.view?.safeAreaInsets
-                return cell
-            case .account:
-                let cell = collectionView.dequeueReusableCell(withCell: UICollectionViewCell.self, for: indexPath)
-                return cell
-            }
+            let cell = collectionView.dequeueReusableCell(withCell: ContentCell.self, for: indexPath)
+            cell.setupViews(
+                menu,
+                areaInsets: self?.view?.safeAreaInsets,
+                navbarHeight: self?.navigationController?.navigationBar.frame.height
+            )
+            return cell
         }
 
         data.send([DiffableData(section: .main, items: Menu.allCases)])

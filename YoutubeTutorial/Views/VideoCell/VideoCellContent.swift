@@ -5,6 +5,7 @@
 //  Created by Dimas Prabowo on 01/02/23.
 //
 
+import Combine
 import UIKit
 
 internal final class VideoCellContent: UICollectionViewCell {
@@ -104,6 +105,8 @@ internal final class VideoCellContent: UICollectionViewCell {
     
     private let profileImageSize: CGFloat = 44.0
     
+    internal var cancellable: AnyCancellable?
+    
     // MARK: Lifecycles
     
     override internal init(frame: CGRect) {
@@ -156,6 +159,20 @@ internal final class VideoCellContent: UICollectionViewCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1.0)
         ])
+    }
+    
+    override internal func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
+        let inset: CGFloat = 16.0
+        let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)
+        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70.0
+        let targetSize: CGSize = CGSizeMake(layoutAttributes.frame.width, cellHeight)
+        layoutAttributes.frame.size = contentView.systemLayoutSizeFitting(
+            targetSize,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .required
+        )
+        return layoutAttributes
     }
     
     // MARK: Interfaces
