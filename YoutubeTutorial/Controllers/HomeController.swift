@@ -26,15 +26,6 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
         return menu
     }()
     
-    private let searchBtn: UIBarButtonItem = {
-        let btn = UIBarButtonItem()
-        btn.image = UIImage(systemName: "magnifyingglass")
-        btn.style = .plain
-        btn.tintColor = .white
-        btn.accessibilityIdentifier = "HomeController.searchBtn"
-        return btn
-    }()
-    
     private let settingBtn: UIBarButtonItem = {
         let btn = UIBarButtonItem()
         btn.image = UIImage(systemName: "ellipsis.circle.fill")
@@ -125,7 +116,7 @@ internal final class HomeController: DiffableCollectionController<DefaultSection
     
     private func setupNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-        navigationItem.rightBarButtonItems = [settingBtn, searchBtn]
+        navigationItem.rightBarButtonItems = [settingBtn]
     }
 }
 
@@ -153,10 +144,6 @@ extension HomeController {
             }
     }
     
-    private func searchAction() {
-        print("Search Tapped")
-    }
-    
     private func bindData() {
         statusBarFrame
             .receive(on: DispatchQueue.main)
@@ -166,13 +153,6 @@ extension HomeController {
     }
     
     private func bindAction() {
-        searchBtn.tap()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                self.searchAction()
-            }
-            .store(in: &cancellables)
-        
         settingBtn.tap()
             .sink { [weak self] in
                 guard let self else { return }
