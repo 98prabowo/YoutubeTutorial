@@ -83,6 +83,10 @@ internal final class VideoView: UIView {
         return btn
     }()
     
+    private var leadingConstraint: NSLayoutConstraint?
+    
+    private var trailingContraint: NSLayoutConstraint?
+    
     private var heightConstraint: NSLayoutConstraint?
     
     private var bottomContraint: NSLayoutConstraint?
@@ -164,6 +168,16 @@ internal final class VideoView: UIView {
         let initialHeight: CGFloat = 0.0
         
         // Handle video view contraint
+        leadingConstraint?.isActive = false
+        leadingConstraint = leadingAnchor.constraint(equalTo: window.leadingAnchor)
+        leadingConstraint?.isActive = true
+        leadingConstraint?.identifier = "VideoView.leadingConstraint"
+        
+        trailingContraint?.isActive = false
+        trailingContraint = trailingAnchor.constraint(equalTo: window.trailingAnchor)
+        trailingContraint?.isActive = true
+        trailingContraint?.identifier = "VideoView.trailingContraint"
+        
         bottomContraint?.isActive = false
         bottomContraint = bottomAnchor.constraint(equalTo: window.bottomAnchor)
         bottomContraint?.isActive = true
@@ -173,11 +187,6 @@ internal final class VideoView: UIView {
         heightConstraint = heightAnchor.constraint(equalToConstant: initialHeight)
         heightConstraint?.isActive = true
         heightConstraint?.identifier = "VideoView.heightConstraint"
-        
-        NSLayoutConstraint.activate([
-            leadingAnchor.constraint(equalTo: window.leadingAnchor),
-            trailingAnchor.constraint(equalTo: window.trailingAnchor)
-        ])
         
         // Handle video player constraint
         topConstraintVideoPlayer?.isActive = false
@@ -231,6 +240,20 @@ internal final class VideoView: UIView {
             self.frame = CGRectMake(0.0, 0.0, window.frame.width, window.frame.height)
         } completion: { [weak self, videoPlayer] _ in
             guard let self else { return }
+            
+            self.removeFromSuperview()
+            self.translatesAutoresizingMaskIntoConstraints = false
+            window.addSubview(self)
+            
+            // Handle video view contraint
+            self.leadingConstraint?.isActive = false
+            self.leadingConstraint = self.leadingAnchor.constraint(equalTo: window.leadingAnchor)
+            self.leadingConstraint?.isActive = true
+            
+            self.trailingContraint?.isActive = false
+            self.trailingContraint = self.trailingAnchor.constraint(equalTo: window.trailingAnchor)
+            self.trailingContraint?.isActive = true
+            
             self.setupLayoutNormal()
             videoPlayer.play()
         }
