@@ -214,7 +214,7 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
             let cell = collectionView.dequeueReusableCell(withCell: ContentCell.self, for: indexPath)
             cell.setupViews(
                 menu,
-                areaInsets: self?.view?.safeAreaInsets,
+                areaInsets: self?.view.safeAreaInsets,
                 navbarHeight: self?.navigationController?.navigationBar.frame.height
             )
             return cell

@@ -34,12 +34,15 @@ internal class VideoDetailView: UIView {
     
     private let video: Video
     
+    private let menu: Menu
+    
     private let areaInsets: UIEdgeInsets
     
     // MARK: Lifecycles
     
-    internal init(_ video: Video, areaInsets: UIEdgeInsets) {
+    internal init(_ video: Video, menu: Menu, areaInsets: UIEdgeInsets) {
         self.video = video
+        self.menu = menu
         self.areaInsets = areaInsets
         super.init(frame: .zero)
         backgroundColor = .white
@@ -62,7 +65,7 @@ internal class VideoDetailView: UIView {
     // MARK: Private Implementations
     
     private func bindData() {
-        NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .home)
+        menu.service
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }

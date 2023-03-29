@@ -12,11 +12,10 @@ internal class ContentCell: UICollectionViewCell {
     // MARK: UI Components
     
     private let collectionView: DiffableCollectionView = {
-        let layout = VideoFlowLayout()
+        let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0.0
         layout.minimumInteritemSpacing = 0.0
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collection = DiffableCollectionView<DefaultSection, Video>(frame: .zero, layout: layout)
         collection.backgroundColor = .white
         collection.translatesAutoresizingMaskIntoConstraints = false
@@ -88,9 +87,18 @@ extension ContentCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
             return cell
         }
     }
+
+    internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
+        let inset: CGFloat = 16
+        // Use video pixel aspect ratio w: 16 h: 9 as thumbnail size
+        let thumbnailHeight: CGFloat = (frame.width - inset - inset) * (9 / 16)
+        let cellHeight: CGFloat = thumbnailHeight + inset + inset + 70.0
+        return CGSizeMake(frame.width, cellHeight)
+    }
     
     internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let video = collectionView.itemSource?.itemIdentifier(for: indexPath),
+        guard let menu,
+              let video = collectionView.itemSource?.itemIdentifier(for: indexPath),
               previousIndex != indexPath
         else {
             videoLauncher?.showFullScreen()
@@ -106,7 +114,7 @@ extension ContentCell: UICollectionViewDelegate, UICollectionViewDelegateFlowLay
             .zeroIfNil
             .substract(navbarHeight, .top, lowest: 0.0)
         
-        videoLauncher = VideoView(video, areaInsets: videoInsets)
+        videoLauncher = VideoView(video, menu: menu, areaInsets: videoInsets)
         
         guard let videoLauncher else { return }
         videoLauncher.startVideoPlayer()

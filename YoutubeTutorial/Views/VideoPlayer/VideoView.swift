@@ -13,12 +13,7 @@ internal final class VideoView: UIView {
     
     private var videoPlayer: VideoPlayerView?
     
-    private lazy var detailView: VideoDetailView = {
-        let view = VideoDetailView(video, areaInsets: areaInsets)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.accessibilityIdentifier = "VideoPlayerView.detailView"
-        return view
-    }()
+    private let detailView: VideoDetailView
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -129,9 +124,14 @@ internal final class VideoView: UIView {
     
     // MARK: Lifecycles
     
-    internal init(_ video: Video, areaInsets: UIEdgeInsets) {
+    internal init(_ video: Video, menu: Menu, areaInsets: UIEdgeInsets) {
         self.video = video
         self.areaInsets = areaInsets
+        
+        detailView = VideoDetailView(video, menu: menu, areaInsets: areaInsets)
+        detailView.translatesAutoresizingMaskIntoConstraints = false
+        detailView.accessibilityIdentifier = "VideoPlayerView.detailView"
+        
         super.init(frame: .zero)
         backgroundColor = .white
         translatesAutoresizingMaskIntoConstraints = false
@@ -558,6 +558,7 @@ internal final class VideoView: UIView {
                       case .maximize = videoPlayer.screenState.value else { return }
                 let orientation: UIDeviceOrientation = UIDevice.current.orientation
                 self.setupLayoutMaximizeDeviceRotation(orientation: orientation)
+                print("Change orientation")
             }
             .store(in: &cancellables)
     }
