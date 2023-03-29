@@ -12,7 +12,6 @@ internal enum Menu: String, CaseIterable, Hashable {
     case home
     case trending
     case subscriptions
-    case account
     
     internal var title: String {
         switch self {
@@ -22,8 +21,6 @@ internal enum Menu: String, CaseIterable, Hashable {
             return "Trending"
         case .subscriptions:
             return "Subscriptions"
-        case .account:
-            return "Account"
         }
     }
     
@@ -35,17 +32,10 @@ internal enum Menu: String, CaseIterable, Hashable {
             return UIImage(systemName: "flame.fill")
         case .subscriptions:
             return UIImage(systemName: "play.square.stack.fill")
-        case .account:
-            return UIImage(systemName: "person.fill")
         }
     }
     
     internal var service: Future<[Video], NetworkError> {
-        switch self {
-        case .home, .trending, .subscriptions:
-            return FirebaseManager.shared.fetchAllData(self)
-        case .account:
-            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .account)
-        }
+        FirebaseManager.shared.fetchAllData(self)
     }
 }

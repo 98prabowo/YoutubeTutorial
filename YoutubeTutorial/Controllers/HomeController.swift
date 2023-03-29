@@ -215,7 +215,7 @@ extension HomeController: UICollectionViewDelegateFlowLayout {
     }
     
     override internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        menuBar.leadingConstraint?.constant = scrollView.contentOffset.x / 4
+        menuBar.leadingConstraint?.constant = scrollView.contentOffset.x / CGFloat(Menu.allCases.count)
     }
     
     override internal func scrollViewWillEndDragging(_: UIScrollView, withVelocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {

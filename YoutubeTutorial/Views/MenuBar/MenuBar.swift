@@ -72,10 +72,12 @@ internal final class MenuBar: UIView {
         addSubview(horizontalView)
         leadingConstraint = horizontalView.leadingAnchor.constraint(equalTo: leadingAnchor)
         leadingConstraint?.isActive = true
+        
+        let horizontalWidthMultiplier: CGFloat = 1.0 / CGFloat(menus.count)
         NSLayoutConstraint.activate([
             horizontalView.bottomAnchor.constraint(equalTo: bottomAnchor),
             horizontalView.heightAnchor.constraint(equalToConstant: 4.0),
-            horizontalView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/4)
+            horizontalView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: horizontalWidthMultiplier)
         ])
     }
 }
@@ -108,7 +110,7 @@ extension MenuBar: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout 
     }
     
     internal func collectionView(_: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt: IndexPath) -> CGSize {
-        return CGSizeMake(frame.width / 4, frame.height)
+        return CGSizeMake(frame.width / CGFloat(menus.count), frame.height)
     }
     
     internal func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
