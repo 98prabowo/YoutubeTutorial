@@ -11,7 +11,12 @@ import Firebase
 internal struct FirebaseManager {
     internal static let shared = FirebaseManager()
     
-    private let referenceDB = Database.database().reference()
+    private let referenceDB: DatabaseReference = {
+        Database.database().isPersistenceEnabled = true
+        let reference = Database.database().reference()
+        reference.keepSynced(true)
+        return reference
+    }()
     
     private init() {}
     
