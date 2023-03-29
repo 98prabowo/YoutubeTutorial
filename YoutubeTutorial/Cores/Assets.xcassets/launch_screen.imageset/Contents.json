@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "icons8-youtube-logo-32(@1x).png",
+      "filename" : "youtube@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "icons8-youtube-logo-64(@2x).png",
+      "filename" : "youtube@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "icons8-youtube-logo-96(@3x).png",
+      "filename" : "youtube@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
