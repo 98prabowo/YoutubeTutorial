@@ -74,9 +74,9 @@ internal final class SettingCell: UICollectionViewCell {
         contentView.addSubview(rootStack)
         NSLayoutConstraint.activate([
             rootStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: inset),
-            rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: inset),
+            rootStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -inset),
             rootStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: inset),
-            rootStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: inset)
+            rootStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -inset)
         ])
         
         NSLayoutConstraint.activate([
