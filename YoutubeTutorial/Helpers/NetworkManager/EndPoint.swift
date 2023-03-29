@@ -44,7 +44,6 @@ internal enum EndPoint {
             return baseURL + "/account." + fileType
         case .video:
             return "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8"
-//            return videoURLs.randomElement() ?? "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
         }
     }
 }

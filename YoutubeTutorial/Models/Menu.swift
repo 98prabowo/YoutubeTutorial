@@ -8,7 +8,7 @@
 import Combine
 import UIKit
 
-internal enum Menu: CaseIterable, Hashable {
+internal enum Menu: String, CaseIterable, Hashable {
     case home
     case trending
     case subscriptions
@@ -42,12 +42,8 @@ internal enum Menu: CaseIterable, Hashable {
     
     internal var service: Future<[Video], NetworkError> {
         switch self {
-        case .home:
-            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .home)
-        case .trending:
-            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .trending)
-        case .subscriptions:
-            return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .subscriptions)
+        case .home, .trending, .subscriptions:
+            return FirebaseManager.shared.fetchAllData(self)
         case .account:
             return NetworkManager.shared.fetchEndPointPublisher([Video].self, from: .account)
         }

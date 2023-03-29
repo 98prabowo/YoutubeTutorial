@@ -256,7 +256,9 @@ internal final class VideoPlayerView: UIView {
         
         let currentReso: VideoDefinition = currentResolution ?? .auto(url: url)
         var resolutions: [VideoDefinition] = streamVariants.removeDuplicate().map(\.definition)
-        resolutions.insert(.auto(url: url), at: streamVariants.endIndex - 1)
+        if !resolutions.isEmpty {
+            resolutions.insert(.auto(url: url), at: resolutions.endIndex)
+        }
         
         resolutionPicker = PlaybackResolutionView(
             areaInsets: areaInsets,
